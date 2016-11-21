@@ -5,3 +5,5 @@
 /// <reference path="modules/koa-router/index.d.ts" />
 /// <reference path="modules/koa/index.d.ts" />
 /// <reference path="modules/lodash/index.d.ts" />
+/// <reference path="modules/mongorito/index.d.ts" />
+/// <reference path="modules/koa-cors/index.d.ts" />

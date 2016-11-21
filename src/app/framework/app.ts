@@ -31,7 +31,7 @@ export class App extends EventEmitter {
   app: Application
   config: AppConfig
   appRoot: string
-  get middlewares() { 
+  middlewares() { 
     const m: RequestHandler<Context>[] = [];
     return m;
   }
@@ -135,7 +135,7 @@ export class App extends EventEmitter {
     await serviceLoader.load(this);
 
     console.info('Loading middlewares...');
-    for (let middleware of this.middlewares) {
+    for (let middleware of this.middlewares()) {
       app.use(middleware);
     }
 

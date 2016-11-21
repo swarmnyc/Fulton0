@@ -17,6 +17,7 @@
     "fs-extra": "1.0.0",
     "koa": "1.2.4",
     "koa-bodyparser": "2.3.0",
+    "koa-cors": "0.0.16",
     "koa-router": "5.4.0",
     "lodash": "4.17.2",
     "mongorito": "2.2.0"
