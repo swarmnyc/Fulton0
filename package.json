@@ -6,15 +6,17 @@
   "scripts": {
     "test": "mocah test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joeyfromspace/swarm-monitor"
+  },
   "author": "Joey Lappin <joey@swarmnyc.com>",
   "license": "UNLICENSED",
   "dependencies": {
-    "async": "2.1.2",
     "bluebird": "3.4.6",
-    "co": "4.6.0",
-    "express": "4.14.0",
     "fs-extra": "1.0.0",
     "koa": "1.2.4",
+    "koa-bodyparser": "2.3.0",
     "koa-router": "5.4.0",
     "lodash": "4.17.2",
     "mongorito": "2.2.0"

@@ -1,13 +1,13 @@
 import { Router } from '../framework';
 
 class HelloWorldRouter extends Router {
-  routes() {
+  prefix() {
+    return '/hello';
+  }
+  public routes = () => {
     const router = this.router;
-    const _this = this;
-    router.get('/', function *(next: any) {
-        console.info('Hello');
-        yield next;
-        console.info('World');
+    router.get('/', function (next: any) {
+        this.body = 'Hello World!';        
     });
     return router.routes();
   }

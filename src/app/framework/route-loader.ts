@@ -8,8 +8,8 @@ export class RouteLoader extends ModuleLoader {
   async action(app: App, filePath: string) {
     const Router = require(filePath);
     const basePath = `/${basename(filePath, extname(filePath))}`;
-    const router = new Router({ prefix: basePath });
-    console.info(`Mounting route to ${basePath}...`);
+    const router = new Router();
+    console.info(`Mounting route to ${router.prefix()}...`);
     app.use(router.routes());
     return router;
   }

@@ -3,7 +3,6 @@ import * as koa from 'koa';
 import Router from './router';
 import CallbackFunction from './callback';
 import RequestHandler from './request-handler';
-import * as async from 'async';
 import { resolve } from 'path';
 import { set as _set, get as _get } from 'lodash';
 import ConfigLoader from './config-loader';
@@ -12,10 +11,22 @@ import RouteLoader from './route-loader';
 import Context from './context';
 import { EventEmitter } from 'events';
 
+/**
+ * Configuration object for an app instance
+ * 
+ * @interface AppConfig
+ */
 interface AppConfig {
   [K: string]: any
 }
 
+/**
+ * Base App class
+ * 
+ * @export
+ * @class App
+ * @extends {EventEmitter}
+ */
 export class App extends EventEmitter {
   app: Application
   config: AppConfig
@@ -25,6 +36,13 @@ export class App extends EventEmitter {
     return m;
   }
 
+  /**
+   * Creates an instance of App.
+   * 
+   * @param {AppConfig} [config]
+   * 
+   * @memberOf App
+   */
   constructor(config?: AppConfig) {
     super();
     this.appRoot = resolve(`${__dirname}/..`);
@@ -72,14 +90,37 @@ export class App extends EventEmitter {
     this.app.use(handler);
   }
 
+  /**
+   * Sets options on the underlying Koa context object for use in requests 
+   * 
+   * @param {string} key - Key to set the value at
+   * @param {*} value - The value to set
+   * 
+   * @memberOf App
+   */
   set(key: string, value: any) {
     _set(this.app.context, key, value);
   }
 
+  /**
+   * Returns value bound to specified key in the app's context object
+   * 
+   * @param {string} key
+   * @returns
+   * 
+   * @memberOf App
+   */
   get(key: string) {
     return _get(this.app.context, key);
   }
 
+  /**
+   * Returns a new Koa app instance with routes and services loaded into the app 
+   * 
+   * @returns {Application}
+   * 
+   * @memberOf App
+   */
   async init() {
     console.info('app.init() called');
     const app = this.app;
