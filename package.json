@@ -1,0 +1,22 @@
+{
+  "name": "swarm-monitor",
+  "version": "1.0.0",
+  "description": "A server for storing logs and reports from swarm apps",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocah test"
+  },
+  "author": "Joey Lappin <joey@swarmnyc.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "async": "2.1.2",
+    "bluebird": "3.4.6",
+    "co": "4.6.0",
+    "express": "4.14.0",
+    "fs-extra": "1.0.0",
+    "koa": "1.2.4",
+    "koa-router": "5.4.0",
+    "lodash": "4.17.2",
+    "mongorito": "2.2.0"
+  }
+}
