@@ -11,7 +11,7 @@ export default async function main(port:number) {
   await app.init();
   console.info(`app init complete`);
   console.info(`server listening for connections on port ${port}`);
-  server.on('request', app.app.callback());
+  server.on('request', app.listener());
 }
 
 main(port);

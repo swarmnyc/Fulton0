@@ -9,7 +9,7 @@ import ConfigLoader from './config-loader';
 import ServiceLoader from './service-loader';
 import RouteLoader from './route-loader';
 import Context from './context';
-import { EventEmitter } from 'events';
+import { EventEmitter, Listener } from 'events';
 
 /**
  * Configuration object for an app instance
@@ -53,6 +53,17 @@ export class App extends EventEmitter {
 
     this.app = new koa();
     this.on('didInit', this.didInit.bind(this));
+  }
+  
+  /**
+   * Returns event listener of underlying koa app
+   * 
+   * @returns { Listener }
+   * 
+   * @memberOf App
+   */
+  listener() {
+    return this.app.callback();
   }
 
   /**
