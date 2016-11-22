@@ -1,6 +1,7 @@
 import { Router } from '../framework';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
 import { Model } from 'mongorito';
+import { forEach as _forEach, startsWith as _startsWith } from 'lodash';
 import * as bodyParser from 'koa-bodyparser';
 
 interface IAdapterOptions {
@@ -14,8 +15,20 @@ interface IRelationshipDefinition {
   path: string  
 }
 
+interface IQueryObject {
+  filter?: any;
+  sort?: ISortObject;
+}
+
+interface ISortObject {
+  [K: string]: number
+}
 
 export abstract class JSONAPIRouter extends Router {
+  queryIgnorePaths() {
+    return ['include'];
+  }
+
   Model() {
     return Model;
   }
@@ -59,10 +72,57 @@ export abstract class JSONAPIRouter extends Router {
     return new JSONAPIAdapter(this.adapterOptions());
   }
 
+  composeQuery(query: any) {
+    function _filter(key: string) {
+      const re = new RegExp(/filter\[([a-z0-9]+)\]/, 'i');
+      let assoc: string;
+      let matches: string[] = key.match(re);
+
+      if (matches.length >= 2) {
+        assoc = matches[1];
+      }
+
+      return assoc;
+    }
+
+    function _sort(value: string) {       
+      const sortKeys = value.split(',');
+      const sortObj: ISortObject = {};
+      _forEach(sortKeys, (key) => {
+        sortObj[key] = (key.charAt(0) === '-') ? -1 : 1;         
+      });
+
+      return sortObj;
+    }
+    
+    const ignorePaths: string[] = this.queryIgnorePaths();
+    const q: IQueryObject = {
+      filter: {},
+      sort: {}
+    };
+    _forEach(query, (value: any, key: string) => {
+      let filter: string;      
+      if(_startsWith(key, 'filter')) {
+        filter = _filter(key);
+        q.filter[filter] = value;
+      } else if (key === 'sort') {
+        q.sort = _sort(value);
+      } else if (ignorePaths.indexOf(key) >= 0) {
+        // skip
+        return;
+      } else {
+        q.filter[key] = value;
+      }
+    });    
+    return q;
+  }
+
   find() {
     const Model = this.Model();
     const serialize = this.adapter().serialize;
+    const composeQuery = this.composeQuery;    
     return function*(next: any) {
+      const query = composeQuery(this.query);
       const model = yield Model.find();
       const output: any = [];       
       for (let item of model) {
