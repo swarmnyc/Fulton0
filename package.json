@@ -4,7 +4,9 @@
   "description": "A server for storing logs and reports from swarm apps",
   "main": "index.js",
   "scripts": {
-    "test": "mocah test"
+    "prepublish": "typings install && npm run build",
+    "build": "rm -rf dist && tsc",
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",
@@ -18,8 +20,14 @@
     "koa": "1.2.4",
     "koa-bodyparser": "2.3.0",
     "koa-cors": "0.0.16",
+    "koa-oauth-server": "1.0.1",
     "koa-router": "5.4.0",
     "lodash": "4.17.2",
     "mongorito": "2.2.0"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "mocha": "3.1.2",
+    "sinon": "1.17.6"
   }
 }

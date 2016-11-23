@@ -1,5 +1,6 @@
 *.log
 dist
 node_modules
+typings
 
 *.pyc

@@ -10,6 +10,7 @@ import ServiceLoader from './service-loader';
 import RouteLoader from './route-loader';
 import Context from './context';
 import { EventEmitter, Listener } from 'events';
+import * as bodyParser from 'koa-bodyparser';
 
 /**
  * Configuration object for an app instance
@@ -34,6 +35,14 @@ export class App extends EventEmitter {
   middlewares() { 
     const m: RequestHandler<Context>[] = [];
     return m;
+  }
+
+  bodyParser() {
+    return true;
+  }
+
+  oauth2Server() {
+    return false;
   }
 
   /**
@@ -146,6 +155,10 @@ export class App extends EventEmitter {
     await serviceLoader.load(this);
 
     console.info('Loading middlewares...');
+    if (this.bodyParser() === true) {
+      app.use(bodyParser());
+    }
+
     for (let middleware of this.middlewares()) {
       app.use(middleware);
     }

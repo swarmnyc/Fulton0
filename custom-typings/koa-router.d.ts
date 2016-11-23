@@ -278,7 +278,7 @@ interface Router <C extends Router.Context> {
      * @param {Object} params url parameters
      * @returns {String|Error}
      */
-    url(name: string, params: Router.Dict<Router.ParamMiddleware<Router.Context>>): string | Error;
+    url(name: string, params): string | Error;
 
     /**
      * Match given `path` and return corresponding routes.

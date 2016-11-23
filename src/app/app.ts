@@ -1,5 +1,5 @@
 import { App } from './framework';
-import cors = require('koa-cors');
+import { cors } from 'koa-cors';
 
 class SwarmMonitorAPI extends App {
     middlewares() {

@@ -377,6 +377,7 @@ namespace req {
          *     // => undefined
          */
         get(field: string): string;
+        body: any
     }
 
     export interface BaseRequest extends ContextDelegatedRequest {

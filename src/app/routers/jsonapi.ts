@@ -1,8 +1,9 @@
 import { Router } from '../framework';
+import { OAuth2Authorizer } from '../authorizers/oauth2';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
 import { Model } from 'mongorito';
 import { forEach as _forEach, startsWith as _startsWith } from 'lodash';
-import * as bodyParser from 'koa-bodyparser';
+import { QueryHelper } from '../helpers/query';
 
 interface IAdapterOptions {
   type: string;
@@ -13,15 +14,6 @@ interface IAdapterOptions {
 interface IRelationshipDefinition {
   type: string,
   path: string  
-}
-
-interface IQueryObject {
-  filter?: any;
-  sort?: ISortObject;
-}
-
-interface ISortObject {
-  [K: string]: number
 }
 
 export abstract class JSONAPIRouter extends Router {
@@ -72,58 +64,18 @@ export abstract class JSONAPIRouter extends Router {
     return new JSONAPIAdapter(this.adapterOptions());
   }
 
-  composeQuery(query: any) {
-    function _filter(key: string) {
-      const re = new RegExp(/filter\[([a-z0-9]+)\]/, 'i');
-      let assoc: string;
-      let matches: string[] = key.match(re);
-
-      if (matches.length >= 2) {
-        assoc = matches[1];
-      }
-
-      return assoc;
-    }
-
-    function _sort(value: string) {       
-      const sortKeys = value.split(',');
-      const sortObj: ISortObject = {};
-      _forEach(sortKeys, (key) => {
-        sortObj[key] = (key.charAt(0) === '-') ? -1 : 1;         
-      });
-
-      return sortObj;
-    }
-    
-    const ignorePaths: string[] = this.queryIgnorePaths();
-    const q: IQueryObject = {
-      filter: {},
-      sort: {}
-    };
-    _forEach(query, (value: any, key: string) => {
-      let filter: string;      
-      if(_startsWith(key, 'filter')) {
-        filter = _filter(key);
-        q.filter[filter] = value;
-      } else if (key === 'sort') {
-        q.sort = _sort(value);
-      } else if (ignorePaths.indexOf(key) >= 0) {
-        // skip
-        return;
-      } else {
-        q.filter[key] = value;
-      }
-    });    
-    return q;
+  authorizer() {
+    return new OAuth2Authorizer();
   }
 
   find() {
     const Model = this.Model();
     const serialize = this.adapter().serialize;
-    const composeQuery = this.composeQuery;    
+    const queryHelper = new QueryHelper(this.queryIgnorePaths);
+    const composeQuery = queryHelper.exec;
     return function*(next: any) {
       const query = composeQuery(this.query);
-      const model = yield Model.find();
+      const model = yield Model.find(query.filter, query.options);
       const output: any = [];       
       for (let item of model) {
         output.push(serialize(item.toJSON()));
@@ -198,9 +150,15 @@ export abstract class JSONAPIRouter extends Router {
       this.response.status = 204;
     };
   }
+
   public routes = () => {
-    const router = this.router;
-    router.use(bodyParser());
+    const router = this.router;  
+    const oauth = this.authorizer();
+
+    if (oauth) {
+      router.use(oauth.auth());
+    }
+
     router.get('/', this.find());
     router.get('/:item_id', this.findById());
     router.patch('/:item_id', this.update());

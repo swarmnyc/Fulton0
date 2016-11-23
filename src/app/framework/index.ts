@@ -11,3 +11,5 @@ export * from './route-loader';
 export * from './service-loader';
 export * from './service';
 export * from './model';
+export * from './authorizer';
+export * from './authenticator';
