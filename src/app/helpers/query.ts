@@ -48,13 +48,13 @@ export class QueryHelper {
         }
 
         function _sort(value: string) {       
-        const sortKeys = value.split(',');
-        const sortObj: ISortObject = {};
-        _forEach(sortKeys, (key) => {
-            sortObj[key] = (key.charAt(0) === '-') ? -1 : 1;         
-        });
+            const sortKeys = value.split(',');
+            const sortObj: ISortObject = {};
+            _forEach(sortKeys, (key) => {
+                sortObj[key] = (key.charAt(0) === '-') ? -1 : 1;         
+            });
 
-        return sortObj;
+            return sortObj;
         }
         
         const ignorePaths: string[] = this.queryIgnorePaths;

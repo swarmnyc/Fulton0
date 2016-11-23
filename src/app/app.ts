@@ -1,4 +1,4 @@
-import { App } from './framework';
+import { App } from './framework/index';
 import { cors } from 'koa-cors';
 
 class SwarmMonitorAPI extends App {

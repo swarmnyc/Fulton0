@@ -40,11 +40,7 @@ export class App extends EventEmitter {
   bodyParser() {
     return true;
   }
-
-  oauth2Server() {
-    return false;
-  }
-
+  
   /**
    * Creates an instance of App.
    * 

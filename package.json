@@ -4,9 +4,10 @@
   "description": "A server for storing logs and reports from swarm apps",
   "main": "index.js",
   "scripts": {
+    "pretest": "tsc -p .",
+    "test": "mocha dist/test",
     "prepublish": "typings install && npm run build",
-    "build": "rm -rf dist && tsc",
-    "test": "mocha test"
+    "build": "rm -rf dist && tsc"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "chai": "3.5.0",
     "mocha": "3.1.2",
-    "sinon": "1.17.6"
+    "sinon": "1.17.6",
+    "typescript": "2.0.10"
   }
 }
