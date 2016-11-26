@@ -13,7 +13,10 @@
         "upsert",
         "JSONAPI",
         "IJSONAPI",
-        "rels"
+        "rels",
+        "Validators",
+        "bodyparser",
+        "cors"
     ],
     // flagWords - list of words to be always considered incorrect
     // This is useful for offensive words and common spelling errors.

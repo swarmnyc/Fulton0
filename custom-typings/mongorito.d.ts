@@ -22,6 +22,10 @@ declare module "mongorito" {
         populate?: IPopulateOptions
       }
 
+      interface IIndexOptions {
+        unique?: boolean
+      }
+
       interface JSONDocument {
         [K: string]: any
       }
@@ -40,16 +44,19 @@ declare module "mongorito" {
       }
 
       class Model {
+        before(event: string, handlerName: string): void
         collection(): string
         constructor(o: JSONDocument)
+        configure(): void
         get: (attr?: string) => Model
         set: (attr: string, value: any) => void
         toJSON: () => JSONDocument
         save: () => Model
         remove: () => void
-        where(attr: string, value: string): Model
-        sort(attr: string, order: number): Model
-        count(query?: IQuery): number
+        static index(pathName: string, options?: IIndexOptions): void
+        static where(attr: string, value: any): Model
+        static sort(attr: string, order: number): Model
+        static count(query?: IQuery): number
         static find(query?: IQuery, options?: IQueryOptions): Model[]
         static all(): Model[]
         static findOne(query?: IQuery): Model

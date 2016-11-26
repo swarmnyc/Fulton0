@@ -27,14 +27,14 @@ interface IQueryHelperOptions {
 
 export class QueryHelper {
     constructor(opts?: IQueryHelperOptions) {
-        if (_get(opts, 'queryIgnorePaths')) {
+        if (!!opts.queryIgnorePaths) {
             this.queryIgnorePaths = opts.queryIgnorePaths;
         }
     }
 
     queryIgnorePaths: string[]
 
-    exec(query: any) {
+    exec = (query: any) => {
         function _filter(key: string) {
         const re = new RegExp(/filter\[([a-z0-9]+)\]/, 'i');
         let assoc: string;

@@ -32,7 +32,7 @@ export class App extends EventEmitter {
   app: Application
   config: AppConfig
   appRoot: string
-  middlewares() { 
+  middlewares(): RequestHandler<Context>[] { 
     const m: RequestHandler<Context>[] = [];
     return m;
   }
@@ -156,7 +156,7 @@ export class App extends EventEmitter {
     }
 
     for (let middleware of this.middlewares()) {
-      app.use(middleware);
+      app.use(middleware());
     }
 
     console.info('Loading routes...');

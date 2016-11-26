@@ -25,16 +25,16 @@ export abstract class JSONAPIRouter extends Router {
     return Model;
   }
 
-  mountPath() {
-    return '/api';
-  }  
+  namespace() {
+    return 'api';
+  }
 
   type(): string {
     return '';
   }
 
   prefix() {
-    return `${this.mountPath()}/${this.type()}`;
+    return `/${this.namespace()}/${this.type()}`;
   }
 
   idPath(): string {
@@ -71,7 +71,7 @@ export abstract class JSONAPIRouter extends Router {
   find() {
     const Model = this.Model();
     const serialize = this.adapter().serialize;
-    const queryHelper = new QueryHelper(this.queryIgnorePaths);
+    const queryHelper = new QueryHelper(this.queryIgnorePaths());
     const composeQuery = queryHelper.exec;
     return function*(next: any) {
       const query = composeQuery(this.query);
@@ -152,12 +152,7 @@ export abstract class JSONAPIRouter extends Router {
   }
 
   public routes = () => {
-    const router = this.router;  
-    const oauth = this.authorizer();
-
-    if (oauth) {
-      router.use(oauth.auth());
-    }
+    const router = this.router;
 
     router.get('/', this.find());
     router.get('/:item_id', this.findById());
