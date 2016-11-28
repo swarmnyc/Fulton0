@@ -1,6 +1,6 @@
 *.log
-dist
+build
 node_modules
-typings
+src/typings
 
 *.pyc

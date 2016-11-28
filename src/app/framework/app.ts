@@ -160,7 +160,10 @@ export class App extends EventEmitter {
     }
 
     console.info('Loading routes...');
+    
     await routeLoader.load(this);
+    
+    console.info('All loaded.');
     
     app.on('error', this.onErrorRequest);
     this.emit('didInit');
