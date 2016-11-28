@@ -1,6 +1,7 @@
 import { Model as MongoritoModel } from 'mongorito';
 import { pickBy as _pickBy, forEach as _forEach, isNil as _isNil } from 'lodash';
 import { ObjectID } from 'mongodb';
+import { endsWith as _endsWith, isArray as _isArray } from 'lodash';
 
 interface IValidator {
   (): boolean | string
@@ -74,12 +75,26 @@ export class Model extends MongoritoModel {
   async validateTypeCasting(next: any) {
     const Parent = <typeof Model>this.constructor;
     _forEach(Parent.schema(), (schemaPath: ISchemaPath, pathName: string) => {
-      let docType = typeof this.get(pathName);
-      let val: any = this.get(pathName);
-      if (schemaPath.type !== 'ObjectId' && docType !== schemaPath.type) {
-        throw new Error(`Found type ${docType} at path ${pathName}, ${schemaPath.type} expected.`);        
-      } else if (schemaPath.type === 'ObjectId' && ObjectID.isValid(val) === false) {
-        throw new Error(`Cast to type ObjectId failed at path ${pathName}`);
+      let isArray: boolean = _endsWith(schemaPath.type, '[]');
+      let schemaPathType = isArray ? schemaPath.type.substr(0, -2) : schemaPath.type;
+      let value = this.get(pathName);
+
+      const _test = (val: any, index?: any | number) => {
+        let docType = typeof val;
+        if (schemaPathType !== 'ObjectId' && docType !== schemaPathType) {
+          throw new Error(`Found type ${docType} at path ${pathName}, ${schemaPath.type} expected.`);        
+        } else if (schemaPath.type === 'ObjectId' && ObjectID.isValid(val) === false) {
+          throw new Error(`Cast to type ObjectId failed at path ${pathName}`);
+        }
+      };
+
+      if (isArray === true) {
+        if (_isArray(value) === false) {
+          throw new Error(`Cast to type ${schemaPath.type} failed at path ${pathName}`);
+        }
+        _forEach(value, _test);
+      } else {
+        _test(value);
       }
     });
 

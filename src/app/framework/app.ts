@@ -9,7 +9,7 @@ import ConfigLoader from './config-loader';
 import ServiceLoader from './service-loader';
 import RouteLoader from './route-loader';
 import Context from './context';
-import { EventEmitter, Listener } from 'events';
+import { EventEmitter } from 'events';
 import * as bodyParser from 'koa-bodyparser';
 
 /**

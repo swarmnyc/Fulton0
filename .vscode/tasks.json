@@ -20,7 +20,7 @@
         "owner": "tsc",
         "fileLocation": ["relative", "${workspaceRoot}"],
         "pattern": {
-          // TODO ALL THIS
+          "regexp": "(.+)"
         }
       }
     }
