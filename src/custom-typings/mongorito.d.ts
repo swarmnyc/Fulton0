@@ -43,16 +43,29 @@ declare module "mongorito" {
         upsert: boolean
       }
 
+      interface IPreviousValueHash {
+        [path: string]: any
+      }
+
+      interface IChangedValuesHash {
+        [path: string]: any
+      }
+
       class Model {
+        after(event: string, handlerName: string): void
+        around(event: string, handlerName: string): void
         before(event: string, handlerName: string): void
         collection(): string
         constructor(o: JSONDocument)
         configure(): void
+        previous: IPreviousValueHash
+        changed: IChangedValuesHash
         get: (attr?: string) => Model
         set: (attr: string, value: any) => void
         toJSON: () => JSONDocument
         save: () => Model
         remove: () => void
+        update: () => void
         static index(pathName: string, options?: IIndexOptions): void
         static where(attr: string, value: any): Model
         static sort(attr: string, order: number): Model
