@@ -1,9 +1,9 @@
-import { Router } from '../framework';
-import { OAuth2Authorizer } from '../authorizers/oauth2';
+import { Router, Model } from '../framework';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
-import { Model } from 'mongorito';
 import { forEach as _forEach, startsWith as _startsWith } from 'lodash';
 import { QueryHelper } from '../helpers/query';
+import { ClientGrant } from '../oauth';
+import * as oauthserver from 'koa-oauth-server';
 
 interface IAdapterOptions {
   type: string;
@@ -17,12 +17,12 @@ interface IRelationshipDefinition {
 }
 
 export abstract class JSONAPIRouter extends Router {
-  queryIgnorePaths() {
-    return ['include'];
-  }
-
   Model() {
     return Model;
+  }
+
+  queryIgnorePaths() {
+    return ['include'];
   }
 
   namespace() {
@@ -65,7 +65,13 @@ export abstract class JSONAPIRouter extends Router {
   }
 
   authorizer() {
-    return new OAuth2Authorizer();
+    const oauth = oauthserver({
+      model: new ClientGrant(),
+      grants: ['password'],
+      debug: process.env['NODE_ENV'] === 'development'
+    });
+
+    return oauth;
   }
 
   find() {
@@ -153,7 +159,13 @@ export abstract class JSONAPIRouter extends Router {
 
   public routes = () => {
     const router = this.router;
+    const authorizer = this.authorizer();
 
+    if (authorizer) {
+      router.post('/token', authorizer.grant());
+      router.use(authorizer.authorise());
+    }
+    
     router.get('/', this.find());
     router.get('/:item_id', this.findById());
     router.patch('/:item_id', this.update());

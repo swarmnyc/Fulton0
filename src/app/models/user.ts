@@ -1,16 +1,28 @@
 import { Model } from '../framework';
+import UserHelper from '../helpers/user';
 
 export class User extends Model {
-  uniquePaths() {
-    return ['email'];
-  }
-
-  requiredPaths() {
-    return ['email', 'password'];
-  }
-
   collection() {
     return 'users';
+  }
+
+  configure() {
+    super.configure();
+    this.before('save', 'saltPasswordOnSave');
+  }
+
+  public async comparePassword(candidate: string) {
+    const password = this.get('password');
+    return UserHelper.comparePassword(candidate, password);
+  }
+
+  async saltPasswordOnSave(next: any) {
+    if (this.isNew() || this.changed['password']) {
+      const passwordHash = await UserHelper.hashPassword(this.get('password'));
+      this.set('password', passwordHash);
+    }
+
+    await next;
   }
 
   static schema() {

@@ -3,11 +3,25 @@ import * as fs from 'fs-extra';
 import { resolve, join, extname, basename } from 'path';
 import { promisify } from 'bluebird';
 
-class ModuleLoader {
+/**
+ * ModuleLoader abstract base class. Extend to load your own modules, implemenitng your own
+ * load(), find(), and action() methods.
+ * 
+ * @class ModuleLoader
+ */
+export abstract class ModuleLoader {
   path: string
   appRoot: string
   extname = '.js'
 
+  /**
+   * Main public function that performs whatever task is required to load the modules
+   * 
+   * @param {App} app - Instance of app
+   * @returns {void}
+   * 
+   * @memberOf ModuleLoader
+   */
   async load(app: App) {
     this.appRoot = app.appRoot;
     const files = await this.find();
@@ -16,14 +30,14 @@ class ModuleLoader {
       await this.action(app, file);
     }
 
-    return true;
+    return;
   }
 
   isFileValid(file: string) {
     return extname(file) === this.extname;
   }
 
-  async find() {
+  protected async find() {
     function getFullFilePath(filePath: string) {
       return join(absPath, filePath);
     }
@@ -39,7 +53,7 @@ class ModuleLoader {
     return files;
   }
 
-  async action(app: App, moduleFile: string) {
+  protected async action(app: App, moduleFile: string) {
     return moduleFile;
   }
 }

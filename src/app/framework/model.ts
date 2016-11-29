@@ -52,7 +52,13 @@ export class Model extends MongoritoModel {
 
   protected _getSchema() {
     const Parent = <typeof Model>this.constructor;
-    return Parent.schema();
+    let schema = Parent.schema();
+    if (this.timestamps() === true) {
+      schema['createdAt'] = { type: 'date' };
+      schema['updatedAt'] = { type: 'date' };
+    }
+
+    return schema;
   }
 
   /**
@@ -109,26 +115,32 @@ export class Model extends MongoritoModel {
    * @memberOf Model
    */
   protected async _updateTimestamps(next: any) {
+    const timestamp = new Date().toISOString();
     if (_isNil(this.get('createdAt'))) {
-      this.set('createdAt', Date.now());
+      this.set('createdAt', timestamp);
     }
-    this.set('updatedAt', Date.now());
+    this.set('updatedAt', timestamp);
 
     await next;
   }
 
+  /**
+   * Removes paths from document that are not specified in schema
+   * 
+   * @protected
+   * @param {*} next
+   * 
+   * @memberOf Model
+   */
   protected async _removeExtraneousPaths(next: any) {
     const schema = this._getSchema();
-    const documentPaths = Object.keys(this.toJSON());
-    let schemaPaths = Object.keys(schema);
-
-    if (this.timestamps() === true) {
-      schemaPaths = schemaPaths.concat(['updatdAt', 'createdAt']);
-    }
+    const documentPaths = Object.keys(this.attributes);
+    const schemaPaths = Object.keys(schema);
 
     for (let path in documentPaths) {
-      if (schemaPaths.indexOf(path) === -1) {
+      if (schemaPaths.indexOf(path) === -1) {        
         this.set(path, undefined);
+        delete this.attributes[path];
       }
     }
 
@@ -157,6 +169,14 @@ export class Model extends MongoritoModel {
     await next;
   }
 
+  /**
+   * Validation middleware that ensures unique paths are actually unique
+   * 
+   * @protected
+   * @param {*} next
+   * 
+   * @memberOf Model
+   */
   protected async _validateUniquePaths(next: any) {
     const Parent = this._getParent();
     const schema = this._getSchema();
@@ -177,6 +197,14 @@ export class Model extends MongoritoModel {
     await next;
   }
 
+  /**
+   * Validates typecasting on models
+   * 
+   * @protected
+   * @param {*} next
+   * 
+   * @memberOf Model
+   */
   protected async _validateTypeCasting(next: any) {
     const schema = this._getSchema();
     _forEach(schema, (schemaPath: ISchemaPath, pathName: string) => {
@@ -208,6 +236,14 @@ export class Model extends MongoritoModel {
     await next;
   }
 
+  /**
+   * Runs custom validate() hooks on schema paths
+   * 
+   * @protected
+   * @param {*} next
+   * 
+   * @memberOf Model
+   */
   protected async _validateValidators(next: any) {
     const schema = this._getSchema();
     const pathsWithValidators = _pickBy(schema, (path) => {
@@ -225,6 +261,14 @@ export class Model extends MongoritoModel {
     await next;
   }
 
+  /**
+   * Assigns values on undefined paths with a defaultValue specified in their schema
+   * 
+   * @protected
+   * @param {*} next
+   * 
+   * @memberOf Model
+   */
   protected async _assignDefaultValues(next: any) {
     const schema = this._getSchema();
     const pathsWithDefaultValues = _pickBy(schema, (path) => {

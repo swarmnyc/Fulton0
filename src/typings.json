@@ -1,15 +1,20 @@
 {
   "globalDependencies": {
+    "bcrypt-nodejs": "registry:dt/bcrypt-nodejs#0.0.0+20160316155526",
     "fs-extra": "registry:dt/fs-extra#0.0.0+20161004190449",
     "mocha": "registry:env/mocha#2.2.5+20160926180742",
     "mongodb": "registry:dt/mongodb#2.1.0+20161110150902",
     "node": "registry:env/node#6.0.0+20161105011511"
   },
   "dependencies": {
+    "bcrypt": "registry:npm/bcrypt#0.8.0+20161010165625",
     "bluebird": "registry:npm/bluebird#3.4.1+20160909132857",
     "chai": "registry:npm/chai#3.5.0+20160723033700",
     "koa": "registry:npm/koa#2.0.0+20161018080506",
     "lodash": "registry:npm/lodash#4.0.0+20161015015725",
     "sinon": "registry:npm/sinon#1.16.0+20160723033700"
+  },
+  "globalDevDependencies": {
+    "chai-http": "registry:dt/chai-http#0.0.0+20160317120654"
   }
 }

@@ -1,7 +1,6 @@
 import * as Application from 'koa/lib/application';
 import * as koa from 'koa';
 import Router from './router';
-import CallbackFunction from './callback';
 import RequestHandler from './request-handler';
 import { resolve } from 'path';
 import { set as _set, get as _get } from 'lodash';
@@ -29,9 +28,11 @@ interface AppConfig {
  * @extends {EventEmitter}
  */
 export class App extends EventEmitter {
-  app: Application
-  config: AppConfig
+  protected app: Application
+  protected config: AppConfig
+  
   appRoot: string
+  
   middlewares(): RequestHandler<Context>[] { 
     const m: RequestHandler<Context>[] = [];
     return m;
@@ -44,7 +45,7 @@ export class App extends EventEmitter {
   /**
    * Creates an instance of App.
    * 
-   * @param {AppConfig} [config]
+   * @param {AppConfig} [config] - Optional configuration settings for your app
    * 
    * @memberOf App
    */
@@ -72,7 +73,8 @@ export class App extends EventEmitter {
   }
 
   /**
-   * Fired after init() is called
+   * Event fired after init() is called. Replace with your own function
+   * to fire an event after the app is ready
    * 
    * 
    * @memberOf App
@@ -91,8 +93,7 @@ export class App extends EventEmitter {
    * @memberOf App
    */
   onErrorRequest(err?: any) {
-    console.error('Error processing request:');
-    console.error(err);
+    throw err;
   }
 
   /**

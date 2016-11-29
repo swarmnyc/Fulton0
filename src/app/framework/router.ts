@@ -1,7 +1,6 @@
 import * as KoaRouter  from 'koa-router';
 import * as Application from 'koa/lib/application';
 import { get as _get, forEach as _forEach, isNil as _isNil } from 'lodash'; 
-import { Authorizer } from './authorizer';
 import { RequestHandler } from './request-handler';
 
 export class Router { 
