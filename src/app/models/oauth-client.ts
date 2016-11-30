@@ -1,4 +1,4 @@
-import { Model } from '../framework';
+import { Model } from '../lib';
 
 export class OAuthClient extends Model {
     collection() {

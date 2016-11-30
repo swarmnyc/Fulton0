@@ -1,4 +1,4 @@
-import { Model } from '../framework';
+import { Model } from '../lib';
 import UserHelper from '../helpers/user';
 
 export class User extends Model {

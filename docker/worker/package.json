@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A server for storing logs and reports from swarm apps",
   "main": "build/main.js",
-  "types": "./src/app/framework/index.d.ts",
   "private": true,
   "scripts": {
     "start": "node main.js",

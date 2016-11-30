@@ -1,4 +1,4 @@
-import { OAuthGrants } from '../framework';
+import { OAuthGrants } from '../lib';
 import { User, OAuthToken, OAuthClient } from '../models';
 
 export class ClientGrant implements OAuthGrants.ClientCredentialsGrant {

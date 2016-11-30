@@ -1,4 +1,4 @@
-import { Model } from '../../app/framework';
+import { Model } from '../../app/lib';
 import * as _ from 'lodash';
 import * as mongorito from 'mongorito';
 import * as koa from 'koa';
@@ -11,7 +11,7 @@ class TestModel extends Model {
         return 'test-items';
     }
 
-    schema() {
+    static schema() {
         return {
             name: { type: 'string', required: true }
         }
@@ -75,19 +75,8 @@ describe('Model', () => {
         });
 
         const doc = await test.save();
-        assert.typeOf(doc.get('createdAt'), 'string');
-        assert.typeOf(doc.get('updatedAt'), 'string');
-        return;
-    });
-
-    it('should remove paths not specified in the schema from the model', async () => {
-        const test = new TestModel({
-            name: 'Jimmy',
-            favoriteNumber: 55
-        });
-
-        const doc = await test.save();
-        assert.isUndefined(doc.get('favoriteNumber'));
+        assert.instanceOf(doc.get('createdAt'), Date);
+        assert.instanceOf(doc.get('updatedAt'), Date);
         return;
     });
 });

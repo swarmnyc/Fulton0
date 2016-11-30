@@ -1,4 +1,4 @@
-import { IAdapter } from '../framework';
+import { IAdapter } from '../lib';
 import { keys as _keys, map as _map, kebabCase as _kebabCase, find as _find, assign as _assign, set as _set, get as _get, forEach as _forEach } from 'lodash';
 
 interface GenericObject {

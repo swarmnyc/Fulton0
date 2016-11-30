@@ -2,5 +2,5 @@
 build
 node_modules
 src/typings
-
+app.package.tar.gz
 *.pyc

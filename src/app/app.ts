@@ -1,10 +1,10 @@
-import { App } from './framework/index';
+import { App } from './lib';
 import * as cors from 'koa-cors';
 
-class SwarmMonitorAPI extends App {
+class MyApp extends App {
     middlewares() {
         return [cors];
     }
 }
 
-export default SwarmMonitorAPI;
+export default MyApp;

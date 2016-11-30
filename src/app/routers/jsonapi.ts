@@ -1,4 +1,4 @@
-import { Router, Model } from '../framework';
+import { Router, Model } from '../lib';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
 import { forEach as _forEach, startsWith as _startsWith } from 'lodash';
 import { QueryHelper } from '../helpers/query';

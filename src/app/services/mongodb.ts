@@ -1,5 +1,5 @@
 import * as mongorito from 'mongorito';
-import { Service, Model } from '../framework';
+import { Service, Model } from '../lib';
 import { pickBy as _pickBy, forEach as _forEach } from 'lodash';
 import * as Models from '../models';
 

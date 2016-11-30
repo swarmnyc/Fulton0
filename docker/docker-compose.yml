@@ -1,0 +1,23 @@
+version: '2'
+services:
+  nginx:
+    build: ./nginx
+    ports: 
+      - "80:80"
+      - "443:443"
+    restart: always
+    depends_on: 
+      - worker1
+      - worker2
+      - worker3
+  worker1:
+    build: ./worker
+    ports:
+      - "3000:3000"
+  worker2:
+    build: ./worker
+    ports: "3000:3000"
+  worker3:
+    build: ./worker
+    ports: "3000:3000"
+  

@@ -1,4 +1,4 @@
-import { App } from '../../app/framework';
+import { App } from '../../app/lib';
 import { createServer, Server } from 'http';
 import * as koa from 'koa';
 import * as chai from 'chai';

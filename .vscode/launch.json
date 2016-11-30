@@ -27,10 +27,15 @@
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "stopOnEntry": false,
-      "args": ["test/**/*.js", "--no-timeouts"],
+      "args": ["--no-timeouts", "--recursive", "--require", "source-map-support/register", "build/test/**/*.js"],
+      "runtimeArgs": [
+        "--nolazy"
+      ],
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": null,
-      "env": { "NODE_ENV": "testing"}
+      "sourceMaps": true,
+      "outDir": "${workspaceRoot}/build",
+      "env": {}
     }
   ]
 }

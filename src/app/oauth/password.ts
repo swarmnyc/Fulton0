@@ -1,4 +1,4 @@
-import { OAuthGrants } from '../framework'
+import { OAuthGrants } from '../lib'
 import { User, OAuthToken, OAuthClient } from '../models';
 import UserHelper from '../helpers/user';
 

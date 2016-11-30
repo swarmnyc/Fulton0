@@ -72,8 +72,9 @@ declare module "mongorito" {
         around(event: string, handlerName: string): void
         before(event: string, handlerName: string): void
         collection(): string
-        constructor(o: JSONDocument)
+        constructor(o: JSONDocument, opts?: any)
         configure(): void
+        _collection: string
         attributes: IAttributesHash
         previous: IPreviousValueHash
         changed: IChangedValuesHash

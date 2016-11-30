@@ -1,4 +1,4 @@
-import { Router } from '../framework';
+import { Router } from '../lib';
 
 class HelloWorldRouter extends Router {
   prefix() {
