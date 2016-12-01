@@ -7,7 +7,7 @@ class HelloWorldRouter extends Router {
   public routes = () => {
     const router = this.router;
     router.get('/', function (next: any) {
-        this.body = 'Hello World!';        
+        this.body = 'Hello World!';
     });
     return router.routes();
   }

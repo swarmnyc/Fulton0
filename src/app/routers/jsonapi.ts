@@ -30,7 +30,7 @@ export abstract class JSONAPIRouter extends Router {
   }
 
   type(): string {
-    return '';
+    return undefined;
   }
 
   prefix() {
@@ -173,6 +173,10 @@ export abstract class JSONAPIRouter extends Router {
     router.del('/:item_id', this.remove());
     return router.routes();
   }
+
+  constructor() {
+    super();
+  }  
 }
 
 export default JSONAPIRouter
