@@ -1,4 +1,4 @@
-import { RequiredError, TypecastError, ValidationError, UniqueError } from '../../app/lib/schema-error';
+import { RequiredError, ValidationError, UniqueError } from '../../app/lib/schema-error';
 import { Model, Schema } from '../../app/lib';
 import * as chai from 'chai';
 
@@ -95,7 +95,7 @@ describe('Schema', () => {
       } catch(e) {
           result = e;
       } finally {
-          assert.instanceOf(result, TypecastError);
+          assert.instanceOf(result, TypeError);
           return;
       }
   });

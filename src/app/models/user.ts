@@ -1,4 +1,4 @@
-import { Model } from '../lib';
+import { Model } from '../lib/model';
 import UserHelper from '../helpers/user';
 
 export class User extends Model {
@@ -25,7 +25,7 @@ export class User extends Model {
     await next;
   }
 
-  static schema() {
+  schema() {
     return {
       email: { type: 'string', required: true, unique: true },
       password: { type: 'string', required: true }

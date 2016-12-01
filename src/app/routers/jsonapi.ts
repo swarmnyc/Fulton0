@@ -17,8 +17,8 @@ interface IRelationshipDefinition {
 }
 
 export abstract class JSONAPIRouter extends Router {
-  Model() {
-    return Model;
+  Model(): typeof Model {
+    return undefined;
   }
 
   queryIgnorePaths() {
@@ -29,14 +29,31 @@ export abstract class JSONAPIRouter extends Router {
     return 'api';
   }
 
+  /**
+   * Set the type, used by the json api serializer. Defaults to the collection name of the model.  
+   * 
+   * @returns {string}
+   * 
+   * @memberOf JSONAPIRouter
+   */
   type(): string {
-    return undefined;
+    const Model = this.Model();
+    const m = new Model();
+    return m._collection;
   }
 
   prefix() {
     return `/${this.namespace()}/${this.type()}`;
   }
 
+  /**
+   * The id path on the model. Set to _id by default, as per mongodb. 
+   * Override to point to a different path. 
+   * 
+   * @returns {string}
+   * 
+   * @memberOf JSONAPIRouter
+   */
   idPath(): string {
     return '_id';
   }
@@ -90,6 +107,7 @@ export abstract class JSONAPIRouter extends Router {
       this.body = { data: output };
     };
   }
+
   findById() {
     const Model = this.Model();
     const serialize = this.adapter().serialize;
@@ -109,6 +127,7 @@ export abstract class JSONAPIRouter extends Router {
       this.body = output;
     };
   }
+
   create() {
     const Model = this.Model();
     const deserialize = this.adapter().deserialize;
@@ -133,6 +152,7 @@ export abstract class JSONAPIRouter extends Router {
       this.body = serialize(model.toJSON());
     };
   }
+  
   update() {
     const Model = this.Model();
     const deserialize = this.adapter().deserialize;
@@ -148,6 +168,7 @@ export abstract class JSONAPIRouter extends Router {
       }
     };
   }
+
   remove() {
     const Model = this.Model();
     return function*(next: any) {
@@ -157,8 +178,7 @@ export abstract class JSONAPIRouter extends Router {
     };
   }
 
-  public routes = () => {
-    const router = this.router;
+  configure(router) {
     const authorizer = this.authorizer();
 
     if (authorizer) {
@@ -171,12 +191,7 @@ export abstract class JSONAPIRouter extends Router {
     router.patch('/:item_id', this.update());
     router.post('/', this.create());
     router.del('/:item_id', this.remove());
-    return router.routes();
   }
-
-  constructor() {
-    super();
-  }  
 }
 
 export default JSONAPIRouter

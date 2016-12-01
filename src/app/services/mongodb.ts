@@ -7,6 +7,8 @@ interface MongoDBConfig {
   mongoURI: string
 }
 
+type ModelConstructor = typeof Model;
+
 class MongoDB extends Service {  
   config: MongoDBConfig
   as = 'db'
@@ -25,11 +27,12 @@ class MongoDB extends Service {
     return this;
   }
 
-  async setIndex(ParentModel = <typeof Model>Model.constructor) {
-    let indexPaths: any;    
+  async setIndex(ParentModel: ModelConstructor) {
+    let indexPaths: any;
+    let model = new ParentModel();
 
-    if (!!ParentModel.hasSchema) {      
-      indexPaths = _pickBy(ParentModel.schema(), (schemaPath, pathName) => {
+    if (!!model.hasSchema) {      
+      indexPaths = _pickBy(model.schema, (schemaPath, pathName) => {
         return !!schemaPath.unique || !!schemaPath.index;
       });
 

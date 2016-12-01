@@ -1,11 +1,11 @@
 import { Router } from '../lib';
 
 class HelloWorldRouter extends Router {
-  prefix() {
-    return '/hello';
+  namespace() {
+    return 'hello';
   }
-  public routes = () => {
-    const router = this.router;
+  
+  configure(router) {
     router.get('/', function (next: any) {
         this.body = 'Hello World!';
     });

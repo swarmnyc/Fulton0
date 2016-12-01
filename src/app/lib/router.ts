@@ -5,24 +5,49 @@ import { RequestHandler } from './request-handler';
 
 export class Router { 
   router: KoaRouter<KoaRouter.Context>
-  
-  prefix(): string {
-    return null;
+
+  protected prefix(): string {
+    const namespace = this.namespace() || '';
+    return `/${namespace}`;
   };
 
-  public routes = () => {
-    const router = this.router;    
+  /**
+   * Returns the underlying router's event listeners.
+   * Used by the Route Loader to mount routes in the app.
+   * 
+   * @returns {KoaRouter}
+   * 
+   * @memberOf Router
+   */
+  routes() {
+    return this.router.routes();
+  }
 
-    return router.routes();
+  /**
+   * Set the namespace for the route. All defined routes will lie behind this string.
+   * 
+   * @returns {string}
+   * 
+   * @memberOf Router
+   */
+  namespace(): string {
+    return undefined;
+  }
+
+/**
+ * Map your route handlers to the router object here.
+ * 
+ * @param {KoaRouter<KoaRouter.Context>} router
+ * 
+ * @memberOf Router
+ */
+  configure(router: KoaRouter<KoaRouter.Context>) {   
+    
   }
 
   constructor() {
-    if (!_isNil(this.prefix())) {
-      this.router = new KoaRouter({ prefix: this.prefix()});
-    } else {
-      this.router = new KoaRouter();
-    }
-    
+    this.router = new KoaRouter({ prefix: this.prefix()});
+    this.configure(this.router);
   }
 }
 

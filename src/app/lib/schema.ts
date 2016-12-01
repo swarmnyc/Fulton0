@@ -2,7 +2,7 @@ import { Model } from './model';
 import * as _ from 'lodash';
 import * as assert from 'assert';
 import { ObjectID } from 'mongodb';
-import { ValidationError, TypecastError, UniqueError, RequiredError } from './schema-error';
+import { ValidationError, UniqueError, RequiredError } from './schema-error';
 
 export interface ISchemaPathDefinition {
   type: string
@@ -167,17 +167,22 @@ export class Schema {
       const _test = (val: any, index?: any | number) => {
         let docType = typeof val;
         if (schemaPathType !== 'ObjectId' && schemaPathType !== 'date' && docType !== schemaPathType) {
-          throw new TypecastError(`Found type ${docType} at path ${schemaPath.pathName}, ${schemaPath.type} expected.`);        
+          throw new TypeError(`Found type ${docType} at path ${schemaPath.pathName}, ${schemaPath.type} expected.`);        
         } else if (schemaPathType === 'date' && !(val instanceof Date)) {
-          throw new TypecastError(`Cast to type Date failed at path ${schemaPath.pathName} with ${val}`);
-        } else if (schemaPathType === 'ObjectId' && ObjectID.isValid(val) === false) {
-          throw new TypecastError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
+          throw new TypeError(`Cast to type Date failed at path ${schemaPath.pathName} with ${val}`);
+        } else if (schemaPathType === 'ObjectId') {
+          if (ObjectID.isValid(val) === false && !(val instanceof schemaPath.ref.constructor)) {
+            throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
+          }
+          if (val instanceof schemaPath.ref.constructor) {
+            doc.set(schemaPath.pathName, val.get('_id'));
+          }
         }
       };
 
       if (isArray === true) {
         if (_.isArray(value) === false) {
-          throw new TypecastError(`Cast to type ${schemaPath.type} failed at path ${schemaPath.pathName}`);
+          throw new TypeError(`Cast to type ${schemaPath.type} failed at path ${schemaPath.pathName}`);
         }
         _.forEach(value, _test);
       } else {
@@ -204,7 +209,7 @@ export class Schema {
       return path.validator && typeof path.validator === 'function';
     });
     _.forEach(pathsWithValidators, (schemaPath: ISchemaPath) => {
-      const isValid: boolean | string = schemaPath.validator.apply(this);
+      const isValid: boolean | string = schemaPath.validator.apply(doc, doc.get(schemaPath.pathName));
       if (isValid === false) {
         throw new ValidationError(`Validation failed for ${doc.get(schemaPath.pathName)} at path ${schemaPath.pathName}`);
       } else if (typeof isValid === 'string') {

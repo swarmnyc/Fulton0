@@ -11,7 +11,7 @@ class TestModel extends Model {
         return 'test-items';
     }
 
-    static schema() {
+    schema() {
         return {
             name: { type: 'string', required: true }
         }

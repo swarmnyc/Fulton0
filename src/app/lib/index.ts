@@ -1,5 +1,4 @@
 export * from './router';
-export * from './route';
 export * from './request-handler';
 export * from './app';
 export * from './request-handler';

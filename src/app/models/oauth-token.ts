@@ -1,4 +1,4 @@
-import { Model } from '../lib';
+import { Model } from '../lib/model';
 
 export class OAuthToken extends Model {
     collection() {
@@ -6,7 +6,7 @@ export class OAuthToken extends Model {
     }
 
     
-    static schema() {
+    schema() {
         return {
             accessToken: { type: 'string' },
             accessTokenExpiresOn: { type: 'date' },

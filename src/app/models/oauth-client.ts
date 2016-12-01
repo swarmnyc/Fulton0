@@ -1,11 +1,11 @@
-import { Model } from '../lib';
+import { Model } from '../lib/model';
 
 export class OAuthClient extends Model {
     collection() {
         return 'oauth-clients';
     }
 
-    static schema() {
+    schema() {
         return {
             userId: { type: 'ObjectId', ref: 'users' },
             secret: { type: 'string' },
@@ -13,5 +13,3 @@ export class OAuthClient extends Model {
         };
     }
 }
-
-export default OAuthClient

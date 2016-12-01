@@ -1,7 +1,7 @@
 import JSONAPIRouter from '../routers/jsonapi';
-import User from '../models/user';
+import { User } from '../models';
 
-class UserRouter extends JSONAPIRouter {
+export class UserRouter extends JSONAPIRouter {
   Model() {
     return User;
   }
@@ -10,4 +10,4 @@ class UserRouter extends JSONAPIRouter {
   }
 }
 
-export = UserRouter;
+export default UserRouter;

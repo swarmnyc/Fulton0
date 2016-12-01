@@ -1,21 +1,27 @@
 import { Model as MongoritoModel } from 'mongorito';
 import { keys as _keys, pickBy as _pickBy, forEach as _forEach, isNil as _isNil, has as _has, endsWith as _endsWith, isArray as _isArray  } from 'lodash';
 import { ISchemaDefinition, Schema } from './schema';
+import { ValidationError, UniqueError, RequiredError } from './schema-error';
+import { ObjectID } from 'mongodb';
 
 export class Model extends MongoritoModel {
+  static ValidationError = ValidationError
+  static UniqueError = UniqueError
+  static RequiredError = RequiredError
+  static ObjectID = ObjectID 
+
   /**
    * Define a schema for your model here.
    * 
-   * @static
    * @returns {ISchemaDefinition}
    * 
    * @memberOf Model
    */
-  static schema() {
-    return {};
+  schema(): ISchemaDefinition {
+    return undefined;
   }
 
-  schema: Schema
+  protected _schema: Schema
 
   /**
    * Returns true if constructor has a schema attached to it
@@ -26,7 +32,7 @@ export class Model extends MongoritoModel {
    * 
    * @memberOf Model
    */
-  static get hasSchema() {
+  get hasSchema() {
     return Object.keys(this.schema()).length > 0;
   }
 
@@ -66,11 +72,11 @@ export class Model extends MongoritoModel {
   configure() {}
 
   protected async _validate(next: any) {
-    return this.schema.validate(this);
+    return this._schema.validate(this);
   }
 
   protected _setTimestampPaths() {
-    const schema = this.schema;
+    const schema = this._schema;
     schema.add('createdAt', { type: 'date', defaultValue: Date.now });
     schema.add('updatedAt', { type: 'date', defaultValue: Date.now });    
   }
@@ -97,11 +103,11 @@ export class Model extends MongoritoModel {
     super(attr, opts);
 
     const Parent = this._getParent();
-    const parentSchema = Parent.schema();
+    const parentSchema = this.schema();
     const collection = this._collection;
 
     if (parentSchema) {
-      this.schema = new Schema(parentSchema, collection, Parent);            
+      this._schema = new Schema(parentSchema, collection, Parent);            
 
       if (this.timestamps() === true) {
         this.before('save', '_updateTimestamps');
@@ -112,5 +118,3 @@ export class Model extends MongoritoModel {
     }
   }
 }
-
-export default Model
