@@ -33,7 +33,7 @@ export class App extends EventEmitter {
   
   appRoot: string
   
-  middlewares(): RequestHandler<Context>[] { 
+  middleware(): RequestHandler<Context>[] { 
     const m: RequestHandler<Context>[] = [];
     return m;
   }
@@ -156,7 +156,7 @@ export class App extends EventEmitter {
       app.use(bodyParser());
     }
 
-    for (let middleware of this.middlewares()) {
+    for (let middleware of this.middleware()) {
       app.use(middleware());
     }
 

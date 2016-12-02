@@ -7,8 +7,8 @@ export class Router {
   router: KoaRouter<KoaRouter.Context>
 
   protected prefix(): string {
-    const namespace = this.namespace() || '';
-    return `/${namespace}`;
+    const namespace = this.namespace();
+    return namespace ? `/${namespace}` : '';
   };
 
   /**

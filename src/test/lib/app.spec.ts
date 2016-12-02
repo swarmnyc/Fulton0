@@ -56,9 +56,9 @@ describe('App', () => {
         const app = new App();
         const server = createServer();
         const responseText = 'success';
-        const listener = function *(next: any) {
-            this.body = responseText;
+        const listener = function *(next: any) {            
             yield next;
+            this.body = responseText;
         };
         
         app.use(listener);
@@ -68,7 +68,7 @@ describe('App', () => {
         const response = await chai['request'](server).get('/').set('content-type', 'text/plain');
         
         expect(response).to.have['status'](200);
-        expect(response).to.be['text'];
+        expect(response).to.be['html'];
         expect(response.text).to.equal(responseText);
         
         return;
