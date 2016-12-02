@@ -106,7 +106,7 @@ export abstract class JSONAPIRouter extends Router {
         output.push(serialize(item.toJSON()));
       }
       yield next;
-      this.body = { data: output };
+      this.body = output;
     };
   }
 

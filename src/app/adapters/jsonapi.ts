@@ -14,6 +14,10 @@ interface SerializedJSONAPIObject {
   included?: JSONAPICompoundDocument|JSONAPICompoundDocument[];
 }
 
+interface SerializedJSONAPIPackage {
+  data: SerializedJSONAPIObject | SerializedJSONAPIObject[]
+}
+
 interface JSONAPIAttributes {
   [K: string]: string|number|string[]|number[]|boolean|boolean[]; 
 }
@@ -48,8 +52,8 @@ interface IRelationshipDefinition {
 interface IJSONAPIAdapter extends IAdapter {
   relationships: IRelationshipDefinition[];
   type: string;
-  serialize(input: GenericObject): SerializedJSONAPIObject;
-  deserialize(input: SerializedJSONAPIObject): GenericObject;
+  serialize(input: GenericObject | GenericObject[]): SerializedJSONAPIPackage;
+  deserialize(input: SerializedJSONAPIPackage): GenericObject | GenericObject[];
 }
 
 class AdapterError extends Error {
@@ -80,14 +84,12 @@ export class JSONAPIAdapter implements IJSONAPIAdapter {
     return this.rels;
   }
 
-  public serialize = (input: GenericObject) => {
+  protected _serialize(o: GenericObject) {
     const idPath: string = this.idPath;
     const oType = this.type;
     const namespace = !!this.namespace ? `/${this.namespace}` : '';
-    const oId = _get(input, idPath);
+    const oId = _get(o, idPath);
     const relationships: IRelationshipDefinition[] = this.relationships || [];
-    let output: SerializedJSONAPIObject;
-    function _serialize(o: GenericObject) {
       let j: SerializedJSONAPIObject = { type: oType, id: o[idPath], attributes: {}, relationships: {}, links: {} };
       j.links = { self: `/${namespace}/${oType}/${oId}` };
       
@@ -125,27 +127,54 @@ export class JSONAPIAdapter implements IJSONAPIAdapter {
       if (_keys(j.relationships).length === 0) {
         delete j.relationships;
       }
-      return j;
-    }
-    output = _serialize(input);    
-    return output;
+      return j;    
   }
 
-  public deserialize = (input: SerializedJSONAPIObject) => {
-    let data = _get(input, 'data');
+  private _deserialize = (input: SerializedJSONAPIObject) => {
+    let data = input;
     let output: GenericObject = {};
-    let attrs: any, relationships: any;    
+    let attrs: any, relationships: any;        
 
     if (!data) {
       throw new AdapterError(`Data provided to deserializer is not in JSON API format`);
     }
 
+    output[this.idPath] = data.id;
     attrs = _get(data, 'attributes');
     relationships = _get(data, 'relationships');
 
     _assign(output, attrs, relationships);
     return output;
   }
+
+  public serialize = (input: GenericObject | GenericObject[]) => {
+    let output: SerializedJSONAPIObject | SerializedJSONAPIObject[];
+
+    if (Array.isArray(input)) {
+      output = input.map((o: GenericObject) => {
+        return this._serialize(o);
+      });
+    } else {
+      output = this._serialize(input);
+    }
+
+    return { data: output };
+  }
+
+  public deserialize = (input: SerializedJSONAPIPackage) => {
+    let output: GenericObject | GenericObject[];
+    let data = input.data;
+
+    if (Array.isArray(data)) {
+      output = data.map((o: SerializedJSONAPIObject) => {
+        return this._deserialize(o);
+      });
+    } else {
+      output = this._deserialize(data);
+    }
+
+    return output;
+  } 
 }
 
 export default JSONAPIAdapter

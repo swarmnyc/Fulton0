@@ -1,8 +1,10 @@
 {
   "globalDependencies": {
     "bcrypt-nodejs": "registry:dt/bcrypt-nodejs#0.0.0+20160316155526",
+    "faker": "registry:dt/faker#3.1.0+20161003184239",
     "fs-extra": "registry:dt/fs-extra#0.0.0+20161004190449",
     "mocha": "registry:env/mocha#2.2.5+20160926180742",
+    "moment": "registry:dt/moment#2.11.1+20161010105546",
     "mongodb": "registry:dt/mongodb#2.1.0+20161110150902",
     "node": "registry:env/node#6.0.0+20161105011511",
     "winston": "registry:dt/winston#0.0.0+20161108133445"
