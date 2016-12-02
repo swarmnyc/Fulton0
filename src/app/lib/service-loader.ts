@@ -12,7 +12,7 @@ export class ServiceLoader extends ModuleLoader {
     let asName: string;    
     await service.init();
     asName = _isString(service.as) ? service.as : Service.name;
-    app.set(`services.${asName}`, service.instance);
+    app.set(`services.${asName}`, service.instance);    
     return service;
   }
 }

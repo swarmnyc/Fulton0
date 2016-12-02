@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for app/services/logger.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">app/services/</a> logger.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">54.55% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>24/44</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">61.54% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>8/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">35.29% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.89% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>23/36</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
+var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+<span class="fstat-no" title="function not covered" >        function fulfilled(value) {</span> <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >step(generator.next(value)); </span>} catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} </span>}
+<span class="fstat-no" title="function not covered" >        function rejected(value) {</span> <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >step(generator.throw(value)); </span>} catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} </span>}
+        function step(result) { result.done ? resolve(result.value) : <span class="branch-1 cbranch-no" title="branch not covered" >new P(<span class="fstat-no" title="function not covered" >function (resolve) {</span> <span class="cstat-no" title="statement not covered" >resolve(result.value); </span>}).then(fulfilled, rejected);</span> }
+        step((generator = generator.apply(thisArg, _arguments)).next());
+    });
+};
+const lib_1 = require('../lib');
+const winston = require('winston');
+const _ = require('lodash');
+class Logger extends lib_1.Service {
+    constructor() {
+        super(...arguments);
+        this.as = 'log';
+    }
+    onException<span class="fstat-no" title="function not covered" >(err) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.error(err.message, err);</span>
+<span class="cstat-no" title="statement not covered" >        process.exit(1);</span>
+    }
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const transports = this.config.transports;
+            this.instance = new winston.Logger();
+            _.forEach(transports, (settings, name) =&gt; {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (settings.enabled === false) {
+<span class="cstat-no" title="statement not covered" >                    return;</span>
+                }
+                const ts = _.omit(settings, 'enabled');
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (winston.transports[_.upperFirst(name)]) {
+                    this.instance.add(winston.transports[_.upperFirst(name)], ts);
+                }
+            });
+            process.on('unhandledException', this.onException.bind(this));
+            process.on('unhandledRejection', this.onException.bind(this));
+            return this;
+        });
+    }
+    log<span class="fstat-no" title="function not covered" >(level, msg) {</span>
+<span class="cstat-no" title="statement not covered" >        if (arguments.length === 1) {</span>
+<span class="cstat-no" title="statement not covered" >            msg = level;</span>
+<span class="cstat-no" title="statement not covered" >            level = 'info';</span>
+        }
+<span class="cstat-no" title="statement not covered" >        this.instance.log(level, msg);</span>
+    }
+    info<span class="fstat-no" title="function not covered" >(msg, metadata) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.info(msg, metadata);</span>
+    }
+    error<span class="fstat-no" title="function not covered" >(msg, metadata) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.error(msg, metadata);</span>
+    }
+    debug<span class="fstat-no" title="function not covered" >(msg, metadata) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.error(msg, metadata);</span>
+    }
+    warn<span class="fstat-no" title="function not covered" >(msg, metadata) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.warn(msg, metadata);</span>
+    }
+    verbose<span class="fstat-no" title="function not covered" >(msg, metadata) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.verbose(msg, metadata);</span>
+    }
+    silly<span class="fstat-no" title="function not covered" >(msg, metadata) {</span>
+<span class="cstat-no" title="statement not covered" >        this.instance.silly(msg, metadata);</span>
+    }
+}
+module.exports = Logger;
+//# sourceMappingURL=logger.js.map</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Dec 02 2016 13:52:11 GMT-0500 (EST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

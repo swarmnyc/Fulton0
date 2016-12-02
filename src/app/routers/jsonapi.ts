@@ -8,7 +8,8 @@ import * as oauthserver from 'koa-oauth-server';
 interface IAdapterOptions {
   type: string;
   idPath?: string;
-  relationships?: IRelationshipDefinition[] 
+  relationships?: IRelationshipDefinition[];
+  namespace: string;
 }
 
 interface IRelationshipDefinition {
@@ -66,7 +67,8 @@ export abstract class JSONAPIRouter extends Router {
     return {
       type: this.type(),
       idPath: this.idPath(),
-      relationships: this.relationships()
+      relationships: this.relationships(),
+      namespace: this.namespace()
     }
   }
 
@@ -164,7 +166,7 @@ export abstract class JSONAPIRouter extends Router {
       try {
         this.body = serialize(model);
       } catch(e) {
-        this.response.status = 500;        
+        this.throw(500);       
       }
     };
   }
@@ -178,6 +180,13 @@ export abstract class JSONAPIRouter extends Router {
     };
   }
 
+  setHeaders() {
+    return function* (next: any) {
+      this.set('Content-Type', 'application/vnd.api+json');
+      yield next;
+    };
+  }
+
   configure(router) {
     const authorizer = this.authorizer();
 
@@ -186,6 +195,7 @@ export abstract class JSONAPIRouter extends Router {
       router.use(authorizer.authorise());
     }
     
+    router.use(this.setHeaders());
     router.get('/', this.find());
     router.get('/:item_id', this.findById());
     router.patch('/:item_id', this.update());

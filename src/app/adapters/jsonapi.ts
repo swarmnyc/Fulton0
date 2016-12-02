@@ -24,7 +24,7 @@ interface JSONAPIRelationships {
 
 interface JSONAPIRelationship {
   data: JSONAPIRelationshipData|JSONAPIRelationshipData[];
-  links: JSONAPILinksObject|JSONAPILinksObject[];
+  links: JSONAPILinksObject;
 }
 
 interface JSONAPIRelationshipData {
@@ -33,11 +33,7 @@ interface JSONAPIRelationshipData {
 }
 
 interface JSONAPILinksObject {
-  [linkType: string]: JSONAPILink  
-}
-
-interface JSONAPILink {
-  link: string
+  [linkType: string]: string  
 }
 
 interface JSONAPICompoundDocument {
@@ -64,16 +60,19 @@ interface IAdapterOptions {
   type: string;
   idPath?: string;
   relationships?: IRelationshipDefinition[]
+  namespace?: string
 }
 
 export class JSONAPIAdapter implements IJSONAPIAdapter {
   private rels: IRelationshipDefinition[]
   idPath: string;
   type: string;
+  namespace: string;
   
   constructor(options: IAdapterOptions) {
     this.rels = options.relationships;
     this.idPath = options.idPath || '_id';
+    this.namespace = options.namespace;
     this.type = options.type;
   }
 
@@ -84,19 +83,44 @@ export class JSONAPIAdapter implements IJSONAPIAdapter {
   public serialize = (input: GenericObject) => {
     const idPath: string = this.idPath;
     const oType = this.type;
+    const namespace = !!this.namespace ? `/${this.namespace}` : '';
+    const oId = _get(input, idPath);
     const relationships: IRelationshipDefinition[] = this.relationships || [];
     let output: SerializedJSONAPIObject;
     function _serialize(o: GenericObject) {
-      let j: SerializedJSONAPIObject = { type: oType, id: null, attributes: {}, relationships: {} }; 
+      let j: SerializedJSONAPIObject = { type: oType, id: o[idPath], attributes: {}, relationships: {}, links: {} };
+      j.links = { self: `/${namespace}/${oType}/${oId}` };
+      
       _forEach(o, (value: any, key: string) => {
         const rel = _find(relationships, { path: key });
         const preamble = rel ? 'relationships' : 'attributes';
-        const val = rel ? { data: { type: _get(rel, 'type'), id: value }} : value;   
+        
         if (key === idPath) {
-          _set(j, 'id', value);
-        } else {
-          _set(j, `${preamble}.${_kebabCase(key)}`, val);
+          return;
         }
+
+        if (!rel) {
+          _set(j, `${preamble}.${_kebabCase(key)}`, value);
+        } else {
+          
+          let relType: string = rel.type;
+          let val: JSONAPIRelationship = {
+            data: undefined,
+            links: undefined
+          };
+
+          if (Array.isArray(value)) {
+            val.data =_map(value, (v) => {
+              return { type: relType, id: v };
+            });
+          } else {
+            val.data = { type: relType, id: value };
+          }
+
+          val.links = { self: `${namespace}/${oType}/${oId}/relationships/${key}`, related: `${namespace}/${oType}/${oId}/${key}` };
+          
+        }
+
       });
       if (_keys(j.relationships).length === 0) {
         delete j.relationships;

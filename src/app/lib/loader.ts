@@ -25,12 +25,12 @@ export abstract class ModuleLoader {
   async load(app: App) {
     this.appRoot = app.appRoot;
     const files = await this.find();
-
+    const items = [];
     for (let file of files) {
-      await this.action(app, file);
+      items.push(await this.action(app, file));
     }
 
-    return;
+    return items;
   }
 
   isFileValid(file: string) {

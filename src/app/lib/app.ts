@@ -1,6 +1,7 @@
 import * as Application from 'koa/lib/application';
 import * as koa from 'koa';
 import Router from './router';
+import { Service } from './service';
 import RequestHandler from './request-handler';
 import { resolve } from 'path';
 import { set as _set, get as _get } from 'lodash';
@@ -60,7 +61,7 @@ export class App extends EventEmitter {
     this.app = new koa();
     this.on('didInit', this.didInit.bind(this));
   }
-  
+
   /**
    * Returns event listener of underlying koa app
    * 
@@ -80,21 +81,17 @@ export class App extends EventEmitter {
    * @memberOf App
   
    */
-  didInit() {
-    
-  }
+  didInit() {}
 
   /**
    * Fired when there is an error bubbled up through the request middleware
    * 
    * 
-   * @param {*} [err] - Error, if any, returned by app instance
+   * @param {Error|string} err - Error, if any, returned by app instance
    * 
    * @memberOf App
    */
-  onErrorRequest(err?: any) {
-    throw err;
-  }
+  didError(err: Error | string) {}
 
   /**
    * Bind a middleware to the app
@@ -139,35 +136,28 @@ export class App extends EventEmitter {
    * @memberOf App
    */
   async init() {
-    console.info('app.init() called');
     const app = this.app;
     const configLoader = new ConfigLoader();
     const serviceLoader = new ServiceLoader();
     const routeLoader = new RouteLoader();
 
-    console.info('Loading config...');
-    this.set('config', await configLoader.load(this));
+    app.on('error', this.didError);
 
-    console.info('Loading services...');
+    this.set('config', await configLoader.load(this));
     await serviceLoader.load(this);
 
-    console.info('Loading middlewares...');
     if (this.bodyParser() === true) {
       app.use(bodyParser());
     }
 
     for (let middleware of this.middleware()) {
       app.use(middleware());
-    }
-
-    console.info('Loading routes...');
+    }    
     
     await routeLoader.load(this);
-    
-    console.info('All loaded.');
-    
-    app.on('error', this.onErrorRequest);
+        
     this.emit('didInit');
+
     return app;
   }
 }

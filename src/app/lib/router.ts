@@ -8,7 +8,7 @@ export class Router {
 
   protected prefix(): string {
     const namespace = this.namespace();
-    return namespace ? `/${namespace}` : '';
+    return (!!namespace) ? `/${namespace}` : '';
   };
 
   /**

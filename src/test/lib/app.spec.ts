@@ -73,4 +73,37 @@ describe('App', () => {
         
         return;
     });
+
+    it('should call didError when an underlying request handler throws an error', async () => {
+        class TestApp extends App {
+            middleware() {
+                return [function() {
+                    return function * (next: any) {
+                        this.throw('Never gonna get it', 400);
+                        yield next;
+                    };
+                }];
+            }
+
+            didError(err: Error | string) {
+                didError = true;
+            }
+        }
+
+        const server = createServer();
+        let response: any;
+        let app: TestApp;
+        let didError: boolean;
+
+        app = new TestApp();
+        await app.init();
+        server.on('request', app.listener());
+        try {
+            response = await chai['request'](server).get('/');
+        } catch(e) {} finally {
+            expect(didError).to.equal(true);
+            return;
+        }
+        
+    });
 });

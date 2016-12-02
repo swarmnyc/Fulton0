@@ -9,7 +9,7 @@
     "start": "node build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
-    "test": "mocha build/test --recursive --no-timeouts --require source-map-support/register || true",
+    "test": "istanbul cover node_modules/.bin/_mocha -- build/test --recursive --no-timeouts --require source-map-support/register || true",
     "build": "tsc -p src/ || true",
     "package": "rm -f docker/worker/app.package.tar.gz && rm -f docker/worker/package.json && rimraf build && tsc -p src/ && cp package.json docker/worker/package.json && tar czf app.package.tar.gz build && mv app.package.tar.gz docker/worker/app.package.tar.gz && rimraf build",
     "clean": "rimraf build"
@@ -32,11 +32,13 @@
     "lodash": "4.17.2",
     "mongodb": "2.2.11",
     "mongorito": "2.2.0",
-    "source-map-support": "0.4.6"
+    "source-map-support": "0.4.6",
+    "winston": "2.3.0"
   },
   "devDependencies": {
     "chai": "3.5.0",
     "chai-http": "3.0.0",
+    "istanbul": "0.4.5",
     "mocha": "3.1.2",
     "rimraf": "2.5.4",
     "sinon": "1.17.6",
