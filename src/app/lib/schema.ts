@@ -31,7 +31,6 @@ type SchemaModel = typeof Model;
 
 export class Schema {
   private _paths: ISchemaPath[]
-  private _collection: string
   private _Model: SchemaModel
   private _validationMethods = ['_removeExtraneousPaths', '_validateRequiredPaths', '_assignDefaultValues', '_validateTypeCasting', '_validateUniquePaths', '_validateValidators']
 
@@ -41,10 +40,6 @@ export class Schema {
 
   Model(): SchemaModel  {
     return this._Model;
-  }
-
-  collection(): string {
-    return this._collection;
   }
 
   add(pathName: string, def: ISchemaPathDefinition) {
@@ -63,9 +58,8 @@ export class Schema {
     return doc;
   }
 
-  constructor(def: ISchemaDefinition, collection: string, Model: SchemaModel) {
+  constructor(def: ISchemaDefinition, Model: SchemaModel) {
     this._Model = Model;
-    this._collection = collection;
     this._paths = [];
     _.forEach(def, (pathdef: ISchemaPathDefinition, pathName: string) => {
       this.add(pathName, pathdef);
@@ -161,8 +155,8 @@ export class Schema {
   protected async _validateTypeCasting(doc: Model) {
     const paths = this.paths();
     _.forEach(paths, (schemaPath: ISchemaPath) => {
-      let isArray: boolean = _.endsWith(schemaPath.type, '[]');
-      let schemaPathType = isArray ? schemaPath.type.substr(0, -2) : schemaPath.type;
+      let isArray: boolean = _.endsWith(schemaPath.type, '[]');      
+      let schemaPathType = isArray ? schemaPath.type.slice(0, -2) : schemaPath.type;
       let value = doc.get(schemaPath.pathName);
 
       const _test = (val: any, index?: any | number) => {
@@ -185,8 +179,12 @@ export class Schema {
         return;
       }
 
+      if (_.isNil(value)) {
+        return;
+      }
+
       if (isArray === true) {
-        if (_.isArray(value) === false) {
+        if (_.isNil(value) === false && _.isArray(value) === false) {
           throw new TypeError(`Cast to type ${schemaPath.type} failed at path ${schemaPath.pathName}`);
         }
         _.forEach(value, _test);

@@ -23,6 +23,10 @@ export class Router {
     return this.router.routes();
   }
 
+  allowedMethods() {
+    return this.router.allowedMethods();
+  }
+
   /**
    * Set the namespace for the route. All defined routes will lie behind this string.
    * 

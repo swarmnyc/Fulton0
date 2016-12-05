@@ -13,12 +13,12 @@ export class PasswordGrant implements OAuthGrants.PasswordGrant {
     }
 
     async getClient(id: string, secret: string) {
-        const obj = await OAuthClient.findOne({ id: id, secret: secret });
+        let obj = await OAuthClient.findOne({ _id: id, secret: secret });
         if (!obj) {
             return undefined;
         }
 
-        return obj.toJSON();
+         return obj.toJSON();
     }
 
     async getUser(username: string, password: string) {
@@ -32,13 +32,13 @@ export class PasswordGrant implements OAuthGrants.PasswordGrant {
         isValidPassword = await comparePassword(password, hashPassword);
 
         if (!isValidPassword) {
-            return null;
+            return undefined;
         }
 
         return user.toJSON();
     }
 
-    async saveToken(token: OAuthGrants.IOAuthAccessTokenObject, client: OAuthGrants.IOAuthClientObject, user: any) {
+    async saveToken(token: OAuthGrants.IOAuthAccessTokenDefinition, client: OAuthGrants.IOAuthClientObject, user: any) {
         const obj = new OAuthToken({
             userId: user.id,
             accessToken: token.accessToken,

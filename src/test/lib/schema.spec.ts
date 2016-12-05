@@ -11,7 +11,7 @@ describe('Schema', () => {
     const def = {
       name: { type: 'string' }
     };
-    const schema = new Schema(def, 'test-items', TestModel);
+    const schema = new Schema(def, TestModel);
     const test = new TestModel({
         name: 'Jimmy',
         favoriteNumber: 55
@@ -25,7 +25,7 @@ describe('Schema', () => {
   it('should enforce required paths in schema on save', async () => {
     const schema = new Schema({
       name: { type: 'string', required: true }
-    }, 'test-items', TestModel);
+    }, TestModel);
     const test = new TestModel({
         blah: 25
     });
@@ -53,7 +53,7 @@ describe('Schema', () => {
           };
       }
     }
-    const schema = new Schema({ nickname: { type: 'string', unique: true }}, 'test-items-4', TestModel4);
+    const schema = new Schema({ nickname: { type: 'string', unique: true }}, TestModel4);
 
     let test1: TestModel4;
     let test2: TestModel4;
@@ -84,7 +84,7 @@ describe('Schema', () => {
     it('should enforce typecasting on schema paths on save', async () => {
       const schema = new Schema({
         name: { type: 'string' }
-      }, 'test-items', TestModel);
+      }, TestModel);
       const test = new TestModel({
           name: 4
       });
@@ -104,7 +104,7 @@ describe('Schema', () => {
       const schema = new Schema({
         name: { type: 'string' },
         birthdate: { type: 'date' }
-      }, 'test-items', TestModel);
+      }, TestModel);
       const test = new TestModel({
           name: 'Brad',
           birthdate: 22
@@ -130,7 +130,7 @@ describe('Schema', () => {
     const schema = new Schema({
         name: { type: 'string' },
         friend: { type: 'ObjectId', ref: Friend }
-    }, 'test-items', TestModel);
+    }, TestModel);
     const test = new TestModel({
         name: 'Brad',
         friend: 'afjklasdfkljds'
@@ -162,7 +162,7 @@ describe('Schema', () => {
       const schema = new Schema({
           name: { type: 'string' },
           friend: { type: 'ObjectId', ref: Friend }
-      }, 'test-items', TestModel);
+      }, TestModel);
       let friend = new Friend({ name: 'Dan' });
       let test: TestModel;
       let result: any;

@@ -9,6 +9,16 @@ export namespace OAuthGrants {
         [OptionalProperties: string]: any
     }
 
+    export interface IOAuthAccessTokenDefinition {
+        accessToken: string
+        refreshToken?: string
+        accessTokenExpiresOn: Date
+        refreshTokenExpiresOn?: Date
+        clientId?: string
+        scope?: OAuthScope
+        [OptionalProperties: string]: any
+    }
+
     export interface IOAuthClientObject {
         id: ClientId
         secret: ClientSecret

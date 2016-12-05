@@ -1,6 +1,6 @@
 declare module "mongorito" {
 
-  import { Db } from 'mongodb';
+  import { Db, Collection } from 'mongodb';
   namespace mongorito {
     
       interface IQuery {
@@ -74,13 +74,13 @@ declare module "mongorito" {
         collection(): string
         constructor(o: JSONDocument, opts?: any)
         configure(): void
+        toJSON(): JSONDocument
         _collection: string
         attributes: IAttributesHash
         previous: IPreviousValueHash
         changed: IChangedValuesHash
         get: (attr?: string) => any
-        set: (attr: string, value: any) => void
-        toJSON: () => JSONDocument
+        set: (attr: string, value: any) => void        
         save: () => this
         remove: () => void
         update: () => this

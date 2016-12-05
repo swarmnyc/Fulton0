@@ -12,7 +12,7 @@ export class ClientGrant implements OAuthGrants.ClientCredentialsGrant {
     }
 
     async getClient(id: string, secret: string) {
-        const obj = await OAuthClient.findOne({ id: id, secret: secret });
+        const obj = await OAuthClient.findOne({ _id: id, secret: secret });
         if (!obj) {
             return undefined;
         }
@@ -21,17 +21,17 @@ export class ClientGrant implements OAuthGrants.ClientCredentialsGrant {
     }
 
     async getUserFromClient(id: string, secret: string) {
-        const client = await OAuthClient.populate('userId', User).findOne({ id: id, secret: secret });
-        let user: User;
+        const client = await OAuthClient.findOne({ _id: id, secret: secret });
+        const user = await User.findById(client.get('userId'));
 
-        if (!client) {
+        if (!client || !user) {
             return undefined;
         }
-
-        return client.get('userId').toJSON();
+        
+        return user.toJSON();
     }
 
-    async saveToken(token: OAuthGrants.IOAuthAccessTokenObject, client: OAuthGrants.IOAuthClientObject, user: any) {
+    async saveToken(token: OAuthGrants.IOAuthAccessTokenDefinition, client: OAuthGrants.IOAuthClientObject, user: any) {
         const obj = new OAuthToken({
             userId: user.id,
             accessToken: token.accessToken,

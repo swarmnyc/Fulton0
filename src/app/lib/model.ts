@@ -8,7 +8,9 @@ export class Model extends MongoritoModel {
   static ValidationError = ValidationError
   static UniqueError = UniqueError
   static RequiredError = RequiredError
-  static ObjectID = ObjectID 
+  static ObjectID = ObjectID
+
+  collectionName: string
 
   /**
    * Define a schema for your model here.
@@ -104,10 +106,15 @@ export class Model extends MongoritoModel {
 
     const Parent = this._getParent();
     const parentSchema = this.schema();
-    const collection = this._collection;
+    const collection = this.collection;
+    
+    // The underlying mongorito class constructor overrides the collection() function with a string
+    if (typeof collection === 'string') {
+      this.collectionName = collection;
+    }
 
     if (parentSchema) {
-      this._schema = new Schema(parentSchema, collection, Parent);            
+      this._schema = new Schema(parentSchema, Parent);            
 
       if (this.timestamps() === true) {
         this.before('save', '_updateTimestamps');
