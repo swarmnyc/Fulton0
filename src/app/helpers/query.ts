@@ -1,5 +1,5 @@
-import { forEach as _forEach, get as _get, startsWith as _startsWith } from 'lodash';
-import { Model } from 'mongorito';
+import { forEach as _forEach, get as _get, startsWith as _startsWith, take as _take } from 'lodash';
+import { Model } from '../lib';
 
 interface IQueryObject {
   filter?: any;
@@ -25,17 +25,8 @@ interface IQueryHelperOptions {
     queryIgnorePaths?: string[]
 }
 
-export class QueryHelper {
-    constructor(opts?: IQueryHelperOptions) {
-        if (!!opts.queryIgnorePaths) {
-            this.queryIgnorePaths = opts.queryIgnorePaths;
-        }
-    }
-
-    queryIgnorePaths: string[]
-
-    exec = (query: any) => {
-        function _filter(key: string) {
+export async function queryHelper(model: typeof Model, query?: any) {
+    function _filter(key: string) {
         const re = new RegExp(/filter\[([a-z0-9]+)\]/, 'i');
         let assoc: string;
         let matches: string[] = key.match(re);
@@ -45,26 +36,31 @@ export class QueryHelper {
         }
 
         return assoc;
-        }
+    }
 
-        function _sort(value: string) {       
-            const sortKeys = value.split(',');
-            const sortObj: ISortObject = {};
-            _forEach(sortKeys, (key) => {
-                sortObj[key] = (key.charAt(0) === '-') ? -1 : 1;         
-            });
+    function _sort(value: string) {       
+        const sortKeys = value.split(',');
+        const sortObj: ISortObject = {};
+        _forEach(sortKeys, (key) => {
+            const isDescending: boolean = key.charAt(0) === '-';
+            if (!!isDescending) {
+                key = key.substr(1);
+            }
+            sortObj[key] = (!!isDescending) ? -1 : 1;         
+        });
 
-            return sortObj;
-        }
-        
-        const ignorePaths: string[] = this.queryIgnorePaths;
-        const q: IQueryObject = {
+        return sortObj;
+    }
+
+    const q: IQueryObject = {
         filter: {},
         options: {
-            sort: {}
+            sort: {},
+            skip: 0
         }
-        };
-        _forEach(query, (value: any, key: string) => {
+    };
+
+    _forEach(query, (value: any, key: string) => {
         let filter: string;      
         if(_startsWith(key, 'filter')) {
             filter = _filter(key);
@@ -72,18 +68,27 @@ export class QueryHelper {
         } else if (key === 'sort') {
             q.options.sort = _sort(value);
         } else if (key === 'limit') {
-            q.options['limit'] = value;
+            q.options.limit = value;
         } else if (key === 'skip') {
-            q.options['skip'] = value;
-        } else if (ignorePaths.indexOf(key) >= 0) {
-            // skip
-            return;
+            q.options.skip = value;        
         } else {
             q.filter[key] = value;
         }
-        });    
-        return q;
-    }
-}
+    });    
 
-export default QueryHelper;
+    let docs = model.skip(q.options.skip).limit(q.options.limit);
+    
+
+    if (q.options.sort) {
+        _forEach(q.options.sort, (dir: number, key: string) => {
+            console.log(key, dir);
+            docs.sort(key, dir);
+        });
+    }
+
+    _forEach(q.filter, (value: any, key: string) => {
+        docs.where(key, value);
+    });
+
+    return docs.find();
+}

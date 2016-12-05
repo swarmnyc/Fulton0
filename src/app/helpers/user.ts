@@ -4,19 +4,15 @@ import { promisify } from 'bluebird';
 
 const SALT_WORK_FACTOR = 10;
 
-export class UserHelper {
-    static async hashPassword(password: string) {        
-        const bcryptGenSalt = promisify(bcrypt.genSalt);
-        const bcryptHash = promisify(bcrypt.hash);
-        const salt = await bcryptGenSalt(SALT_WORK_FACTOR);
-        
-        return bcryptHash(password, salt);
-    }
-
-    static async comparePassword(candidate: string, password: string) {
-        const bcryptCompare = promisify(bcrypt.compare);
-        return bcryptCompare(candidate, password);
-    }
+export async function hashPassword(password: string) {        
+    const bcryptGenSalt = promisify(bcrypt.genSalt);
+    const bcryptHash = promisify<any, string, string, any>(bcrypt.hash);
+    const salt = await bcryptGenSalt(SALT_WORK_FACTOR);
+    
+    return bcryptHash(password, salt, null);
 }
 
-export default UserHelper;
+export async function comparePassword(candidate: string, password: string) {
+    const bcryptCompare = promisify(bcrypt.compare);
+    return bcryptCompare(candidate, password);
+}

@@ -37,8 +37,13 @@ class MongoDB extends Service {
       });
 
       _forEach(indexPaths, (schemaPath, pathName) => {
+        let o: any;
+
         if (!!schemaPath.unique) {
           ParentModel.index(pathName, { unique: true });
+        } else if (schemaPath.indexType) {
+          o[pathName] = schemaPath.indexType;
+          ParentModel.index(o);
         } else {
           ParentModel.index(pathName);
         }

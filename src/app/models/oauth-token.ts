@@ -1,4 +1,6 @@
 import { Model } from '../lib/model';
+import { User } from './user';
+import { OAuthClient } from './oauth-client';
 
 export class OAuthToken extends Model {
     collection() {
@@ -10,8 +12,8 @@ export class OAuthToken extends Model {
         return {
             accessToken: { type: 'string' },
             accessTokenExpiresOn: { type: 'date' },
-            clientId: { type: 'ObjectId', ref: 'oauth-clients' },
-            userId: { type: 'ObjectId', ref: 'users' }
+            clientId: { type: 'ObjectId', ref: OAuthClient },
+            userId: { type: 'ObjectId', ref: User }
         };
     }
 }

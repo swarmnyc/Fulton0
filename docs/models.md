@@ -48,7 +48,7 @@ export class Post extends Model {
         return {
             title: { type: 'string', required: true, unique: true, index: true },
             content: { type: 'string', defaultValue: 'Your content here' },
-            createdBy: { type: 'ObjectId', ref: User },
+            createdBy: { type: 'ObjectId', ref: typeof User },
             comments: { type: 'string[]' },            
             likes: { type: 'number' }
         };

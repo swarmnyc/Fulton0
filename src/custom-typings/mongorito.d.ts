@@ -81,13 +81,15 @@ declare module "mongorito" {
         get: (attr?: string) => any
         set: (attr: string, value: any) => void
         toJSON: () => JSONDocument
-        save: () => Model
+        save: () => this
         remove: () => void
-        update: () => void
+        update: () => this
+        static skip(amount: number): typeof Model
         static populate(pathName: string, model: PopulationOption<typeof Model>): typeof Model
         static index(pathName: string, options?: IIndexOptions): void
         static where(attr: string, value: any): typeof Model
         static sort(attr: string, order: number): typeof Model
+        static limit(amount: number): typeof Model
         static count(query?: IQuery): Promise<number>
         static find(query?: IQuery, options?: IQueryOptions): Promise<Model[]>
         static all(): Promise<Model[]>

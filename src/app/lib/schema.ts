@@ -9,8 +9,9 @@ export interface ISchemaPathDefinition {
   unique?: boolean
   required?: boolean
   index?: boolean
+  indexType?: string
   validator?: IValidator
-  ref?: string
+  ref?: typeof Model
   defaultValue?: any
 }
 
@@ -166,19 +167,23 @@ export class Schema {
 
       const _test = (val: any, index?: any | number) => {
         let docType = typeof val;
+        
         if (schemaPathType !== 'ObjectId' && schemaPathType !== 'date' && docType !== schemaPathType) {
           throw new TypeError(`Found type ${docType} at path ${schemaPath.pathName}, ${schemaPath.type} expected.`);        
         } else if (schemaPathType === 'date' && !(val instanceof Date)) {
           throw new TypeError(`Cast to type Date failed at path ${schemaPath.pathName} with ${val}`);
         } else if (schemaPathType === 'ObjectId') {
-          if (ObjectID.isValid(val) === false && !(val instanceof schemaPath.ref.constructor)) {
+          if (ObjectID.isValid(val) === false && !(val instanceof schemaPath.ref)) {
             throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
-          }
-          if (val instanceof schemaPath.ref.constructor) {
+          } else if (val instanceof schemaPath.ref) {
             doc.set(schemaPath.pathName, val.get('_id'));
           }
         }
       };
+
+      if (schemaPathType === 'any') { 
+        return;
+      }
 
       if (isArray === true) {
         if (_.isArray(value) === false) {

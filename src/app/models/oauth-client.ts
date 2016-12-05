@@ -1,4 +1,5 @@
 import { Model } from '../lib/model';
+import { User } from './user';
 
 export class OAuthClient extends Model {
     collection() {
@@ -7,7 +8,7 @@ export class OAuthClient extends Model {
 
     schema() {
         return {
-            userId: { type: 'ObjectId', ref: 'users' },
+            userId: { type: 'ObjectId', ref: User },
             secret: { type: 'string' },
             redirectUris: { type: 'string[]'}
         };

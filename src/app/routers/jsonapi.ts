@@ -1,7 +1,7 @@
 import { Router, Model } from '../lib';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
-import { forEach as _forEach, startsWith as _startsWith } from 'lodash';
-import { QueryHelper } from '../helpers/query';
+import { forEach as _forEach, startsWith as _startsWith, omit as _omit } from 'lodash';
+import { queryHelper } from '../helpers/query';
 import { ClientGrant } from '../oauth';
 import * as oauthserver from 'koa-oauth-server';
 
@@ -96,11 +96,9 @@ export abstract class JSONAPIRouter extends Router {
   find() {
     const Model = this.Model();
     const serialize = this.adapter().serialize;
-    const queryHelper = new QueryHelper(this.queryIgnorePaths());
-    const composeQuery = queryHelper.exec;
+    const queryIgnorePaths = this.queryIgnorePaths();
     return function*(next: any) {
-      const query = composeQuery(this.query);
-      const model = yield Model.find(query.filter, query.options);
+      const model = yield queryHelper(Model, _omit(this.query, queryIgnorePaths));
       const output: any = [];       
       for (let item of model) {
         output.push(serialize(item.toJSON()));

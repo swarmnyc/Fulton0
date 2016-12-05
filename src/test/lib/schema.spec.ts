@@ -99,4 +99,88 @@ describe('Schema', () => {
           return;
       }
   });
+
+  it ('should enforce typecasting on invalid date objects', async () => {
+      const schema = new Schema({
+        name: { type: 'string' },
+        birthdate: { type: 'date' }
+      }, 'test-items', TestModel);
+      const test = new TestModel({
+          name: 'Brad',
+          birthdate: 22
+      });
+      let result: any;
+
+      try {
+          result = await schema.validate(test);
+      } catch(e) {
+          result = e;
+      } finally {
+          assert.instanceOf(result, TypeError);
+          return;
+      }
+  });
+
+  it('should throw TypeError when setting objectId path to invalid objectId', async () => {
+    class Friend extends Model {
+        collection() {
+            return 'friends';
+        }
+    }
+    const schema = new Schema({
+        name: { type: 'string' },
+        friend: { type: 'ObjectId', ref: Friend }
+    }, 'test-items', TestModel);
+    const test = new TestModel({
+        name: 'Brad',
+        friend: 'afjklasdfkljds'
+    });
+    let result: any;
+
+    try {
+        result = await schema.validate(test);
+    } catch(e) {
+        result = e;
+    } finally {
+        assert.instanceOf(result, TypeError);
+        return;
+    }
+  });
+
+  it('should not throw TypeError when assigning another model to an objectId path', async () => {
+      class Friend extends Model {
+          collection() {
+              return 'friends';
+          }
+
+          schema() {
+              return {
+                  name: { type: 'string', required: true }
+              };
+          }
+      }
+      const schema = new Schema({
+          name: { type: 'string' },
+          friend: { type: 'ObjectId', ref: Friend }
+      }, 'test-items', TestModel);
+      let friend = new Friend({ name: 'Dan' });
+      let test: TestModel;
+      let result: any;
+
+      await friend.save();
+      test = new TestModel({
+          name: 'Brad',
+          friend: friend
+      });
+
+      try {
+          result = await schema.validate(test);
+      } catch(e) {
+          result = e;
+      } finally {
+          assert.instanceOf(result, TestModel);
+          assert.equal(result.get('friend').toString(), friend.get('_id').toString());
+          return;
+      }
+  });
 });

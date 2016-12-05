@@ -1,6 +1,6 @@
 import { OAuthGrants } from '../lib'
 import { User, OAuthToken, OAuthClient } from '../models';
-import UserHelper from '../helpers/user';
+import { comparePassword } from '../helpers/user';
 
 export class PasswordGrant implements OAuthGrants.PasswordGrant {
     async getAccessToken(token: string) {
@@ -29,7 +29,7 @@ export class PasswordGrant implements OAuthGrants.PasswordGrant {
         }
 
         hashPassword = user.get('password');
-        isValidPassword = await UserHelper.comparePassword(password, hashPassword);
+        isValidPassword = await comparePassword(password, hashPassword);
 
         if (!isValidPassword) {
             return null;
