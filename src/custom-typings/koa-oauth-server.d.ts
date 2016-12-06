@@ -36,13 +36,16 @@ declare module "koa-oauth-server" {
         debug?: boolean
     }
 
-    class KoaOauthServer {
-        constructor(config: any);
+    export = class KoaOauthServer {
+        constructor(config: IKoaOAuthOptions);
         authorise(): any;
         grant(): any;
+        token(): any;
     }
 
-    function koa_oauth_server(opts?: IKoaOAuthOptions): KoaOauthServer;
-    namespace koa_oauth_server {}
-    export = koa_oauth_server;
+
+    // function koa_oauth_server(opts?: IKoaOAuthOptions): KoaOauthServer;
+    // namespace koa_oauth_server {}
+    //const KoaOauthServer: OauthServer.KoaOauthServer;
+    //export = OauthServer;
 }

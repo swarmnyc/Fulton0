@@ -45,9 +45,7 @@ export class Router {
  * 
  * @memberOf Router
  */
-  configure(router: KoaRouter<KoaRouter.Context>) {   
-    
-  }
+  configure(router: KoaRouter<KoaRouter.Context>) {}
 
   constructor() {
     this.router = new KoaRouter({ prefix: this.prefix()});

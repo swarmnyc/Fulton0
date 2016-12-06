@@ -67,7 +67,23 @@ declare module "mongorito" {
         new (...args: any[]): Model
       }
 
-      abstract class Model {
+      interface IModelHooks {
+        before: IModelHookCollection
+        after: IModelHookCollection
+      }
+
+      interface IModelHookCollection {
+        create: IModelHookEvent[]
+        update: IModelHookEvent[]
+        remove: IModelHookEvent[]
+        save: IModelHookEvent[]
+      }
+
+      interface IModelHookEvent {
+        (next: any): any
+      }
+
+      class Model {
         after(event: string, handlerName: string): void
         around(event: string, handlerName: string): void
         before(event: string, handlerName: string): void
@@ -75,6 +91,7 @@ declare module "mongorito" {
         constructor(o: JSONDocument, opts?: any)
         configure(): void
         toJSON(): JSONDocument
+        _hooks: IModelHooks
         _collection: string
         attributes: IAttributesHash
         previous: IPreviousValueHash
@@ -91,10 +108,10 @@ declare module "mongorito" {
         static sort(attr: string, order: number): typeof Model
         static limit(amount: number): typeof Model
         static count(query?: IQuery): Promise<number>
-        static find(query?: IQuery, options?: IQueryOptions): Promise<Model[]>
-        static all(): Promise<Model[]>
-        static findOne(query?: IQuery): Promise<Model>
-        static findById(id: string): Promise<Model>
+        static find<T extends Model>(query?: IQuery, options?: IQueryOptions): Promise<T[]>
+        static all<T extends Model>(): Promise<T[]>
+        static findOne<T extends Model>(query?: IQuery): Promise<T>
+        static findById<T extends Model>(id: string): Promise<T>
         static update(query: IQuery, update: IUpdateObject, options?: IUpdateOptions): Promise<IResultsObject>
         static remove(query?: IQuery): Promise<IResultsObject>
       }

@@ -1,5 +1,5 @@
 import { User, OAuthToken, OAuthClient } from '../../app/models';
-import { PasswordGrant } from '../../app/oauth/password';
+import { passwordGrant } from '../../app/oauth/password';
 import * as _ from 'lodash';
 import * as chai from 'chai';
 import * as faker from 'faker';
@@ -7,7 +7,7 @@ import * as mongorito from 'mongorito';
 
 const { assert } = chai;
 
-describe('OAuth PasswordGrant', () => {
+describe('OAuth passwordGrant', () => {
     function factory() {
         return {
             email: faker.internet.email(),
@@ -25,7 +25,7 @@ describe('OAuth PasswordGrant', () => {
         await mongorito.connect('mongodb://localhost:27017/spec-tests');
         await mongorito.db.dropDatabase();
         
-        const users = _.times(25, factory);
+        const users = _.times(5, factory);
 
         for (let user of users) {
             let token: OAuthToken;
@@ -54,7 +54,7 @@ describe('OAuth PasswordGrant', () => {
     });
 
     it('should get oauth token object from accessToken', async () => {
-        const pwg = new PasswordGrant();
+        const pwg = passwordGrant;
         const sample = _.sample(data.tokens);        
         let o = await pwg.getAccessToken(sample.get('accessToken'));
 
@@ -64,7 +64,7 @@ describe('OAuth PasswordGrant', () => {
     });
 
     it('should get oauth client from oauth client and secret', async () => {
-        const pwg = new PasswordGrant();
+        const pwg = passwordGrant;
         const sample = _.sample(data.clients);
         let o = await pwg.getClient(sample.get('_id').toString(), sample.get('secret'));
 
@@ -74,7 +74,7 @@ describe('OAuth PasswordGrant', () => {
     });
 
     it('should get user from username and password', async () => {
-        const pwg = new PasswordGrant();
+        const pwg = passwordGrant;
         const sample = _.sample(data.users);
         const pw = _.find(data.originalPasswords, { userId: sample.get('_id').toString() }).password;
         let o = await pwg.getUser(sample.get('email'), pw);
@@ -86,12 +86,10 @@ describe('OAuth PasswordGrant', () => {
     });
 
     it('should save a new token on saveToken', async () => {
-        const pwg = new PasswordGrant();
+        const pwg = passwordGrant;
         const sample = _.sample(data.users);
         let user = sample.toJSON();        
-        const client = _.find(data.clients, (client) => {
-            return client.get('userId').equals(sample.get('_id'));
-        }).toJSON();
+        const client = _.sample(data.clients).toJSON();
         const token = { accessToken: faker.random.uuid(), accessTokenExpiresOn: faker.date.future() };
         user = _.mapKeys(user, (v: any, path: string) => {
             if (path === '_id') {
@@ -110,7 +108,7 @@ describe('OAuth PasswordGrant', () => {
     });
 
     it('should return undefined on bad password', async () => {
-        const pwg = new PasswordGrant();
+        const pwg = passwordGrant;
         const sample = _.sample(data.users);
         let o = await pwg.getUser(sample.get('email'), 'wrongpassword');
 
@@ -119,7 +117,7 @@ describe('OAuth PasswordGrant', () => {
     });
 
     it('should return undefined on bad user', async () => {
-        const pwg = new PasswordGrant();
+        const pwg = passwordGrant;
         let o = await pwg.getUser('notauser', 'notapassword');
 
         assert.isUndefined(o);

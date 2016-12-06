@@ -7,6 +7,7 @@
     "moment": "registry:dt/moment#2.11.1+20161010105546",
     "mongodb": "registry:dt/mongodb#2.1.0+20161110150902",
     "node": "registry:env/node#6.0.0+20161105011511",
+    "oauth2-server": "registry:dt/oauth2-server#0.0.0+20160317120654",
     "winston": "registry:dt/winston#0.0.0+20161108133445"
   },
   "dependencies": {

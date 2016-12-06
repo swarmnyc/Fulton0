@@ -1,5 +1,6 @@
 import { Model } from '../lib/model';
 import { hashPassword, comparePassword } from '../helpers/user';
+import { OAuthToken } from '.';
 
 export class User extends Model {
   collection() {
@@ -22,7 +23,8 @@ export class User extends Model {
   schema() {
     return {
       email: { type: 'string', required: true, unique: true },
-      password: { type: 'string', required: true }
+      password: { type: 'string', required: true },
+      secret: { type: 'string' }
     };
   }
 }

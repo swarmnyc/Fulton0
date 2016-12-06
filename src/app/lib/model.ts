@@ -1,5 +1,5 @@
 import { Model as MongoritoModel } from 'mongorito';
-import { keys as _keys, pickBy as _pickBy, forEach as _forEach, isNil as _isNil, has as _has, endsWith as _endsWith, isArray as _isArray  } from 'lodash';
+import { get as _get, keys as _keys, pickBy as _pickBy, forEach as _forEach, isNil as _isNil, has as _has, endsWith as _endsWith, isArray as _isArray  } from 'lodash';
 import { ISchemaDefinition, Schema } from './schema';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
 import { ObjectID } from 'mongodb';
@@ -8,7 +8,7 @@ export class Model extends MongoritoModel {
   static ValidationError = ValidationError
   static UniqueError = UniqueError
   static RequiredError = RequiredError
-  static ObjectID = ObjectID
+  static ObjectID = ObjectID  
 
   collectionName: string
 
@@ -24,6 +24,7 @@ export class Model extends MongoritoModel {
   }
 
   protected _schema: Schema
+  protected _isNew: boolean
 
   /**
    * Returns true if constructor has a schema attached to it
@@ -61,7 +62,7 @@ export class Model extends MongoritoModel {
    * @memberOf Model
    */
   isNew() {
-    return _isNil(this.get('_id'));
+    return this._isNew;
   }
 
   /**
@@ -101,27 +102,35 @@ export class Model extends MongoritoModel {
     await next;
   }
 
+  protected async _setIsNew(next: any) {
+    this._isNew = false;
+    await next;
+  }
+
   constructor(attr?: any, opts?: any) {    
     super(attr, opts);
 
     const Parent = this._getParent();
-    const parentSchema = this.schema();
+    const schema = this.schema();
     const collection = this.collection;
+
+    this._isNew = (!_get(attr, '_id'));
     
     // The underlying mongorito class constructor overrides the collection() function with a string
     if (typeof collection === 'string') {
       this.collectionName = collection;
     }
 
-    if (parentSchema) {
-      this._schema = new Schema(parentSchema, Parent);            
+    // Register schema hooks BEFORE any registered middleware handlers
+    if (schema) {
+      this._schema = new Schema(schema, Parent);            
+      this._hooks.before.save.unshift(this._validate);
+      this.after('save', '_setIsNew');
 
       if (this.timestamps() === true) {
-        this.before('save', '_updateTimestamps');
+        this._hooks.before.save.unshift(this._updateTimestamps);
         this._setTimestampPaths();
       }
-
-      this.before('save', '_validate');
     }
   }
 }

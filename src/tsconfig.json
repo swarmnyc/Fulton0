@@ -5,6 +5,7 @@
         "noImplicitAny": false,
         "sourceMap": true,
         "outDir": "../build",
-        "removeComments": true
+        "removeComments": true,
+        "allowJs": true
     }
 }

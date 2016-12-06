@@ -1,10 +1,11 @@
-import * as Application from 'koa/lib/application';
+//import * as Application from 'koa/lib/application';
 import * as koa from 'koa';
+import * as KoaRouter from 'koa-router';
 import Router from './router';
 import { Service } from './service';
 import RequestHandler from './request-handler';
 import { resolve } from 'path';
-import { set as _set, get as _get } from 'lodash';
+import { set as _set, get as _get, assign as _assign } from 'lodash';
 import ConfigLoader from './config-loader';
 import ServiceLoader from './service-loader';
 import RouteLoader from './route-loader';
@@ -21,6 +22,16 @@ interface AppConfig {
   [K: string]: any
 }
 
+interface AppInitOptions {
+  loadRoutes?: boolean
+  loadServices?: boolean
+  loadConfig?: boolean
+}
+
+interface ServiceHash {
+  [N: string]: any
+}
+
 /**
  * Base App class
  * 
@@ -29,9 +40,10 @@ interface AppConfig {
  * @extends {EventEmitter}
  */
 export class App extends EventEmitter {
-  protected app: Application
+  protected app: koa
   protected config: AppConfig
-  
+  services: ServiceHash
+
   appRoot: string
   
   middleware(): RequestHandler<Context>[] { 
@@ -59,6 +71,7 @@ export class App extends EventEmitter {
     }
 
     this.app = new koa();
+    this.services = {};
     this.on('didInit', this.didInit.bind(this));
   }
 
@@ -135,16 +148,29 @@ export class App extends EventEmitter {
    * 
    * @memberOf App
    */
-  async init() {
+  async init(opts: AppInitOptions = { loadConfig: true, loadRoutes: true, loadServices: true }) {
     const app = this.app;
     const configLoader = new ConfigLoader();
     const serviceLoader = new ServiceLoader();
     const routeLoader = new RouteLoader();
+    let config: AppConfig;
+    let oauth: any;
 
     app.on('error', this.didError);
 
-    this.set('config', await configLoader.load(this));
-    await serviceLoader.load(this);
+    if (opts.loadConfig === true) {
+      config = await configLoader.load(this);
+      if (this.config) {
+        this.config = _assign(this.config, config);
+      } else { 
+        this.config = config;
+      }
+      this.set('config', this.config);
+    }
+    
+    if (opts.loadServices === true) {
+      await serviceLoader.load(this);
+    }
 
     if (this.bodyParser() === true) {
       app.use(bodyParser());
@@ -152,10 +178,19 @@ export class App extends EventEmitter {
 
     for (let middleware of this.middleware()) {
       app.use(middleware());
-    }    
+    }
+
+    if (opts.loadServices === true && !!_get(this.config, 'OAuth.enabled') && !!this.services['oauth']) {
+      oauth = new KoaRouter();
+      oauth.post(`/${_get(this.config, 'OAuth.tokenEndpoint') || 'token'}`, this.services['oauth'].grant());
+      app.use(oauth.routes());
+    }
     
-    await routeLoader.load(this);
-        
+    if (opts.loadRoutes === true) {
+      await routeLoader.load(this);
+    }
+    
+
     this.emit('didInit');
 
     return app;

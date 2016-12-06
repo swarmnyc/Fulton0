@@ -1,6 +1,6 @@
-import * as _ from 'lodash';
+import { generateClientSecret } from '../helpers/oauth-client';
 import { Model } from '../lib/model';
-import { User } from './user';
+import * as _ from 'lodash';
 
 export class OAuthClient extends Model {
     collection() {
@@ -9,10 +9,24 @@ export class OAuthClient extends Model {
 
     schema() {
         return {
-            userId: { type: 'ObjectId', ref: User },
-            secret: { type: 'string' },
-            redirectUris: { type: 'string[]'}
+            name: { type: 'string', index: true },
+            secret: { type: 'string', index: true }
         };
+    }
+
+    configure() {
+        this.before('save', 'generateClientSecret');
+    }
+
+    async generateClientSecret(next: any) {
+        let secret: string;
+
+        if (this.isNew() || this.changed['secret']) {
+            secret = await generateClientSecret();
+            this.set('secret', secret);
+        }
+        
+        await next;
     }
 
     toJSON() {
@@ -28,3 +42,5 @@ export class OAuthClient extends Model {
         return o;
     }
 }
+
+export default OAuthClient

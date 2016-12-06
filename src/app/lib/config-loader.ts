@@ -1,18 +1,24 @@
-import ModuleLoader from './loader';
 import * as fs from 'fs-extra';
 import App from './app';
 import { join, resolve, extname } from 'path';
 import { promisify } from 'bluebird';
+import { assign, spread } from 'lodash';
 
 /**
  * Configuration Loader that reads config.ts file and returns it to the app.
  * 
  * @export
  * @class ConfigLoader
- * @extends {ModuleLoader}
  */
-export class ConfigLoader extends ModuleLoader {
-  path = 'config.js'
+export class ConfigLoader {
+  path: string
+  defaultPath = 'config.js'
+  appRoot: string
+
+  constructor() {
+    const env = process.env['NODE_ENV'] || '';
+    this.path = 'config' + (env ? `.${env}` : '') + `.js`;
+  }
 
   /**
    * Loads config file
@@ -24,8 +30,8 @@ export class ConfigLoader extends ModuleLoader {
    */
   async load(app: App) {
     this.appRoot = app.appRoot;
-    const file = await this.find();
-    return this.action(app, file);
+    const files = await this.find();
+    return this.action(app, files);
   }
 
   /**
@@ -36,16 +42,49 @@ export class ConfigLoader extends ModuleLoader {
    * @memberOf ConfigLoader
    */
   protected async find() {
-    const absPath = join(this.appRoot, this.path);
     const stat = promisify(fs.stat);
-    const exists = await stat(absPath);
-    
-    return absPath;
+    const configs: string[] = [];
+    const searchPaths: string[] = [this.path, this.defaultPath];
+    const appRoot: string = this.appRoot;
+    async function _find(path) {
+      const absPath = join(appRoot, path);
+      let exists: boolean;
+      
+      try {
+        exists = !!await stat(absPath);
+      } catch(e) {
+        exists = false;
+      }
+
+      return exists === true ? absPath : undefined;
+    }
+
+    if (this.path === this.defaultPath) {
+      searchPaths.shift();
+    }
+
+    for (let path of searchPaths) {
+      let absPath: string = await _find(path);
+      if (absPath) {
+        configs.push(absPath);
+      }
+    }
+
+    return configs;
   }
 
-  protected action(app: App, filePath: string) {
-    const config = require(filePath);
-    return config;
+  protected async action(app: App, filePaths: string[]) {
+    const configs: any[] = [];
+
+    for (let path of filePaths) {
+      configs.push(require(path));
+    }
+
+    configs.unshift({});
+
+    const _assign = spread(assign);
+
+    return _assign(configs);
   }
 }
 

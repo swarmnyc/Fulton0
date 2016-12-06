@@ -2,8 +2,6 @@ import { Router, Model } from '../lib';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
 import { forEach as _forEach, startsWith as _startsWith, omit as _omit } from 'lodash';
 import { queryHelper } from '../helpers/query';
-import { PasswordGrant } from '../oauth';
-import * as oauthserver from 'koa-oauth-server';
 
 interface IAdapterOptions {
   type: string;
@@ -81,16 +79,6 @@ export abstract class JSONAPIRouter extends Router {
    */
   adapter() {
     return new JSONAPIAdapter(this.adapterOptions());
-  }
-
-  authorizer() {
-    const oauth = oauthserver({
-      model: new PasswordGrant(),
-      grants: ['password'],
-      debug: process.env['NODE_ENV'] === 'development'
-    });
-
-    return oauth;
   }
 
   find() {
@@ -188,13 +176,6 @@ export abstract class JSONAPIRouter extends Router {
   configure(router) {
     if (!this.Model()) {
       throw new TypeError(`Return type of router.Model() is not an instance of Model`);
-    }
-
-    const authorizer = this.authorizer();
-
-    if (!!authorizer) {
-      router.post('/token', authorizer.grant());
-      router.use(authorizer.authorise());
     }
     
     router.use(this.setHeaders());

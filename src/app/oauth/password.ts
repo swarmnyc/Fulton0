@@ -1,27 +1,28 @@
 import { OAuthGrants } from '../lib'
 import { User, OAuthToken, OAuthClient } from '../models';
 import { comparePassword } from '../helpers/user';
+import * as _ from 'lodash';
 
-export class PasswordGrant implements OAuthGrants.PasswordGrant {
-    async getAccessToken(token: string) {
+export const passwordGrant = {
+    getAccessToken: async function(token: string) {
         const obj = await OAuthToken.findOne({ accessToken: token });
         if (!obj) {
             return undefined;
         }
 
         return obj.toJSON();
-    }
+    },
 
-    async getClient(id: string, secret: string) {
+    getClient: async function (id: string, secret: string) {
         let obj = await OAuthClient.findOne({ _id: id, secret: secret });
         if (!obj) {
             return undefined;
         }
 
-         return obj.toJSON();
-    }
+        return obj.toJSON();
+    },
 
-    async getUser(username: string, password: string) {
+    getUser: async function (username: string, password: string) {
         const user = await User.findOne({ email: username });
         let hashPassword: string, isValidPassword: boolean;
         if (!user) {
@@ -35,10 +36,18 @@ export class PasswordGrant implements OAuthGrants.PasswordGrant {
             return undefined;
         }
 
-        return user.toJSON();
-    }
+        let o = _.mapKeys(user.toJSON(), (v: any, key: string) => {
+            if (key === '_id') {
+                return 'id';
+            } else {
+                return key;
+            }
+        });
 
-    async saveToken(token: OAuthGrants.IOAuthAccessTokenDefinition, client: OAuthGrants.IOAuthClientObject, user: any) {
+        return o;
+    },
+
+    saveToken: async function(token: OAuthGrants.IOAuthAccessTokenDefinition, client: OAuthGrants.IOAuthClientObject, user: any) {
         const obj = new OAuthToken({
             userId: user.id,
             accessToken: token.accessToken,
@@ -57,6 +66,6 @@ export class PasswordGrant implements OAuthGrants.PasswordGrant {
         };
         return out;
     }
-}
+};
 
-export default PasswordGrant
+export default passwordGrant
