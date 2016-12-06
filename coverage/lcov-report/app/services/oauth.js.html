@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">71.88% </span>
+        <span class="strong">64.06% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>46/64</span>
+        <span class='fraction'>41/64</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">52.63% </span>
+        <span class="strong">42.11% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>10/19</span>
+        <span class='fraction'>8/19</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">64.71% </span>
+        <span class="strong">58.82% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>11/17</span>
+        <span class='fraction'>10/17</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">80.36% </span>
+        <span class="strong">71.43% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>45/56</span>
+        <span class='fraction'>40/56</span>
       </div>
     </div>
   </div>
@@ -134,10 +134,7 @@
 89
 90
 91
-92
-93
-94
-95</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+92</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">9×</span>
 <span class="cline-any cline-yes">1×</span>
@@ -146,6 +143,7 @@
 <span class="cline-any cline-yes">9×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
@@ -161,15 +159,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -197,10 +195,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -243,27 +237,28 @@ var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _argument
 const lib_1 = require('../lib');
 const password_1 = require('../oauth/password');
 const bluebird_1 = require('bluebird');
-const Request = require('express/lib/request');
-const Response = require('express/lib/response');
+const co = require('co');
+const express = require('express');
+const { request, response } = express;
 const oauthserver = require('oauth2-server');
 const OAuth2Error = require('oauth2-server/lib/error');
 class OAuthServer {
     constructor(opts) {
-        this.handleResponse = <span class="fstat-no" title="function not covered" >function* (response) {</span>
+        this.handleResponse = <span class="fstat-no" title="function not covered" >function (response) {</span>
 <span class="cstat-no" title="statement not covered" >            this.body = response.body;</span>
 <span class="cstat-no" title="statement not covered" >            this.status = response.status;</span>
 <span class="cstat-no" title="statement not covered" >            this.set(response.headers);</span>
         };
-        this.handleError = function* (err, response) {
-            <span class="missing-if-branch" title="else path not taken" >E</span>if (response) {
-                this.set(response.headers);
+        this.handleError = <span class="fstat-no" title="function not covered" >function (err, response) {</span>
+<span class="cstat-no" title="statement not covered" >            if (response) {</span>
+<span class="cstat-no" title="statement not covered" >                this.set(response.headers);</span>
             }
-            <span class="missing-if-branch" title="if path not taken" >I</span>if (err instanceof OAuth2Error) {
+<span class="cstat-no" title="statement not covered" >            if (err instanceof OAuth2Error) {</span>
 <span class="cstat-no" title="statement not covered" >                this.status = err.code;</span>
             }
             else {
-                this.body = { error: err.name, error_description: err.message };
-                this.status = err.code;
+<span class="cstat-no" title="statement not covered" >                this.body = { error: err.name, error_description: err.message };</span>
+<span class="cstat-no" title="statement not covered" >                this.status = err.code;</span>
             }
 <span class="cstat-no" title="statement not covered" >            if (err.code !== 401 || err.code !== 400) {</span>
 <span class="cstat-no" title="statement not covered" >                return this.throw(err.code);</span>
@@ -272,8 +267,8 @@ class OAuthServer {
         this.tokenEndpoint = opts.tokenEndpoint || <span class="branch-1 cbranch-no" title="branch not covered" >'token';</span>
         this.model = opts.model;
         this.grants = opts.grants || <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
-        this.server = new oauthserver({
-            model: this.model,
+        this.server = oauthserver({
+            model: co.wrap(this.model),
             grants: this.grants,
             debug: console.log
         });
@@ -286,15 +281,11 @@ class OAuthServer {
         return function* (next) {
             const req = this.req;
             const res = this.res;
-            try {
-                this.state.oauth = {
-                    token: yield grant(req, res)
-                };
-<span class="cstat-no" title="statement not covered" >                yield handleResponse.call(this, res);</span>
-            }
-            catch (e) {
-                yield handleError.call(this, e, res);
-            }
+            req.is = request.is;
+            this.state.oauth = {
+                token: yield grant(req, res)
+            };
+<span class="cstat-no" title="statement not covered" >            handleResponse.call(this, res);</span>
 <span class="cstat-no" title="statement not covered" >            yield next;</span>
         };
     }
@@ -331,7 +322,7 @@ module.exports = OAuth;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Dec 06 2016 15:27:37 GMT-0500 (EST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Dec 06 2016 16:11:45 GMT-0500 (EST)
 </div>
 </div>
 <script src="../../prettify.js"></script>

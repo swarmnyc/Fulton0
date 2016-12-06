@@ -3,9 +3,11 @@ import { passwordGrant } from '../oauth/password';
 import * as Router from 'koa-router';
 import * as oauth from 'oauth2-server';
 import { promisify } from 'bluebird';
+import * as co from 'co';
+import * as _ from 'lodash';
+import * as express from 'express';
 
-const Request = require('express/lib/request');
-const Response = require('express/lib/response');
+const { request, response } = express;
 const oauthserver = require('oauth2-server');
 const OAuth2Error = require('oauth2-server/lib/error');
 
@@ -34,20 +36,20 @@ class OAuthServer {
         this.grants = opts.grants || [];        
 
         this.server = new oauthserver({
-            model: this.model,
+            model: co.wrap(this.model),
             grants: this.grants,
             debug: console.log
         });
     }
 
-    handleResponse = function*(response: any) {
+    handleResponse = function(response: any) {
         this.body = response.body;
         this.status = response.status;
 
         this.set(response.headers);
     }
 
-    handleError = function*(err: any, response: any) {
+    handleError = function(err: any, response: any) {
         if (response) {
             this.set(response.headers);
         }
@@ -69,20 +71,22 @@ class OAuthServer {
         const grant = promisify(server.grant());
         const handleResponse = this.handleResponse;
         const handleError = this.handleError;
-        return function *(next: any) {
+        return function *(next: any) {                    
             const req = this.req;
             const res = this.res;
-            
-            
+
+            req.body = this.request.body;
+            req.is = request.is;
             try {
                 this.state.oauth = {
                     token: yield grant(req, res)
                 };
+                // this.model.getclient is not a function
                 handleResponse.call(this, res);
-             } catch(e) {
+            } catch(e) {
                 handleError.call(this, e, res);
-             }
-
+            }
+            
             yield next;
         };
     }
