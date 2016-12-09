@@ -1,28 +1,29 @@
-import { OAuthGrants } from '../lib'
+import { OAuth2PasswordModel } from '../lib/services/oauth2/models'
+import { OAuth2AccessToken, OAuth2Client, OAuth2User, OAuth2Scope } from '../lib/services/oauth2/lib';
 import { User, OAuthToken, OAuthClient } from '../models';
 import { comparePassword } from '../helpers/user';
 import * as _ from 'lodash';
 
-export const passwordGrant = {
-    getAccessToken: async function(token: string) {
+export class PasswordGrant extends OAuth2PasswordModel {
+    async getAccessToken(token: string) {
         const obj = await OAuthToken.findOne({ accessToken: token });
         if (!obj) {
             return undefined;
         }
 
         return obj.toJSON();
-    },
+    }
 
-    getClient: async function (id: string, secret: string) {
+    async getClient(id: string, secret: string) {
         let obj = await OAuthClient.findOne({ _id: id, secret: secret });
         if (!obj) {
             return undefined;
         }
 
         return obj.toJSON();
-    },
+    }
 
-    getUser: async function (username: string, password: string) {
+    async getUser(username: string, password: string) {
         const user = await User.findOne({ email: username });
         let hashPassword: string, isValidPassword: boolean;
         if (!user) {
@@ -45,16 +46,14 @@ export const passwordGrant = {
         });
 
         return o;
-    },
+    }
 
-    saveToken: async function(token: OAuthGrants.IOAuthAccessTokenDefinition, client: OAuthGrants.IOAuthClientObject, user: any) {
+    async saveToken(user: OAuth2User, client: OAuth2Client, scope?: OAuth2Scope) {
         const obj = new OAuthToken({
             userId: user.id,
-            accessToken: token.accessToken,
-            accessTokenExpiresOn: token.accessTokenExpiresOn,
             clientId: client.id
         });
-        let out: OAuthGrants.IOAuthAccessTokenObject;
+        let out: OAuth2AccessToken;
 
         await obj.save();
         
@@ -68,4 +67,4 @@ export const passwordGrant = {
     }
 };
 
-export default passwordGrant
+export default PasswordGrant

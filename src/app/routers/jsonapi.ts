@@ -12,7 +12,7 @@ interface IAdapterOptions {
 
 interface IRelationshipDefinition {
   type: string,
-  path: string  
+  path: string
 }
 
 export abstract class JSONAPIRouter extends Router {

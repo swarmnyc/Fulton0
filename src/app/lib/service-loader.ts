@@ -1,15 +1,16 @@
 import ModuleLoader from './loader';
 import App from './app'
+import Service from './service';
 import { isString as _isString } from 'lodash';
 
-export class ServiceLoader extends ModuleLoader {  
-  path = 'services'
-  
-  async action(app: App, filePath: string) {
-    const Service = require(filePath);
-    const config = app.get(`config.${Service.name}`);    
-    const service = new Service(config);
-    let asName: string;    
+type ServiceConstructor = typeof Service;
+
+export class ServiceLoader {  
+
+  async load(app: App, Svc: ServiceConstructor) {
+    const config = app.get(`config.${Svc.name}`);
+    const service = new Svc(config);
+    let asName: string;
     await service.init();
     asName = _isString(service.as) ? service.as : Service.name;
     app.set(`services.${asName}`, service.instance);

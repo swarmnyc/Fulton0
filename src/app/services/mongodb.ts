@@ -1,5 +1,6 @@
 import * as mongorito from 'mongorito';
-import { Service, Model } from '../lib';
+import { Service } from '../lib/service';
+import { Model } from '../lib/model';
 import { pickBy as _pickBy, forEach as _forEach } from 'lodash';
 import * as Models from '../models';
 
@@ -9,7 +10,7 @@ interface MongoDBConfig {
 
 type ModelConstructor = typeof Model;
 
-class MongoDB extends Service {  
+export class MongoDB extends Service {  
   config: MongoDBConfig
   as = 'db'
 
@@ -51,5 +52,3 @@ class MongoDB extends Service {
     }
   }
 }
-
-export = MongoDB

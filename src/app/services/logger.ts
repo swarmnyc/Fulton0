@@ -1,4 +1,4 @@
-import { Service } from '../lib';
+import { Service } from '../lib/service';
 import * as winston from 'winston';
 import * as _ from 'lodash';
 
@@ -18,7 +18,7 @@ interface LoggerConfig {
     transports?: TransportConfig
 }
 
-class Logger extends Service {
+export class Logger extends Service {
     config: LoggerConfig
     instance: winston.LoggerInstance
     as = 'log'
@@ -81,4 +81,4 @@ class Logger extends Service {
     }
 }
 
-export = Logger;
+export default Logger

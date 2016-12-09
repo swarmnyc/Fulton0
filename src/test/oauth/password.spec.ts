@@ -1,5 +1,5 @@
 import { User, OAuthToken, OAuthClient } from '../../app/models';
-import { passwordGrant } from '../../app/oauth/password';
+import { PasswordGrant } from '../../app/oauth/password';
 import * as _ from 'lodash';
 import * as chai from 'chai';
 import * as faker from 'faker';
@@ -7,7 +7,7 @@ import * as mongorito from 'mongorito';
 
 const { assert } = chai;
 
-describe('OAuth passwordGrant', () => {
+describe('OAuth PasswordGrant', () => {
     function factory() {
         return {
             email: faker.internet.email(),
@@ -54,43 +54,42 @@ describe('OAuth passwordGrant', () => {
     });
 
     it('should get oauth token object from accessToken', async () => {
-        const pwg = passwordGrant;
+        const pwg = new PasswordGrant();
         const sample = _.sample(data.tokens);        
         let o = await pwg.getAccessToken(sample.get('accessToken'));
 
-        assert.equal(o.accessToken, sample.get('accessToken'));
+        assert.equal(o['accessToken'], sample.get('accessToken'));
         assert.property(o, 'accessToken');
         return;
     });
 
     it('should get oauth client from oauth client and secret', async () => {
-        const pwg = passwordGrant;
+        const pwg = new PasswordGrant();
         const sample = _.sample(data.clients);
         let o = await pwg.getClient(sample.get('_id').toString(), sample.get('secret'));
 
-        assert.equal(o.secret, sample.get('secret'));
+        assert.equal(o['secret'], sample.get('secret'));
         assert.property(o, 'secret');
         return;
     });
 
     it('should get user from username and password', async () => {
-        const pwg = passwordGrant;
+        const pwg = new PasswordGrant();
         const sample = _.sample(data.users);
         const pw = _.find(data.originalPasswords, { userId: sample.get('_id').toString() }).password;
         let o = await pwg.getUser(sample.get('email'), pw);
 
         assert.isDefined(o);
-        assert.equal(o.email, sample.get('email'));
-        assert.notEqual(o.password, pw);
+        assert.equal(o['email'], sample.get('email'));
+        assert.notEqual(o['password'], pw);
         return;
     });
 
     it('should save a new token on saveToken', async () => {
-        const pwg = passwordGrant;
+        const pwg = new PasswordGrant();
         const sample = _.sample(data.users);
         let user = sample.toJSON();        
-        const client = _.sample(data.clients).toJSON();
-        const token = { accessToken: faker.random.uuid(), accessTokenExpiresOn: faker.date.future() };
+        const client = _.sample(data.clients).toJSON();        
         user = _.mapKeys(user, (v: any, path: string) => {
             if (path === '_id') {
                 return 'id';
@@ -98,17 +97,19 @@ describe('OAuth passwordGrant', () => {
                 return path;
             }
         });
-        let o = await pwg.saveToken(token, client, user);
+        let o = await pwg.saveToken(user, client);
 
-        assert.equal(token.accessToken, o.accessToken);
-        assert.equal(token.accessTokenExpiresOn, o.accessTokenExpiresOn);
-        assert.equal(o.clientId, client.id);
+        assert.property(o, 'accessToken');
+        assert.property(o, 'accessTokenExpiresOn');
+        assert.typeOf(o.accessToken, 'string');
+        assert.instanceOf(o.accessTokenExpiresOn, Date);
+        assert.equal(o['clientId'], client.id);
         assert.equal(o['userId'], user.id.toString());
         return;
     });
 
     it('should return undefined on bad password', async () => {
-        const pwg = passwordGrant;
+        const pwg = new PasswordGrant();
         const sample = _.sample(data.users);
         let o = await pwg.getUser(sample.get('email'), 'wrongpassword');
 
@@ -117,7 +118,7 @@ describe('OAuth passwordGrant', () => {
     });
 
     it('should return undefined on bad user', async () => {
-        const pwg = passwordGrant;
+        const pwg = new PasswordGrant();
         let o = await pwg.getUser('notauser', 'notapassword');
 
         assert.isUndefined(o);

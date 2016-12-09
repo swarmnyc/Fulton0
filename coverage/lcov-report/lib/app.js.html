@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">16.18% </span>
+        <span class="strong">15.49% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>11/68</span>
+        <span class='fraction'>11/71</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">11.54% </span>
@@ -32,12 +32,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/17</span>
+        <span class='fraction'>0/18</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">18.33% </span>
+        <span class="strong">17.74% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>11/60</span>
+        <span class='fraction'>11/62</span>
       </div>
     </div>
   </div>
@@ -137,7 +137,10 @@
 92
 93
 94
-95</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+95
+96
+97
+98</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -155,30 +158,20 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -188,6 +181,17 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -208,6 +212,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -242,11 +248,12 @@ var __awaiter = (this &amp;&amp; this.__awaiter) || <span class="fstat-no" title
 };
 const koa = require('koa');
 const KoaRouter = require('koa-router');
+const service_loader_1 = require('./service-loader');
 const path_1 = require('path');
 const lodash_1 = require('lodash');
 const config_loader_1 = require('./config-loader');
-const service_loader_1 = require('./service-loader');
-const route_loader_1 = require('./route-loader');
+const services = require('../services');
+<span class="cstat-no" title="statement not covered" >const route_loader_1 = require('./route-loader');</span>
 <span class="cstat-no" title="statement not covered" >const events_1 = require('events');</span>
 <span class="cstat-no" title="statement not covered" >const bodyParser = require('koa-bodyparser');</span>
 class App extends events_1.EventEmitter {
@@ -285,7 +292,7 @@ class App extends events_1.EventEmitter {
 <span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span>
 <span class="cstat-no" title="statement not covered" >            const app = this.app;</span>
 <span class="cstat-no" title="statement not covered" >            const configLoader = new config_loader_1.default();</span>
-<span class="cstat-no" title="statement not covered" >            const serviceLoader = new service_loader_1.default();</span>
+<span class="cstat-no" title="statement not covered" >            const serviceLoader = new service_loader_1.ServiceLoader();</span>
 <span class="cstat-no" title="statement not covered" >            const routeLoader = new route_loader_1.default();</span>
 <span class="cstat-no" title="statement not covered" >            let config;</span>
 <span class="cstat-no" title="statement not covered" >            let oauth;</span>
@@ -301,7 +308,9 @@ class App extends events_1.EventEmitter {
 <span class="cstat-no" title="statement not covered" >                this.set('config', this.config);</span>
             }
 <span class="cstat-no" title="statement not covered" >            if (opts.loadServices === true) {</span>
-<span class="cstat-no" title="statement not covered" >                yield serviceLoader.load(this);</span>
+<span class="cstat-no" title="statement not covered" >                yield lodash_1.forEach(services, (service) =&gt; <span class="cstat-no" title="statement not covered" >__awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span></span>
+<span class="cstat-no" title="statement not covered" >                    yield serviceLoader.load(this, service);</span>
+                }));
             }
 <span class="cstat-no" title="statement not covered" >            if (this.bodyParser() === true) {</span>
 <span class="cstat-no" title="statement not covered" >                app.use(bodyParser());</span>
@@ -311,7 +320,7 @@ class App extends events_1.EventEmitter {
             }
 <span class="cstat-no" title="statement not covered" >            if (opts.loadServices === true &amp;&amp; !!lodash_1.get(this.config, 'OAuth.enabled') &amp;&amp; !!this.services['oauth']) {</span>
 <span class="cstat-no" title="statement not covered" >                oauth = new KoaRouter();</span>
-<span class="cstat-no" title="statement not covered" >                oauth.post(`/${lodash_1.get(this.config, 'OAuth.tokenEndpoint') || 'token'}`, this.services['oauth'].token());</span>
+<span class="cstat-no" title="statement not covered" >                oauth.post(`/${lodash_1.get(this.config, 'OAuth.tokenEndpoint') || 'token'}`, this.services['oauth'].grant());</span>
 <span class="cstat-no" title="statement not covered" >                app.use(oauth.routes());</span>
             }
 <span class="cstat-no" title="statement not covered" >            if (opts.loadRoutes === true) {</span>
@@ -331,7 +340,7 @@ class App extends events_1.EventEmitter {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Dec 06 2016 14:01:08 GMT-0500 (EST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Dec 07 2016 11:58:31 GMT-0500 (EST)
 </div>
 </div>
 <script src="../prettify.js"></script>
