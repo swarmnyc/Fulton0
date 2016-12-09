@@ -60,6 +60,8 @@ describe('OAuthToken', () => {
             .send({ username: data.user.get('email'), password: data.password, grant_type: 'password', client_id: data.client.get('_id').toString(), client_secret: data.client.get('secret') });
         
         expect(response).to.have['status'](200);
+        expect(response.body).to.be.a('object');
+        expect(response.body.accessToken).to.be.a('string');
         return;
     });
 });

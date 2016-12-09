@@ -1,4 +1,4 @@
 export interface OAuth2User {
-  id: any
+  id: string | number
   [K: string]: any
 }

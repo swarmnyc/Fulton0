@@ -1,5 +1,6 @@
-import { generateClientSecret } from '../helpers/oauth-client';
+import { generateClientSecret } from '../helpers/oauth';
 import { Model } from '../lib/model';
+import { User } from './user';
 import * as _ from 'lodash';
 
 export class OAuthClient extends Model {
@@ -10,7 +11,8 @@ export class OAuthClient extends Model {
     schema() {
         return {
             name: { type: 'string', index: true },
-            secret: { type: 'string', index: true }
+            secret: { type: 'string', index: true },
+            userId: { type: 'ObjectId', ref: User }
         };
     }
 

@@ -8,7 +8,6 @@ import RequestHandler from './request-handler';
 import { resolve } from 'path';
 import { toArray as _toArray, map as _map, set as _set, get as _get, assign as _assign } from 'lodash';
 import ConfigLoader from './config-loader';
-import * as services from '../services';
 import RouteLoader from './route-loader';
 import Context from './context';
 import { EventEmitter } from 'events';
@@ -30,7 +29,7 @@ interface AppInitOptions {
 }
 
 interface ServiceHash {
-  [N: string]: any
+  [K: string]: any
 }
 
 /**
@@ -155,8 +154,7 @@ export class App extends EventEmitter {
     const serviceLoader = new ServiceLoader();
     const routeLoader = new RouteLoader();
     let config: AppConfig;
-    let oauth: any;    
-    let svcs: typeof Service[];
+    let oauth: any;
 
     app.on('error', this.didError);
 
@@ -171,9 +169,7 @@ export class App extends EventEmitter {
     }
         
     if (opts.loadServices === true) {
-      await _map(_toArray(services), (service: typeof Service) => {
-        return serviceLoader.load(this, service);
-      });
+      await serviceLoader.load(this);
     }
 
     if (this.bodyParser() === true) {
@@ -184,7 +180,7 @@ export class App extends EventEmitter {
       app.use(middleware());
     }
 
-    if (opts.loadServices === true && !!_get(this.config, 'OAuth.enabled') && !!this.services['oauth']) {
+    if (opts.loadServices === true && _get(this.config, 'OAuth.enabled') === true) {
       oauth = new KoaRouter();
       oauth.post(`/${_get(this.config, 'OAuth.tokenEndpoint') || 'token'}`, this.services['oauth'].token());
       app.use(oauth.routes());

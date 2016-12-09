@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">46.15% </span>
+        <span class="strong">73.08% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>12/26</span>
+        <span class='fraction'>19/26</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">42.86% </span>
+        <span class="strong">85.71% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>3/7</span>
-      </div>
-      <div class='fl pad1y space-right2'>
-        <span class="strong">11.11% </span>
-        <span class="quiet">Functions</span>
-        <span class='fraction'>1/9</span>
+        <span class='fraction'>6/7</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">66.67% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>12/18</span>
+        <span class='fraction'>18/18</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -74,11 +74,11 @@
 29
 30</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -90,10 +90,10 @@
 <span class="cline-any cline-yes">9×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -102,12 +102,12 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
-var __awaiter = (this &amp;&amp; this.__awaiter) || <span class="fstat-no" title="function not covered" >function (thisArg, _arguments, P, generator) {</span>
-<span class="cstat-no" title="statement not covered" >    return new (P || (P = Promise))(<span class="fstat-no" title="function not covered" >function (resolve, reject) {</span></span>
+var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
 <span class="fstat-no" title="function not covered" >        function fulfilled(value) {</span> <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >step(generator.next(value)); </span>} catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} </span>}
 <span class="fstat-no" title="function not covered" >        function rejected(value) {</span> <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >step(generator.throw(value)); </span>} catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} </span>}
-<span class="fstat-no" title="function not covered" >        function step(result) {</span> <span class="cstat-no" title="statement not covered" >result.done ? resolve(result.value) : new P(<span class="fstat-no" title="function not covered" >function (resolve) {</span> <span class="cstat-no" title="statement not covered" >resolve(result.value); </span>}).then(fulfilled, rejected); </span>}
-<span class="cstat-no" title="statement not covered" >        step((generator = generator.apply(thisArg, _arguments)).next());</span>
+        function step(result) { result.done ? resolve(result.value) : <span class="branch-1 cbranch-no" title="branch not covered" >new P(<span class="fstat-no" title="function not covered" >function (resolve) {</span> <span class="cstat-no" title="statement not covered" >resolve(result.value); </span>}).then(fulfilled, rejected);</span> }
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
 const loader_1 = require('./loader');
@@ -118,11 +118,11 @@ class RouteLoader extends loader_1.default {
         super(...arguments);
         this.path = 'routes';
     }
-    load<span class="fstat-no" title="function not covered" >(app) {</span>
-<span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span>
-<span class="cstat-no" title="statement not covered" >            lodash_1.forEach(Routes, (Route) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >                const router = new Route();</span>
-<span class="cstat-no" title="statement not covered" >                app.use(router.routes());</span>
+    load(app) {
+        return __awaiter(this, void 0, void 0, function* () {
+            lodash_1.forEach(Routes, (Route) =&gt; {
+                const router = new Route();
+                app.use(router.routes());
             });
         });
     }
@@ -136,7 +136,7 @@ exports.default = RouteLoader;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Dec 07 2016 11:46:44 GMT-0500 (EST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Dec 09 2016 08:18:35 GMT-0500 (EST)
 </div>
 </div>
 <script src="../../prettify.js"></script>

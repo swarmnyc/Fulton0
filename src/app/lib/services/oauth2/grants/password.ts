@@ -13,8 +13,7 @@ export class PasswordGrantHandler extends BaseGrantHandler {
   }
 
   async handle(ctx: Context) {
-    const usernameField: string = this.model.usernameField();
-    const username = ctx.request['body'][usernameField];
+    const username = ctx.request['body']['username'];
     const password = ctx.request['body']['password'];
     const scope: OAuth2Scope = this._getScope(ctx);
     let user: OAuth2User;

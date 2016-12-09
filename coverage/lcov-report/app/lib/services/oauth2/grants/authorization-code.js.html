@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for app/lib/services/oauth2/models/base.js</title>
+    <title>Code coverage report for app/lib/services/oauth2/grants/authorization-code.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../../../prettify.css" />
     <link rel="stylesheet" href="../../../../../base.css" />
@@ -16,28 +16,28 @@
 <div class='wrapper'>
   <div class='pad1'>
     <h1>
-      <a href="../../../../../index.html">all files</a> / <a href="index.html">app/lib/services/oauth2/models/</a> base.js
+      <a href="../../../../../index.html">all files</a> / <a href="index.html">app/lib/services/oauth2/grants/</a> authorization-code.js
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">21.74% </span>
+        <span class="strong">17.07% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>5/23</span>
+        <span class='fraction'>7/41</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">42.86% </span>
+        <span class="strong">20% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>3/7</span>
+        <span class='fraction'>3/15</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/14</span>
+        <span class='fraction'>0/10</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">33.33% </span>
+        <span class="strong">21.21% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>5/15</span>
+        <span class='fraction'>7/33</span>
       </div>
     </div>
   </div>
@@ -75,7 +75,23 @@
 30
 31
 32
-33</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -84,23 +100,39 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -116,30 +148,46 @@ var __awaiter = (this &amp;&amp; this.__awaiter) || <span class="fstat-no" title
 <span class="cstat-no" title="statement not covered" >        step((generator = generator.apply(thisArg, _arguments)).next());</span>
     });
 };
-class OAuth2BaseModel {
-    getAccessToken<span class="fstat-no" title="function not covered" >(token) {</span>
-<span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span>
-<span class="cstat-no" title="statement not covered" >            return undefined;</span>
-        });
+const _1 = require('.');
+const lib_1 = require('../lib');
+class AuthorizationCodeGrantHandler extends _1.BaseGrantHandler {
+    constructor<span class="fstat-no" title="function not covered" >(model) {</span>
+<span class="cstat-no" title="statement not covered" >        super();</span>
+<span class="cstat-no" title="statement not covered" >        this.model = model;</span>
     }
-    getClient<span class="fstat-no" title="function not covered" >(id, secret) {</span>
-<span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span>
-<span class="cstat-no" title="statement not covered" >            return undefined;</span>
-        });
+    _validateRequestUri<span class="fstat-no" title="function not covered" >(ctx, code) {</span>
+<span class="cstat-no" title="statement not covered" >        if (!code.redirectUri) {</span>
+<span class="cstat-no" title="statement not covered" >            return true;</span>
+        }
+<span class="cstat-no" title="statement not covered" >        const redirectUri = ctx.request['body']['redirect_uri'] || ctx.request.query['redirect_uri'];</span>
+<span class="cstat-no" title="statement not covered" >        return (redirectUri === code.redirectUri);</span>
     }
-    saveToken<span class="fstat-no" title="function not covered" >(user, client, scope) {</span>
+    handle<span class="fstat-no" title="function not covered" >(ctx) {</span>
 <span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span>
-<span class="cstat-no" title="statement not covered" >            return undefined;</span>
-        });
-    }
-    validateScope<span class="fstat-no" title="function not covered" >(token, scope) {</span>
-<span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >function* () {</span></span>
-<span class="cstat-no" title="statement not covered" >            return false;</span>
+<span class="cstat-no" title="statement not covered" >            const code = ctx.request['body']['code'];</span>
+<span class="cstat-no" title="statement not covered" >            let auth;</span>
+<span class="cstat-no" title="statement not covered" >            let isValidRequestUri;</span>
+<span class="cstat-no" title="statement not covered" >            let token;</span>
+<span class="cstat-no" title="statement not covered" >            if (!code) {</span>
+<span class="cstat-no" title="statement not covered" >                return lib_1.errorHandler.call(ctx, 'bad request');</span>
+            }
+<span class="cstat-no" title="statement not covered" >            auth = yield this.model.getAuthorizationCode(code);</span>
+<span class="cstat-no" title="statement not covered" >            isValidRequestUri = this._validateRequestUri(ctx, auth);</span>
+<span class="cstat-no" title="statement not covered" >            if (isValidRequestUri === false) {</span>
+<span class="cstat-no" title="statement not covered" >                return lib_1.errorHandler.call(ctx, 'bad request');</span>
+            }
+<span class="cstat-no" title="statement not covered" >            yield this.model.revokeAuthorizationCode(auth);</span>
+<span class="cstat-no" title="statement not covered" >            token = yield this.model.saveToken(auth.user, ctx.state.oauth.client, auth.scope, auth.authorizationCode);</span>
+<span class="cstat-no" title="statement not covered" >            ctx.state.oauth.user = auth.user;</span>
+<span class="cstat-no" title="statement not covered" >            ctx.state.oauth.scope = auth.scope;</span>
+<span class="cstat-no" title="statement not covered" >            ctx.state.oauth.auth = auth;</span>
+<span class="cstat-no" title="statement not covered" >            ctx.state.oauth.token = token;</span>
+<span class="cstat-no" title="statement not covered" >            return true;</span>
         });
     }
 }
-exports.OAuth2BaseModel = OAuth2BaseModel;
-//# sourceMappingURL=base.js.map</pre></td></tr>
+exports.AuthorizationCodeGrantHandler = AuthorizationCodeGrantHandler;
+//# sourceMappingURL=authorization-code.js.map</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->

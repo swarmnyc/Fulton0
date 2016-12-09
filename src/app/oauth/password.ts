@@ -2,9 +2,15 @@ import { OAuth2PasswordModel } from '../lib/services/oauth2/models'
 import { OAuth2AccessToken, OAuth2Client, OAuth2User, OAuth2Scope } from '../lib/services/oauth2/lib';
 import { User, OAuthToken, OAuthClient } from '../models';
 import { comparePassword } from '../helpers/user';
+import { generateAccessToken } from '../helpers/oauth';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 export class PasswordGrant extends OAuth2PasswordModel {
+    usernameField() {
+        return 'email';
+    }
+
     async getAccessToken(token: string) {
         const obj = await OAuthToken.findOne({ accessToken: token });
         if (!obj) {
@@ -49,12 +55,16 @@ export class PasswordGrant extends OAuth2PasswordModel {
     }
 
     async saveToken(user: OAuth2User, client: OAuth2Client, scope?: OAuth2Scope) {
+        const userId = user.id;
         const obj = new OAuthToken({
             userId: user.id,
             clientId: client.id
         });
         let out: OAuth2AccessToken;
-
+        await obj.save();
+        
+        obj.set('accessToken',  generateAccessToken(userId.toString(), client.id.toString(), obj.get('_id').toString()));
+        obj.set('accessTokenExpiresOn', moment().add(90, 'day').toDate());
         await obj.save();
         
         out = {

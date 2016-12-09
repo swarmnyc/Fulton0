@@ -32,11 +32,11 @@ export function token(model: models.OAuth2BaseModel, grants?: string[]) {
         break;
     }
 
-    this.body = this.state.oauth.token;
-    this.status(200);
+    this.body = this.state.oauth.accessToken;
+    this.status = 200;
     this.response.set('Cache-Control', 'no-store');
     this.response.set('Pragma', 'no-cache');
-    return;
+    yield next;
   }
 }
 

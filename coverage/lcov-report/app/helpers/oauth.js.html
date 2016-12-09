@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for app/helpers/user.js</title>
+    <title>Code coverage report for app/helpers/oauth.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -16,13 +16,13 @@
 <div class='wrapper'>
   <div class='pad1'>
     <h1>
-      <a href="../../index.html">all files</a> / <a href="index.html">app/helpers/</a> user.js
+      <a href="../../index.html">all files</a> / <a href="index.html">app/helpers/</a> oauth.js
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">86.21% </span>
+        <span class="strong">84.62% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>25/29</span>
+        <span class='fraction'>22/26</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -30,14 +30,14 @@
         <span class='fraction'>7/7</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">90% </span>
+        <span class="strong">88.89% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>9/10</span>
+        <span class='fraction'>8/9</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>21/21</span>
+        <span class='fraction'>18/18</span>
       </div>
     </div>
   </div>
@@ -67,35 +67,27 @@
 22
 23
 24
-25
-26
-27
-28
-29</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+25</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">12×</span>
-<span class="cline-any cline-yes">8×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">20×</span>
-<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">8×</span>
-<span class="cline-any cline-yes">8×</span>
-<span class="cline-any cline-yes">8×</span>
-<span class="cline-any cline-yes">8×</span>
-<span class="cline-any cline-yes">8×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -108,26 +100,22 @@ var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _argument
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-const bcrypt = require('bcrypt-nodejs');
+const crypto = require('crypto');
+const moment = require('moment');
 const bluebird_1 = require('bluebird');
-const SALT_WORK_FACTOR = 10;
-function hashPassword(password) {
+function generateAccessToken(userId, clientId, accessTokenId) {
+    return crypto.createHmac('sha256', accessTokenId).update(`user_id=${userId}`).update(`client_id=${clientId}`).update(`created_at=${moment().valueOf()}`).digest('hex');
+}
+exports.generateAccessToken = generateAccessToken;
+function generateClientSecret() {
     return __awaiter(this, void 0, void 0, function* () {
-        const bcryptGenSalt = bluebird_1.promisify(bcrypt.genSalt);
-        const bcryptHash = bluebird_1.promisify(bcrypt.hash);
-        const salt = yield bcryptGenSalt(SALT_WORK_FACTOR);
-        return bcryptHash(password, salt, null);
+        const randomBytes = bluebird_1.promisify(crypto.randomBytes);
+        const str = yield randomBytes(256);
+        return str.toString('hex');
     });
 }
-exports.hashPassword = hashPassword;
-function comparePassword(candidate, password) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const bcryptCompare = bluebird_1.promisify(bcrypt.compare);
-        return bcryptCompare(candidate, password);
-    });
-}
-exports.comparePassword = comparePassword;
-//# sourceMappingURL=user.js.map</pre></td></tr>
+exports.generateClientSecret = generateClientSecret;
+//# sourceMappingURL=oauth.js.map</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
