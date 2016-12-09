@@ -1,84 +1,16 @@
-import { Service } from '../lib/service';
-import * as winston from 'winston';
-import * as _ from 'lodash';
+import { BaseLoggerService } from '../lib/services/logger';
 
-interface TransportConfig {
-    [TransportName: string]: TransportConfigOptions
-}
-
-// See https://github.com/winstonjs/winston/blob/master/docs/transports.md for options
-interface TransportConfigOptions {
-    enabled?: boolean
-    level?: string
-    [OptionName: string]: any
-}
-
-interface LoggerConfig {
-    handleExceptions?: boolean
-    transports?: TransportConfig
-}
-
-export class Logger extends Service {
-    config: LoggerConfig
-    instance: winston.LoggerInstance
-    as = 'log'
-
-    onException(err: Error) {
-        this.instance.error(err.message, err);
-        process.exit(1);
+export class Logger extends BaseLoggerService {
+    as() {
+      return 'log';
     }
 
-    async init() {
-        const transports: TransportConfig = this.config.transports;
-        this.instance = new winston.Logger();        
-        _.forEach(transports, (settings: TransportConfigOptions, name: string) => {
-            if (settings.enabled === false) {
-                return;
-            }
-
-            const ts = _.omit(settings, 'enabled');
-            if (winston.transports[_.upperFirst(name)]) {
-                this.instance.add(winston.transports[_.upperFirst(name)], ts);
-            }
-        });
-
-        process.on('unhandledException', this.onException.bind(this));
-        process.on('unhandledRejection', this.onException.bind(this));
-
-        return this;
-    }
-
-    log(level?: string, msg?: string) {
-        if (arguments.length === 1) {
-            msg = level;
-            level = 'info';
+    transports() {
+      return {
+        console: {
+          enabled: true,
+          level: 'debug'
         }
-        this.instance.log(level, msg);
-    }
-
-    info(msg: string, metadata?: any) {
-        this.instance.info(msg, metadata);
-    }
-
-    error(msg: string, metadata?: any) {
-        this.instance.error(msg, metadata);
-    }
-
-    debug(msg: string, metadata?: any) {
-        this.instance.error(msg, metadata);
-    }
-
-    warn(msg: string, metadata?: any) {
-        this.instance.warn(msg, metadata);
-    }
-
-    verbose(msg: string, metadata?: any) {
-        this.instance.verbose(msg, metadata);
-    }
-
-    silly(msg: string, metadata?: any) {
-        this.instance.silly(msg, metadata);
+      };
     }
 }
-
-export default Logger

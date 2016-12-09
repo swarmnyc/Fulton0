@@ -7,25 +7,14 @@ import { ServiceLoader } from './service-loader';
 import RequestHandler from './request-handler';
 import { resolve } from 'path';
 import { toArray as _toArray, map as _map, set as _set, get as _get, assign as _assign } from 'lodash';
-import ConfigLoader from './config-loader';
 import RouteLoader from './route-loader';
 import Context from './context';
 import { EventEmitter } from 'events';
 import * as bodyParser from 'koa-bodyparser';
 
-/**
- * Configuration object for an app instance
- * 
- * @interface AppConfig
- */
-interface AppConfig {
-  [K: string]: any
-}
-
 interface AppInitOptions {
   loadRoutes?: boolean
   loadServices?: boolean
-  loadConfig?: boolean
 }
 
 interface ServiceHash {
@@ -41,7 +30,6 @@ interface ServiceHash {
  */
 export class App extends EventEmitter {
   protected app: koa
-  protected config: AppConfig
   services: ServiceHash
 
   appRoot: string
@@ -62,13 +50,9 @@ export class App extends EventEmitter {
    * 
    * @memberOf App
    */
-  constructor(config?: AppConfig) {
+  constructor() {
     super();
     this.appRoot = resolve(`${__dirname}/..`);
-
-    if (config) {
-      this.config = config;
-    }
 
     this.app = new koa();
     this.services = {};
@@ -148,25 +132,13 @@ export class App extends EventEmitter {
    * 
    * @memberOf App
    */
-  async init(opts: AppInitOptions = { loadConfig: true, loadRoutes: true, loadServices: true }) {
+  async init(opts: AppInitOptions = { loadRoutes: true, loadServices: true }) {
     const app = this.app;
-    const configLoader = new ConfigLoader();
     const serviceLoader = new ServiceLoader();
     const routeLoader = new RouteLoader();
-    let config: AppConfig;
     let oauth: any;
 
     app.on('error', this.didError);
-
-    if (opts.loadConfig === true) {
-      config = await configLoader.load(this);
-      if (this.config) {
-        this.config = _assign(this.config, config);
-      } else { 
-        this.config = config;
-      }
-      this.set('config', this.config);
-    }
         
     if (opts.loadServices === true) {
       await serviceLoader.load(this);
@@ -180,9 +152,9 @@ export class App extends EventEmitter {
       app.use(middleware());
     }
 
-    if (opts.loadServices === true && _get(this.config, 'OAuth.enabled') === true) {
+    if (opts.loadServices === true && this.services['oauth']) {
       oauth = new KoaRouter();
-      oauth.post(`/${_get(this.config, 'OAuth.tokenEndpoint') || 'token'}`, this.services['oauth'].token());
+      oauth.post(`/${this.services['oauth'].tokenEndpoint()}`, this.services['oauth'].token());
       app.use(oauth.routes());
     }
     

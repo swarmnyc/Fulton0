@@ -17,9 +17,13 @@ export interface OAuthOptions {
 }
 
 export class OAuth2Server {
-    model: typeof OAuth2BaseModel
-    tokenEndpoint: string
+    protected _tokenEndpoint: string
     grants: string[]
+    model: typeof OAuth2BaseModel
+    
+    tokenEndpoint(): string {
+      return this._tokenEndpoint;
+    }    
 
     token() {
       const model = new this.model();
@@ -37,7 +41,7 @@ export class OAuth2Server {
 
     constructor(opts: OAuthOptions) {
         this.model = opts.model;
-        this.tokenEndpoint = opts.tokenEndpoint;
+        this._tokenEndpoint = opts.tokenEndpoint;
         this.grants = opts.grants;
     }
 }

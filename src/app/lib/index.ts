@@ -3,7 +3,6 @@ export * from './request-handler';
 export * from './app';
 export * from './request-handler';
 export * from './loader';
-export * from './config-loader';
 export * from './route-loader';
 export * from './service-loader';
 export * from './service';
