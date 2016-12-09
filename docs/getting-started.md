@@ -30,7 +30,7 @@ $> npm install
 Either by using the built-in build script in Visual Studio Code (<kbd>&#8984;</kbd> <kbd>SHIFT</kbd> <kbd>B</kbd>) or Atom's TypeScript plugin OR by running the following in the terminal:
 
 ```
-$> npm build
+$> npm run-script build
 ``` 
 
 ### 4. Start the Sample App
