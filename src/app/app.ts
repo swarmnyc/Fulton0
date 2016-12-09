@@ -3,7 +3,7 @@ import * as cors from 'koa-cors';
 
 class MyApp extends App {
     middleware() {
-        return [cors()];
+        return [cors];
     }
 }
 

@@ -10,7 +10,7 @@
       "name": "Launch Program",
       "program": "${workspaceRoot}/src/main.ts",
       "cwd": "${workspaceRoot}/src",
-      "outDir": "${workspaceRoot}/dist",
+      "outDir": "${workspaceRoot}/build",
       "sourceMaps": true
     },
     {

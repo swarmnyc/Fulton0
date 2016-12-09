@@ -53,7 +53,7 @@ export class BaseLoggerService extends Service {
 
     async init() {
         const transports: TransportConfig = this.transports();
-        this.instance = new winston.Logger();        
+        const instance = new winston.Logger();        
         _.forEach(transports, (settings: TransportConfigOptions, name: string) => {
             if (settings.enabled === false) {
                 return;
@@ -61,14 +61,14 @@ export class BaseLoggerService extends Service {
 
             const ts = _.omit(settings, 'enabled');
             if (winston.transports[_.upperFirst(name)]) {
-                this.instance.add(winston.transports[_.upperFirst(name)], ts);
+                instance.add(winston.transports[_.upperFirst(name)], ts);
             }
         });
 
         process.on('unhandledException', this._onException.bind(this));
         process.on('unhandledRejection', this._onException.bind(this));
 
-        return;
+        return instance;
     }
 
     log(level?: string, msg?: string) {
@@ -88,7 +88,7 @@ export class BaseLoggerService extends Service {
     }
 
     debug(msg: string, metadata?: any) {
-        this.instance.error(msg, metadata);
+        this.instance.debug(msg, metadata);
     }
 
     warn(msg: string, metadata?: any) {
