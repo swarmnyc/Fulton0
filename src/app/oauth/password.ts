@@ -63,10 +63,6 @@ export class PasswordGrant extends OAuth2PasswordModel {
         let out: OAuth2AccessToken;
         await obj.save();
         
-        obj.set('accessToken',  generateAccessToken(userId.toString(), client.id.toString(), obj.get('_id').toString()));
-        obj.set('accessTokenExpiresOn', moment().add(90, 'day').toDate());
-        await obj.save();
-        
         out = {
             accessToken: obj.get('accessToken'),
             accessTokenExpiresOn: obj.get('accessTokenExpiresOn'),

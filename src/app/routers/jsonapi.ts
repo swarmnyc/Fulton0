@@ -1,6 +1,6 @@
 import { Router, Model } from '../lib';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
-import { forEach as _forEach, startsWith as _startsWith, omit as _omit } from 'lodash';
+import { forEach as _forEach, startsWith as _startsWith, omit as _omit, invokeMap as _invokeMap } from 'lodash';
 import { queryHelper } from '../helpers/query';
 
 interface IAdapterOptions {
@@ -26,6 +26,19 @@ export abstract class JSONAPIRouter extends Router {
 
   namespace(): string {
     return 'api';
+  }
+
+  /**
+   * Auth middleware to use on request
+   * 
+   * @returns {RequestHandler}
+   * 
+   * @memberOf JSONAPIRouter
+   */
+  auth() {
+    return function*(next: any) {
+      yield next;
+    }
   }
 
   /**
@@ -86,11 +99,10 @@ export abstract class JSONAPIRouter extends Router {
     const serialize = this.adapter().serialize;
     const queryIgnorePaths = this.queryIgnorePaths();
     return function*(next: any) {
-      const model = yield queryHelper(Model, _omit(this.query, queryIgnorePaths));
-      const output: any = [];       
-      for (let item of model) {
-        output.push(serialize(item.toJSON()));
-      }
+      let model = yield queryHelper(Model, _omit(this.query, queryIgnorePaths));
+      let output: any;
+      model = _invokeMap(model, 'toJSON');
+      output = serialize(model);  
       yield next;
       this.body = output;
     };
@@ -111,7 +123,7 @@ export abstract class JSONAPIRouter extends Router {
         this.throw(404);
       }
             
-      const output = { data: serialize(model.toJSON()) };      
+      const output = serialize(model.toJSON());      
       this.body = output;
     };
   }
@@ -179,6 +191,7 @@ export abstract class JSONAPIRouter extends Router {
     }
     
     router.use(this.setHeaders());
+    router.use(this.auth());
     router.get('/', this.find());
     router.get('/:item_id', this.findById());
     router.patch('/:item_id', this.update());

@@ -1,6 +1,7 @@
 import { Model } from '../lib/model';
 import { User } from './user';
 import { OAuthClient } from './oauth-client';
+import { generateAccessToken } from '../helpers/oauth';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 
@@ -19,6 +20,20 @@ export class OAuthToken extends Model {
             clientId: { type: 'ObjectId', ref: OAuthClient, required: true },
             userId: { type: 'ObjectId', ref: User, required: true }
         };
+    }
+
+    configure() {
+        this.before('save', 'generateAccessToken');
+    }
+
+    async generateAccessToken(next: any) {
+        let token: string;
+        if (this.isNew() || this.changed['accessToken']) {
+            token = await generateAccessToken();
+            this.set('accessToken', token);
+        }
+        
+        await next;
     }
 
     toJSON() {

@@ -4,6 +4,7 @@ import * as moment from 'moment';
 
 export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
   return function*(next: any) {
+    this.state.oauth = {};
     const bearerToken: string = _getTokenFromRequest.call(this);
     let token: oauth2lib.OAuth2AccessToken;
     let isValidToken: boolean;
@@ -24,13 +25,16 @@ export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
       oauth2lib.errorHandler.call(this, 'unauthorized');
     }
 
-    isValidScope = yield model.validateScope(token, scope);
-    if (isValidScope === false) {
-      oauth2lib.errorHandler.call(this, 'unauthorized');
-    }
-
-    this.set('X-Accepted-OAuth-Scopes', scope);
-    this.set('X-OAuth-Scopes', token.scope);
+    if (scope) {
+      isValidScope = yield model.validateScope(token, scope);
+      if (isValidScope === false) {
+        oauth2lib.errorHandler.call(this, 'unauthorized');
+      }
+      this.set('X-Accepted-OAuth-Scopes', scope);
+      this.set('X-OAuth-Scopes', token.scope);
+    }    
+    
+    this.state.oauth.accessToken = token;
     yield next;
   };
 }
@@ -38,8 +42,8 @@ export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
 function _getTokenFromRequest(): string {
   let token: string;
 
-  if (this.request.header['Authorization']) {
-    token = this.request.header['Authorization'];
+  if (this.headers['authorization']) {
+    token = this.headers['authorization'].split(' ').pop();
   } else if (this.request.body['access_token']) {
     token = this.request.body['access_token'];
   } else if (this.request.query['access_token']) {
