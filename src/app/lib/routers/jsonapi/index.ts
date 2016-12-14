@@ -178,7 +178,7 @@ export abstract class JSONAPIRouter extends Router {
       // TODO error response handler
       ctx.throw(500, `There was an error saving your model ${e}`);
     }
-    model.set('_id', new Model.ObjectID(id));
+    
     return model;
   }
 
