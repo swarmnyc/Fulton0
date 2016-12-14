@@ -1,4 +1,4 @@
-import JSONAPIRouter from '../routers/jsonapi';
+import JSONAPIRouter from '../lib/routers/jsonapi';
 import { User } from '../models';
 
 export class UserRouter extends JSONAPIRouter {
@@ -13,7 +13,7 @@ export class UserRouter extends JSONAPIRouter {
   auth() {
     return function*(next: any) {
       const oauth = this.app.context.services.oauth.authenticate(); // get authenticate middleware from oauth service 
-      yield oauth.call(this, next); // preserve scope of request
+      yield oauth.call(this, next); // use call to preserve context
     };
   }
 }

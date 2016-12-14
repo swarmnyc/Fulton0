@@ -11,6 +11,8 @@ import RouteLoader from './route-loader';
 import Context from './context';
 import { EventEmitter } from 'events';
 import * as bodyParser from 'koa-bodyparser';
+import * as conditional from 'koa-conditional-get';
+import * as etag from 'koa-etag';
 
 interface AppInitOptions {
   loadRoutes?: boolean
@@ -34,12 +36,37 @@ export class App extends EventEmitter {
 
   appRoot: string
   
+  /**
+   * Returns an array of request handler middlewares to apply to each incoming request before passing the request off to the router.
+   * 
+   * @returns {RequestHandler<Context>[]}
+   * 
+   * @memberOf App
+   */
   middleware(): RequestHandler<Context>[] { 
     const m: RequestHandler<Context>[] = [];
     return m;
   }
 
+  /**
+   * Boolean indicating whether the app should apply bodyparser middleware
+   * 
+   * @returns {boolean}
+   * 
+   * @memberof App
+   */
   bodyParser() {
+    return true;
+  }
+
+  /**
+   * Return true if the app should apply etag middleware
+   * 
+   * @returns {boolean}
+   * 
+   * @memberof App
+   */
+  etag() {
     return true;
   }
   
@@ -146,6 +173,11 @@ export class App extends EventEmitter {
 
     if (this.bodyParser() === true) {
       app.use(bodyParser());
+    }
+
+    if (this.etag() === true) {
+      app.use(conditional());
+      app.use(etag());
     }
 
     for (let middleware of this.middleware()) {

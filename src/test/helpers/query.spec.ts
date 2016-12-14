@@ -1,4 +1,4 @@
-import { queryHelper } from '../../app/helpers/query';
+import { queryHelper } from '../../app/lib/helpers/query';
 import { Model } from '../../app/lib';
 import * as mongorito from 'mongorito';
 import * as faker from 'faker';

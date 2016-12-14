@@ -1,5 +1,5 @@
 import { forEach as _forEach, get as _get, startsWith as _startsWith, take as _take } from 'lodash';
-import { Model } from '../lib';
+import { Model } from '../..';
 
 interface IQueryObject {
   filter?: any;

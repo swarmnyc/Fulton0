@@ -1,7 +1,7 @@
-import { Router, Model } from '../lib';
-import { JSONAPIAdapter } from '../adapters/jsonapi';
+import { Router, Model } from '../..';
+import { JSONAPIAdapter } from '../../adapters/jsonapi';
 import { forEach as _forEach, startsWith as _startsWith, omit as _omit, invokeMap as _invokeMap } from 'lodash';
-import { queryHelper } from '../helpers/query';
+import { queryHelper } from '../../helpers/query';
 
 interface IAdapterOptions {
   type: string;
