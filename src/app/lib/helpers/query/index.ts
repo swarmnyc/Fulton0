@@ -25,7 +25,7 @@ interface IQueryHelperOptions {
     queryIgnorePaths?: string[]
 }
 
-export async function queryHelper(model: typeof Model, query?: any) {
+export async function _queryHelper(model: typeof Model, query?: any, method = 'find') {
     function _filter(key: string) {
         const re = new RegExp(/filter\[([a-z0-9]+)\]/, 'i');
         let assoc: string;
@@ -68,7 +68,7 @@ export async function queryHelper(model: typeof Model, query?: any) {
         } else if (key === 'sort') {
             q.options.sort = _sort(value);
         } else if (key === 'limit') {
-            q.options.limit = value;
+            q.options.limit = parseInt(value, 10);
         } else if (key === 'skip') {
             q.options.skip = value;        
         } else {
@@ -90,5 +90,13 @@ export async function queryHelper(model: typeof Model, query?: any) {
         docs.where(key, value);
     });
 
-    return docs.find();
+    return docs[method]();
+}
+
+export async function queryHelper(model: typeof Model, query?: any): Promise<Model[]> {
+    return _queryHelper(model, query, 'find');
+}
+
+export async function countHelper(model: typeof Model, query?: any) {
+    return _queryHelper(model, query, 'count');
 }

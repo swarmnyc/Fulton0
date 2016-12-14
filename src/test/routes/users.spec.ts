@@ -155,6 +155,41 @@ describe('JSON API Users Route', () => {
         return;
     });
 
+    it('should return a limited set of results on /api/users?limit=X GET', async () => {
+        const limit: number = 5;        
+        const response = await chai['request'](server)
+            .get(`/api/users?limit=${limit}`)
+            .set('Content-Type', 'application/vind.api+json')
+            .set('Authorization', `Bearer ${data.accessToken.get('accessToken')}`);
+
+        expect(response.body).to.have.property('data');
+        expect(response.body.data.length).to.equal(5);
+        return;
+    });
+
+    it('should apply pagination and include pagination object in response on /api/users?limit=X&page=X GET', async () => {
+        const limit: number = 5;
+        const page: number = 2;
+        const rootLink: string = `/api/users?limit=${limit}&page=`;
+        const userCount = await User.count();
+        const lastPage = Math.ceil(userCount / limit);
+        const response = await chai['request'](server)
+            .get(`/api/users?limit=${limit}&page=${page}`)
+            .set('Content-Type', 'application/vind.api+json')
+            .set('Authorization', `Bearer ${data.accessToken.get('accessToken')}`);
+
+        expect(response.body.links).to.have.property('self');
+        expect(response.body.links).to.have.property('prev');
+        expect(response.body.links).to.have.property('next');
+        expect(response.body.links).to.have.property('first');
+        expect(response.body.links).to.have.property('last');
+        expect(response.body.links.first).to.equal(`${rootLink}1`);
+        expect(response.body.links.next).to.equal(`${rootLink}3`);
+        expect(response.body.links.prev).to.equal(`${rootLink}1`);
+        expect(response.body.links.last).to.equal(`${rootLink}${lastPage}`);
+        return;
+    });
+
     it('should return a specific user on /api/users/:id GET', async() => {
         const user = _.sample(data.users);
         const response = await chai['request'](server)

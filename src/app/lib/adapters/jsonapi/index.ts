@@ -16,6 +16,7 @@ interface SerializedJSONAPIObject {
 
 interface SerializedJSONAPIPackage {
   data: SerializedJSONAPIObject | SerializedJSONAPIObject[]
+  links?: JSONAPILinksObject
 }
 
 interface JSONAPIAttributes {
@@ -37,7 +38,7 @@ interface JSONAPIRelationshipData {
 }
 
 interface JSONAPILinksObject {
-  [linkType: string]: string  
+  [linkType: string]: string
 }
 
 interface JSONAPICompoundDocument {
@@ -147,18 +148,18 @@ export class JSONAPIAdapter implements IJSONAPIAdapter {
     return output;
   }
 
-  public serialize = (input: GenericObject | GenericObject[]) => {
-    let output: SerializedJSONAPIObject | SerializedJSONAPIObject[];
+  public serialize = (input: GenericObject | GenericObject[], page?: number, limit?: number) => {
+    let output: SerializedJSONAPIPackage;
 
     if (Array.isArray(input)) {
-      output = input.map((o: GenericObject) => {
+      output = { data: input.map((o: GenericObject) => {
         return this._serialize(o);
-      });
+      })};
     } else {
-      output = this._serialize(input);
+      output = { data: this._serialize(input) };
     }
 
-    return { data: output };
+    return output;
   }
 
   public deserialize = (input: SerializedJSONAPIPackage) => {

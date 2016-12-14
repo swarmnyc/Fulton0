@@ -1,7 +1,7 @@
 import { Router, Model } from '../..';
 import { JSONAPIAdapter } from '../../adapters/jsonapi';
 import { forEach as _forEach, startsWith as _startsWith, omit as _omit, invokeMap as _invokeMap } from 'lodash';
-import { queryHelper } from '../../helpers/query';
+import { queryHelper, countHelper } from '../../helpers/query';
 import { Context } from 'koa';
 
 interface IAdapterOptions {
@@ -20,13 +20,17 @@ interface IUpdatePayload {
   [K: string]: any
 }
 
+interface JSONAPILinksObject {
+  [linkType: string]: string
+}
+
 export abstract class JSONAPIRouter extends Router {
   Model(): typeof Model {
     return undefined;
   }
 
   queryIgnorePaths(): string[] {
-    return ['include'];
+    return ['include', 'page'];
   }
 
   namespace(): string {
@@ -99,15 +103,35 @@ export abstract class JSONAPIRouter extends Router {
     return new JSONAPIAdapter(this.adapterOptions());
   }
 
+  private _generatePaginationLinks(input: Model[], page: number, count: number, limit: number): JSONAPILinksObject {
+    const rootLink: string = `${this.prefix()}?limit=${limit}&page=`;
+    const lastPage: number = Math.ceil(count / limit);
+    return {
+      self: `${rootLink}${page}`,
+      next: `${rootLink}${(page + 1)}`,
+      prev: `${rootLink}${page === 1 ? null : (page - 1)}`,
+      first: `${rootLink}1`,
+      last: `${rootLink}${lastPage}`
+    };
+  }
+
   find() {
     const Model = this.Model();
     const serialize = this.adapter().serialize;
     const queryIgnorePaths = this.queryIgnorePaths();
+    const _generatePaginationLinks = this._generatePaginationLinks.bind(this);
     return function*(next: any) {
+      if (this.query.page && this.query.limit && !this.query.skip) {
+        this.query.skip = (parseInt(this.query.limit, 10) * parseInt(this.query.page, 10)) - parseInt(this.query.limit, 10);
+      }
       let model = yield queryHelper(Model, _omit(this.query, queryIgnorePaths));
+      let count = yield countHelper(Model, _omit(this.query, queryIgnorePaths));
       let output: any;
       model = _invokeMap(model, 'toJSON');
-      output = serialize(model);  
+      output = serialize(model);
+      if (this.query.limit && this.query.page) {
+        output.links = _generatePaginationLinks(model, parseInt(this.query.page, 10), count, parseInt(this.query.limit, 10));
+      }      
       yield next;
       this.body = output;
     };
