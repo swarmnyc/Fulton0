@@ -98,9 +98,9 @@ declare module "mongorito" {
         changed: IChangedValuesHash
         get: (attr?: string) => any
         set: (attr: string, value: any) => void        
-        save: () => this
+        save: () => Promise<this>
         remove: () => void
-        update: () => this
+        update: () => Promise<this>
         static skip(amount: number): typeof Model
         static populate(pathName: string, model: PopulationOption<typeof Model>): typeof Model
         static index(pathName: string, options?: IIndexOptions): void

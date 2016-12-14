@@ -83,7 +83,7 @@ export class Schema {
     const documentPaths = _.keys(doc.attributes);
 
     for (let path of documentPaths) {
-      if (pathNames.indexOf(path) === -1) {
+      if (pathNames.indexOf(path) === -1 && path !== '_id') {
         delete doc.attributes[path];
       }
     }

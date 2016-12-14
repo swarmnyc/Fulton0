@@ -2,6 +2,7 @@ import { Router, Model } from '../..';
 import { JSONAPIAdapter } from '../../adapters/jsonapi';
 import { forEach as _forEach, startsWith as _startsWith, omit as _omit, invokeMap as _invokeMap } from 'lodash';
 import { queryHelper } from '../../helpers/query';
+import { Context } from 'koa';
 
 interface IAdapterOptions {
   type: string;
@@ -13,6 +14,10 @@ interface IAdapterOptions {
 interface IRelationshipDefinition {
   type: string,
   path: string
+}
+
+interface IUpdatePayload {
+  [K: string]: any
 }
 
 export abstract class JSONAPIRouter extends Router {
@@ -116,7 +121,7 @@ export abstract class JSONAPIRouter extends Router {
       try {
         model = yield Model.findById(this.params.item_id);
       } catch(e) {
-        this.throw('There was an error processing your request', 500);
+        this.throw('Not found', 404);
       }
 
       if (!model) {
@@ -152,20 +157,46 @@ export abstract class JSONAPIRouter extends Router {
       this.body = serialize(model.toJSON());
     };
   }
-  
-  update() {
+
+  protected async _update(id: string, ctx: Context, payload: IUpdatePayload) {
     const Model = this.Model();
+    let model = await Model.findById(id);
+
+    if (!model) {
+      return undefined;
+    }
+
+    for (let key in payload) {
+      if (key !== '_id' && key !== 'id') {
+        model.set(key, payload[key]);
+      }
+    }
+
+    try {
+      model = await model.save();
+    } catch(e) {
+      // TODO error response handler
+      ctx.throw(500, `There was an error saving your model ${e}`);
+    }
+    model.set('_id', new Model.ObjectID(id));
+    return model;
+  }
+
+  update() {    
     const deserialize = this.adapter().deserialize;
     const serialize = this.adapter().serialize;
+    const _update = this._update;
+    const self = this;
     return function*(next: any) {
-      const o = deserialize(this.request.body);
-      const model = yield Model.findById(this.params.item_id);
-      yield model.update(o);
-      try {
-        this.body = serialize(model);
-      } catch(e) {
-        this.throw(500);       
+      const update = deserialize(this.request.body);
+      const model = yield _update.call(self, this.params.item_id, this, update);
+
+      if (!model) {
+        this.throw(404);
       }
+      
+      this.status = 200;      
+      this.body = serialize(model.toJSON());
     };
   }
 

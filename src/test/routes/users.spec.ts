@@ -2,6 +2,7 @@ import * as chai from 'chai';
 import { App } from '../../app/lib';
 import { User, OAuthClient, OAuthToken } from '../../app/models';
 import { createServer, Server } from 'http';
+import { JSONAPIAdapter } from '../../app/lib/adapters/jsonapi';
 import * as mongorito from 'mongorito';
 import * as faker from 'faker';
 import * as _ from 'lodash';
@@ -42,7 +43,7 @@ describe('JSON API Users Route', () => {
         let testclient: OAuthClient;
         let accesstoken: OAuthToken;
         let expiredToken: OAuthToken;
-        await mongorito.connect('mongodb://localhost:27017/spect-tests');
+        await mongorito.connect('mongodb://localhost:27017/spec-tests');
 
         app = new TestApp();
         user = new User(u);
@@ -170,6 +171,72 @@ describe('JSON API Users Route', () => {
         expect(response.body.data.id).to.equal(user.get('_id').toString());
         expect(response.body.data.type).to.equal('users');
         expect(response.body.data.attributes.email).to.equal(user.get('email'));
+        return;
+    });
+
+    it('should create a new user on /api/users POST', async() => {
+        const adapter = new JSONAPIAdapter({ type: 'users', namespace: 'api' });
+        const user = factory();
+        const payload = adapter.serialize(user);
+        const response = await chai['request'](server)
+            .post(`/api/users`)
+            .set('Content-Type', 'application/vnd.api+json')
+            .set('Authorization', `Bearer ${data.accessToken.get('accessToken')}`)
+            .send(payload);
+        
+        expect(response).to.have['status'](201);
+        expect(response.body).to.be.a('object');
+        expect(response.body).to.have.property('data');
+        expect(response.body.data).to.have.property('id');
+        expect(response.body.data).to.have.property('type');
+        expect(response.body.data).to.have.property('attributes');
+        expect(response.body.data.type).to.equal('users');
+        expect(response.body.data.attributes.email).to.equal(user.email);
+        expect(response.body.data.attributes.password).to.not.equal(user.password); // password should be hashed
+        return;
+    });
+
+    it('should update an existing user on /api/users/:id PATCH', async() => {
+        const adapter = new JSONAPIAdapter({ type: 'users', namespace: 'api', idPath: '_id' });
+        const user = _.sample(data.users);
+        const update = user.toJSON();
+        let response: any;
+        let payload: any;
+        let model: any;
+
+        update['email'] = faker.internet.email();
+        payload = adapter.serialize(update);
+
+        response = await chai['request'](server)
+            .patch(`/api/users/${user.get('_id').toString()}`)
+            .set('Content-Type', 'application/vnd.api+json')
+            .set('Authorization', `Bearer ${data.accessToken.get('accessToken')}`)
+            .send(payload);
+
+        expect(response).to.have['status'](200);
+        expect(response.body).to.be.a('object');
+        expect(response.body).to.have.property('data');
+        expect(response.body.data.id).to.equal(user.get('_id').toString());
+        expect(response.body.data.attributes.email).to.equal(update['email']);
+
+        model = await User.findById(user.get('_id'));
+        expect(model.get('email')).to.equal(update['email']);        
+        return;
+    });
+
+    it('should remove a user on /api/users/:id DELETE', async () => {
+        const user = _.sample(data.users);
+        let model: any;
+        let response: any;
+
+        response = await chai['request'](server)
+            .delete(`/api/users/${user.get('_id').toString()}`)
+            .set('Authorization', `Bearer ${data.accessToken.get('accessToken')}`);
+        
+        expect(response).to.have['status'](204);
+        expect(response.body).to.be.empty;
+        model = await User.findById(user.get('_id'));
+        assert.isUndefined(model);
         return;
     });
 });
