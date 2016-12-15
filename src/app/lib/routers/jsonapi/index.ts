@@ -1,9 +1,10 @@
 import { Router, Model } from '../..';
 import { JSONAPIAdapter } from '../../adapters/jsonapi';
-import { forEach as _forEach, startsWith as _startsWith, omit as _omit, invokeMap as _invokeMap } from 'lodash';
+import { forEach as _forEach, flatten as _flatten, startsWith as _startsWith, isObject as _isObject, omit as _omit, invokeMap as _invokeMap, map as _map } from 'lodash';
 import { queryHelper, countHelper } from '../../helpers/query';
 import { Context } from 'koa';
 import { ObjectID } from 'mongodb';
+import * as assert from 'assert';
 
 interface IAdapterOptions {
   type: string;
@@ -14,7 +15,22 @@ interface IAdapterOptions {
 
 interface IRelationshipDefinition {
   type: string,
-  path: string
+  path: string,
+  Model?: typeof Model
+}
+
+interface JSONAPIRelationshipData {
+  type: string
+  id: string
+}
+
+interface JSONAPIRelationship {
+  links: JSONAPILinksObject,
+  data: JSONAPIRelationshipData
+}
+
+interface JSONAPIRelationships {
+  [K: string]: JSONAPIRelationship
 }
 
 interface JSONModel {
@@ -40,7 +56,8 @@ interface JSONAPIError {
 
 interface JSONAPIResponse {
   data?: JSONModel | JSONModel[]
-  pagination?: JSONAPILinksObject
+  included?: JSONModel[]
+  links?: JSONAPILinksObject
   errors?: JSONAPIError[]
 }
 
@@ -135,10 +152,37 @@ export abstract class JSONAPIRouter extends Router {
     };
   }
 
-  private _getIncludes() {
-    return function*(next: any) {
-
+  protected async _getIncludes(include: string, doc: JSONModel) {
+    const relationships: IRelationshipDefinition[] = this.relationships();
+    const relationshipPaths: string[] = _map(relationships, (rel) => {
+      return rel.path;
+    });
+    let output: JSONModel[] = [];
+    let matchedRelationships: IRelationshipDefinition[];
+    let includes: string[] = include.split(',');
+    matchedRelationships = relationships.filter((item: IRelationshipDefinition) => {
+      return includes.indexOf(item.path) >= 0;
+    });
+    for (let rel of matchedRelationships) {
+      let ids: string[] = [];
+      let adapter = new JSONAPIAdapter({ type: rel.type, namespace: this.namespace() });
+      assert(rel.Model, `Relationship at path ${rel.path} has no Model!`);
+      if (doc['relationships']) {
+        // TODO Gotta figure out why this isn't including
+        if (doc['relationships'][rel.path]) {
+          ids = _map(doc['relationships'][rel.path], (r) => {
+            return r['id'];
+          });
+        }
+      }
+      if (ids.length) {
+        let relatedDocs = await rel.Model.find({ _id: { $in: ids } });
+        if (relatedDocs.length) {
+          output.push(adapter.serialize(relatedDocs).data);
+        }
+      }
     }
+    return _flatten(output);
   }
 
   async count(query: IQueryObject) {
@@ -223,7 +267,7 @@ export abstract class JSONAPIRouter extends Router {
           skip: skip
         };
 
-        for (let key in this.query) {
+        for (let key in this.query) {          
           if (key !== 'skip') {
             if (key === 'limit') {
               query.limit = parseInt(this.query[key], 10);
@@ -291,17 +335,32 @@ export abstract class JSONAPIRouter extends Router {
     const self = this;
     const deserialize = this.adapter().deserialize;
     const generatePaginationLinks = this._generatePaginationLinks;    
+    const getIncludes = this._getIncludes;
     const serialize = this.adapter().serialize;
     return function*(next: any) {
+      let included: JSONModel[] = [];
       let output: JSONAPIResponse;      
-      if (Object.keys(this.request.body).length) {
+      if (_isObject(this.request.body) && Object.keys(this.request.body).length) {
         this.state.data = deserialize(this.request.body);
       }      
       yield next;
       if (this.state.model) {
         output = serialize(this.state.model);
         if (this.query && this.query.limit && this.query.page && this.state.count) {
-          output['links'] = generatePaginationLinks.call(self, this.state.model, parseInt(this.query.page, 10), this.state.count, parseInt(this.query.limit, 10));
+          output.links = generatePaginationLinks.call(self, this.state.model, parseInt(this.query.page, 10), this.state.count, parseInt(this.query.limit, 10));
+        }
+        if (this.query && this.query.include) {
+          if (Array.isArray(output.data)) {
+            for (let item of output.data) {              
+              let d = yield getIncludes.call(self, this.query.include, item);
+              included = included.concat(d);
+            }
+          } else {
+            included = yield getIncludes.call(self, this.query.include, output.data);
+          }
+          if (included.length) {
+            output.included = included;
+          }
         }
       }
       

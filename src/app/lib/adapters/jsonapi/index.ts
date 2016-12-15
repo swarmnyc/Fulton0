@@ -9,7 +9,7 @@ interface SerializedJSONAPIObject {
   id: string;
   type: string;
   attributes: JSONAPIAttributes;
-  relationships: JSONAPIRelationships;
+  relationships?: JSONAPIRelationships;
   links?: JSONAPILinksObject|JSONAPILinksObject[];
   included?: JSONAPICompoundDocument|JSONAPICompoundDocument[];
 }
