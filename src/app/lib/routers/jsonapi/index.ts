@@ -3,6 +3,7 @@ import { JSONAPIAdapter } from '../../adapters/jsonapi';
 import { forEach as _forEach, startsWith as _startsWith, omit as _omit, invokeMap as _invokeMap } from 'lodash';
 import { queryHelper, countHelper } from '../../helpers/query';
 import { Context } from 'koa';
+import { ObjectID } from 'mongodb';
 
 interface IAdapterOptions {
   type: string;
@@ -16,12 +17,31 @@ interface IRelationshipDefinition {
   path: string
 }
 
-interface IUpdatePayload {
+interface JSONModel {
+  [path: string]: any
+}
+
+interface IQueryObject {
+  limit?: number
+  skip?: number
   [K: string]: any
 }
 
 interface JSONAPILinksObject {
   [linkType: string]: string
+}
+
+interface JSONAPIError {
+  title?: string
+  source?: string
+  detail?: string
+  code?: number
+}
+
+interface JSONAPIResponse {
+  data?: JSONModel | JSONModel[]
+  pagination?: JSONAPILinksObject
+  errors?: JSONAPIError[]
 }
 
 export abstract class JSONAPIRouter extends Router {
@@ -42,7 +62,7 @@ export abstract class JSONAPIRouter extends Router {
    * 
    * @returns {RequestHandler}
    * 
-   * @memberOf JSONAPIRouter
+   * @memberof JSONAPIRouter
    */
   auth() {
     return function*(next: any) {
@@ -55,7 +75,7 @@ export abstract class JSONAPIRouter extends Router {
    * 
    * @returns {string}
    * 
-   * @memberOf JSONAPIRouter
+   * @memberof JSONAPIRouter
    */
   type(): string {
     const M = this.Model();
@@ -73,7 +93,7 @@ export abstract class JSONAPIRouter extends Router {
    * 
    * @returns {string}
    * 
-   * @memberOf JSONAPIRouter
+   * @memberof JSONAPIRouter
    */
   idPath(): string {
     return '_id';
@@ -97,13 +117,13 @@ export abstract class JSONAPIRouter extends Router {
    * 
    * @returns {Adapter} - Returns an Adapter to be appied to the routes
    * 
-   * @memberOf JSONAPIRouter
+   * @memberof JSONAPIRouter
    */
   adapter() {
     return new JSONAPIAdapter(this.adapterOptions());
   }
 
-  private _generatePaginationLinks(input: Model[], page: number, count: number, limit: number): JSONAPILinksObject {
+  private _generatePaginationLinks(input: JSONModel[], page: number, count: number, limit: number): JSONAPILinksObject {
     const rootLink: string = `${this.prefix()}?limit=${limit}&page=`;
     const lastPage: number = Math.ceil(count / limit);
     return {
@@ -115,80 +135,43 @@ export abstract class JSONAPIRouter extends Router {
     };
   }
 
-  find() {
+  private _getIncludes() {
+    return function*(next: any) {
+
+    }
+  }
+
+  async count(query: IQueryObject) {
     const Model = this.Model();
-    const serialize = this.adapter().serialize;
     const queryIgnorePaths = this.queryIgnorePaths();
-    const _generatePaginationLinks = this._generatePaginationLinks.bind(this);
-    return function*(next: any) {
-      if (this.query.page && this.query.limit && !this.query.skip) {
-        this.query.skip = (parseInt(this.query.limit, 10) * parseInt(this.query.page, 10)) - parseInt(this.query.limit, 10);
-      }
-      let model = yield queryHelper(Model, _omit(this.query, queryIgnorePaths));
-      let count = yield countHelper(Model, _omit(this.query, queryIgnorePaths));
-      let output: any;
-      model = _invokeMap(model, 'toJSON');
-      output = serialize(model);
-      if (this.query.limit && this.query.page) {
-        output.links = _generatePaginationLinks(model, parseInt(this.query.page, 10), count, parseInt(this.query.limit, 10));
-      }      
-      yield next;
-      this.body = output;
-    };
+    let count: number = await countHelper(Model, _omit(query, queryIgnorePaths));
+    return count;
   }
 
-  findById() {
+  async find(query: IQueryObject): Promise<JSONModel[]> {
     const Model = this.Model();
-    const serialize = this.adapter().serialize;
-    return function*(next: any) {
-      let model: Model;
-      try {
-        model = yield Model.findById(this.params.item_id);
-      } catch(e) {
-        this.throw('Not found', 404);
-      }
-
-      if (!model) {
-        this.throw(404);
-      }
-            
-      const output = serialize(model.toJSON());      
-      this.body = output;
-    };
+    const queryIgnorePaths = this.queryIgnorePaths();
+    let model: Model[] = await queryHelper(Model, _omit(query, queryIgnorePaths));
+    let output = _invokeMap(model, 'toJSON');
+    return output;
   }
 
-  create() {
-    const Model = this.Model();
-    const deserialize = this.adapter().deserialize;
-    const serialize = this.adapter().serialize;
-    return function*(next: any) {
-      let o = {};
-      try {      
-        o = deserialize(this.request.body);
-      } catch(e) {
-        this.throw(`Input rejected: malformed ${e}`, 400);
-      }
-
-      const model: Model = new Model(o);
-
-      try {
-        yield model.save();
-      } catch(e) {
-        this.throw(`There was an error saving your model ${e}`, 500);
-      }
-      
-      this.status = 201;
-      this.body = serialize(model.toJSON());
-    };
-  }
-
-  protected async _update(id: string, ctx: Context, payload: IUpdatePayload) {
+  async findById(id: string) {
     const Model = this.Model();
     let model = await Model.findById(id);
+    return model.toJSON();    
+  }
 
-    if (!model) {
-      return undefined;
-    }
+  async create(data: JSONModel) {
+    const Model = this.Model();
+    const model = new Model(data);
+    await model.save();
+    return model.toJSON();
+  }
+
+  async update(id: string, payload: JSONModel) {
+    const Model = this.Model();
+    const model = await Model.findById(id);
 
     for (let key in payload) {
       if (key !== '_id' && key !== 'id') {
@@ -196,41 +179,21 @@ export abstract class JSONAPIRouter extends Router {
       }
     }
 
-    try {
-      model = await model.save();
-    } catch(e) {
-      // TODO error response handler
-      ctx.throw(500, `There was an error saving your model ${e}`);
-    }
-    
-    return model;
+    await model.save();
+    return model.toJSON();
   }
 
-  update() {    
-    const deserialize = this.adapter().deserialize;
-    const serialize = this.adapter().serialize;
-    const _update = this._update;
-    const self = this;
-    return function*(next: any) {
-      const update = deserialize(this.request.body);
-      const model = yield _update.call(self, this.params.item_id, this, update);
-
-      if (!model) {
-        this.throw(404);
-      }
-      
-      this.status = 200;      
-      this.body = serialize(model.toJSON());
-    };
-  }
-
-  remove() {
+  async remove(itemId: string): Promise<boolean> {
     const Model = this.Model();
-    return function*(next: any) {
-      const model = yield Model.findById(this.params.item_id);
-      yield model.remove();
-      this.response.status = 204;
-    };
+    const model = await Model.findById(itemId);
+    let isRemoved: boolean;
+    try {
+      await model.remove();
+      isRemoved = true;
+    } catch(e) {
+      isRemoved = false;
+    }
+    return isRemoved;
   }
 
   setHeaders() {
@@ -240,18 +203,126 @@ export abstract class JSONAPIRouter extends Router {
     };
   }
 
+  protected _find() {
+    const self = this;
+    const find = this.find;
+    const count = this.count;
+    return function*(next: any) {
+      let query: IQueryObject = {};
+      let skip: number;
+      if (this.query) {
+        if (this.query.limit && this.query.page) {
+          skip = (parseInt(this.query.page, 10) * parseInt(this.query.limit, 10)) - parseInt(this.query.limit, 10);
+        } else if (this.query.skip) {
+          skip = parseInt(this.query.skip, 10);
+        } else {
+          skip = 0;
+        }
+
+        query = {         
+          skip: skip
+        };
+
+        for (let key in this.query) {
+          if (key !== 'skip') {
+            if (key === 'limit') {
+              query.limit = parseInt(this.query[key], 10);
+            } else {
+              query[key] = this.query[key];
+            }
+          }
+        }
+      }
+
+      this.state.model = yield find.call(self, query);
+      this.state.count = yield count.call(self, query);
+      this.state.status = 200;
+      yield next;
+    }
+  }
+
+  protected _findById() {
+    const findById = this.findById;
+    const self = this;
+    return function*(next: any) {
+      const id: string = this.params.item_id;
+      this.state.model = yield findById.call(self, id);
+      this.state.status = this.state.model ? 200 : 404;
+      yield next;
+    };
+  }
+
+  protected _create() {
+    const self = this;
+    const create = this.create;
+    return function*(next: any) {
+      this.state.model = yield create.call(self, this.state.data);
+      this.state.status = 201;
+      yield next;
+    };
+  }
+
+  protected _update() {    
+    const update = this.update;
+    const self = this;
+    return function*(next: any) {
+      this.state.model = yield update.call(self, this.params.item_id, this.state.data);      
+      this.state.status = 200;
+      yield next;
+    };
+  }
+
+
+  protected _remove() {
+    const self = this;
+    const remove = this.remove;
+    return function*(next: any) {
+      let isRemoved: Promise<boolean> = yield remove.call(self, this.params.item_id);
+      if (isRemoved) {
+        this.state.status = 204;
+      } else {
+        this.throw(400);
+      }
+      yield next;
+    };
+  }
+
+  protected _responder() {
+    const self = this;
+    const deserialize = this.adapter().deserialize;
+    const generatePaginationLinks = this._generatePaginationLinks;    
+    const serialize = this.adapter().serialize;
+    return function*(next: any) {
+      let output: JSONAPIResponse;      
+      if (Object.keys(this.request.body).length) {
+        this.state.data = deserialize(this.request.body);
+      }      
+      yield next;
+      if (this.state.model) {
+        output = serialize(this.state.model);
+        if (this.query && this.query.limit && this.query.page && this.state.count) {
+          output['links'] = generatePaginationLinks.call(self, this.state.model, parseInt(this.query.page, 10), this.state.count, parseInt(this.query.limit, 10));
+        }
+      }
+      
+      this.status = this.state.status;
+      this.body = output;
+    };
+  }
+
   configure(router) {
     if (!this.Model()) {
       throw new TypeError(`Return type of router.Model() is not an instance of Model`);
     }
     
     router.use(this.setHeaders());
-    router.use(this.auth());
-    router.get('/', this.find());
-    router.get('/:item_id', this.findById());
-    router.patch('/:item_id', this.update());
-    router.post('/', this.create());
-    router.del('/:item_id', this.remove());
+    router.use(this.auth());    
+    router.use(this._responder());
+    router.get('/', this._find());
+    router.get('/:item_id', this._findById());
+    router.patch('/:item_id', this._update());
+    router.post('/', this._create());
+    router.del('/:item_id', this._remove());    
   }
 }
 
