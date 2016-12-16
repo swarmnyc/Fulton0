@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import { App } from '../../../app/lib';
 import { JSONAPIRouter } from '../../../app/lib/routers/jsonapi';
+import { JSONAPIAdapter } from '../../../app/lib/adapters/jsonapi';
 import { Model } from '../../../app/lib/model';
 import * as mongorito from 'mongorito';
 import * as faker from 'faker';
@@ -13,7 +14,6 @@ interface TestData {
 const chaiHttp = require('chai-http');
 const { assert, expect } = chai;
 let data: TestData; 
-let app: App;
 
 chai.use(chaiHttp);
 
@@ -26,12 +26,27 @@ describe('JSON API Router', () => {
         schema() {
             return {
                 name: { type: 'string' },
-                motto: { type: 'string' },
+                motto: { type: 'string', required: true },
                 age: { type: 'number'},
                 friends: { type: 'ObjectId[]', ref: TestModel }
             };
         }
     }
+
+    class Route extends JSONAPIRouter {
+        Model() {
+            return TestModel;
+        }
+
+        relationships() {
+            return [{
+                router: Route,
+                path: 'friends',
+            }];
+        }
+    }
+
+    class TestApp extends App {}
 
     function factory() {
         return {
@@ -45,7 +60,6 @@ describe('JSON API Router', () => {
         const testModelCount = 25;
         await mongorito.connect('mongodb://localhost:27017/spec-tests');
         await mongorito.db.dropDatabase();
-        app = new App();
 
         data = {
             items: []
@@ -69,20 +83,10 @@ describe('JSON API Router', () => {
     });
 
     it('should return included documents on /api/test-items?include=friends GET', async () => {
-        class Route extends JSONAPIRouter {
-            Model() {
-                return TestModel;
-            }
 
-            relationships() {
-                return [{
-                    router: Route,
-                    path: 'friends',
-                }];
-            }
-        }
         let route = new Route();
         let response: any;
+        let app = new TestApp();
         app.use(route.routes());
         await app.init();
         response = await chai['request'](app.listener())
@@ -99,5 +103,41 @@ describe('JSON API Router', () => {
             expect(include.type).to.equal('test-items');
         }
         return;
+    });
+
+    it('should return code 422 and error object on including wrong type on /api/test-items POST', async() => {        
+        let testData = {
+            name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+            age: 'Cool',
+            motto: faker.lorem.words()
+        };
+        
+        let adapter = new JSONAPIAdapter({ type: 'test-items', namespace: 'api', idPath: '_id' });
+        let app = new TestApp();
+        let route = new Route();
+        let response: any;
+        let payload = adapter.serialize(testData);
+        
+        await app.init();
+        app.use(route.routes());
+
+        try { 
+            response = await chai['request'](app.listener())
+                .post('/api/test-items')
+                .set('Content-Type', 'application/vnd.api+json')
+                .send(payload);
+        } catch(e) {
+            response = e;
+        } finally {
+
+            expect(response).to.have['status'](422);
+            expect(response.response).to.be['json'];
+            expect(response.response.body).to.have.property('errors');
+            expect(response.response.body.errors).to.be.a('array');
+            expect(response.response.body.errors.length).to.equal(1);
+            expect(response.response.body.errors[0].title).to.equal('TypeError');
+            expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/age');
+            return;
+        }
     });
 });

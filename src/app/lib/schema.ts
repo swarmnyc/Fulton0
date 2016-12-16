@@ -108,7 +108,7 @@ export class Schema {
     
     for (let path of requiredPaths) {
       if (_.isNil(doc.get(path.pathName))) {
-        throw new RequiredError(`Missing required path ${path}`);
+        throw new RequiredError(`Missing required path ${path.pathName}`, path.pathName);
       }
     }
 
@@ -135,7 +135,7 @@ export class Schema {
       q[path.pathName] = val;
       let docsWithVal = await Model.count(q);
       if (docsWithVal > 0) {
-        throw new UniqueError(`Document already exists with value "${val}" at path ${path.pathName}`);
+        throw new UniqueError(`Document already exists with value "${val}" at path ${path.pathName}`, path.pathName, val);
       }
     }
 
@@ -163,9 +163,9 @@ export class Schema {
         let docType = typeof val;
         
         if (schemaPathType !== 'ObjectId' && schemaPathType !== 'date' && docType !== schemaPathType) {
-          throw new TypeError(`Found type ${docType} at path ${schemaPath.pathName}, ${schemaPath.type} expected.`);        
+          throw new TypeError(`Found type ${docType} at path ${schemaPath.pathName} ${schemaPath.type} expected.`);        
         } else if (schemaPathType === 'date' && !(val instanceof Date)) {
-          throw new TypeError(`Cast to type Date failed at path ${schemaPath.pathName} with ${val}`);
+          throw new TypeError(`Cast to type Date failed at path ${schemaPath.pathName} with value ${val}`);
         } else if (schemaPathType === 'ObjectId') {
           if (ObjectID.isValid(val) === false && !(val instanceof schemaPath.ref)) {
             throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
@@ -214,9 +214,9 @@ export class Schema {
     _.forEach(pathsWithValidators, (schemaPath: ISchemaPath) => {
       const isValid: boolean | string = schemaPath.validator.apply(doc, doc.get(schemaPath.pathName));
       if (isValid === false) {
-        throw new ValidationError(`Validation failed for ${doc.get(schemaPath.pathName)} at path ${schemaPath.pathName}`);
+        throw new ValidationError(`Validation failed for ${doc.get(schemaPath.pathName)} at path ${schemaPath.pathName}`, schemaPath.pathName, doc.get(schemaPath.pathName));
       } else if (typeof isValid === 'string') {
-        throw new ValidationError(isValid);
+        throw new ValidationError(isValid, schemaPath.pathName, doc.get(schemaPath.pathName));
       }
     });
 

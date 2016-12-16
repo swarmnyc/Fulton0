@@ -46,11 +46,17 @@ interface JSONAPILinksObject {
   [linkType: string]: string
 }
 
+interface JSONAPIErrorSource {
+  pointer: string
+  parameter?: string
+}
+
 interface JSONAPIError {
   title?: string
-  source?: string
+  source?: JSONAPIErrorSource
   detail?: string
   code?: number
+  meta?: JSONModel
 }
 
 interface JSONAPIResponse {
@@ -58,6 +64,7 @@ interface JSONAPIResponse {
   included?: JSONModel[]
   links?: JSONAPILinksObject
   errors?: JSONAPIError[]
+  meta?: JSONModel
 }
 
 export class JSONAPIRouter extends Router {
@@ -137,6 +144,37 @@ export class JSONAPIRouter extends Router {
    */
   adapter() {
     return new JSONAPIAdapter(this.adapterOptions());
+  }
+
+  onRequestError(err: Error) {
+      let code: number;
+      let mesg: JSONAPIError;
+      let path: string;
+      if (err instanceof Model.ValidationError) {
+        code = 422;
+        path = err.path;
+      } else if (err instanceof Model.RequiredError) {
+        code = 422;
+        path = err.path;
+      } else if (err instanceof Model.UniqueError) {
+        code = 409;
+        path = err.path; 
+      } else if (err instanceof TypeError) {
+        let pathstr = 'at path ';
+        let pathIndex: number = (err.message.indexOf(pathstr)) + pathstr.length;
+        code = 422;            
+        path = err.message.substring(pathIndex, err.message.indexOf(' ', pathIndex));
+      }
+      mesg = { 
+        title: err.name,
+        code: code,
+        detail: err.message,
+        source: {
+          pointer: `/data/attributes/${path}`
+        }
+      };
+      
+      return mesg;
   }
 
   private _generatePaginationLinks(input: JSONModel[], page: number, count: number, limit: number): JSONAPILinksObject {
@@ -292,7 +330,7 @@ export class JSONAPIRouter extends Router {
     const findById = this.findById;
     const self = this;
     return function*(next: any) {
-      const id: string = this.params.item_id;
+      const id: string = this.params.item_id;      
       this.state.model = yield findById.call(self, id);
       this.state.status = this.state.model ? 200 : 404;
       yield next;
@@ -302,20 +340,39 @@ export class JSONAPIRouter extends Router {
   protected _create() {
     const self = this;
     const create = this.create;
+    const onRequestError = this.onRequestError;
     return function*(next: any) {
-      this.state.model = yield create.call(self, this.state.data);
-      this.state.status = 201;
-      yield next;
+      if (!this.state.data) {
+        this.throw(400);
+      }
+      try {
+        this.state.model = yield create.call(self, this.state.data);
+        this.state.status = 201;
+      } catch(e) {
+        this.state.errors.push(onRequestError(e));
+      } finally {
+        yield next;
+      }
+
     };
   }
 
   protected _update() {    
     const update = this.update;
     const self = this;
+    const onRequestError = this.onRequestError;
     return function*(next: any) {
-      this.state.model = yield update.call(self, this.params.item_id, this.state.data);      
-      this.state.status = 200;
-      yield next;
+      if (!this.state.data) {
+        this.throw(400);
+      }
+      try {
+        this.state.model = yield update.call(self, this.params.item_id, this.state.data);      
+        this.state.status = 200;
+      } catch(e) {
+        this.state.errors.push(onRequestError(e));
+      } finally {
+        yield next;
+      }
     };
   }
 
@@ -343,11 +400,15 @@ export class JSONAPIRouter extends Router {
     return function*(next: any) {
       let included: JSONModel[] = [];
       let output: JSONAPIResponse;      
+      this.state.errors = [];
       if (_isObject(this.request.body) && Object.keys(this.request.body).length) {
         this.state.data = deserialize(this.request.body);
-      }      
+      }
       yield next;
-      if (this.state.model) {
+      if (this.state.errors.length) {
+        this.state.status = this.state.errors[0].code;
+        output = { errors: this.state.errors };
+      } else if (this.state.model) {
         output = serialize(this.state.model);
         if (this.query && this.query.limit && this.query.page && this.state.count) {
           output.links = generatePaginationLinks.call(self, this.state.model, parseInt(this.query.page, 10), this.state.count, parseInt(this.query.limit, 10));
