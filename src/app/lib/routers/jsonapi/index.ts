@@ -14,9 +14,8 @@ interface IAdapterOptions {
 }
 
 interface IRelationshipDefinition {
-  type: string,
-  path: string,
-  Model?: typeof Model
+  router: typeof JSONAPIRouter
+  path: string
 }
 
 interface JSONAPIRelationshipData {
@@ -61,7 +60,7 @@ interface JSONAPIResponse {
   errors?: JSONAPIError[]
 }
 
-export abstract class JSONAPIRouter extends Router {
+export class JSONAPIRouter extends Router {
   Model(): typeof Model {
     return undefined;
   }
@@ -164,21 +163,25 @@ export abstract class JSONAPIRouter extends Router {
       return includes.indexOf(item.path) >= 0;
     });
     for (let rel of matchedRelationships) {
+      let relRouter = new rel.router();
       let ids: string[] = [];
-      let adapter = new JSONAPIAdapter({ type: rel.type, namespace: this.namespace() });
-      assert(rel.Model, `Relationship at path ${rel.path} has no Model!`);
+      let adapter = new JSONAPIAdapter({ type: relRouter.type(), namespace: relRouter.namespace(), idPath: relRouter.idPath() });      
       if (doc['relationships']) {
-        // TODO Gotta figure out why this isn't including
         if (doc['relationships'][rel.path]) {
-          ids = _map(doc['relationships'][rel.path], (r) => {
-            return r['id'];
-          });
+          if (Array.isArray(doc['relationships'][rel.path]['data'])) {
+            ids = _map(doc['relationships'][rel.path]['data'], (r) => {
+              return r['id'];
+            });
+          } else {
+            ids = [doc['relationships'][rel.path].data.id];
+          }
         }
       }
       if (ids.length) {
-        let relatedDocs = await rel.Model.find({ _id: { $in: ids } });
+        let relatedDocs = await relRouter.Model().find({ _id: {$in: ids }});
         if (relatedDocs.length) {
-          output.push(adapter.serialize(relatedDocs).data);
+          let jsondocs = _invokeMap(relatedDocs, 'toJSON');
+          output.push(adapter.serialize(jsondocs).data);
         }
       }
     }
@@ -349,7 +352,7 @@ export abstract class JSONAPIRouter extends Router {
         if (this.query && this.query.limit && this.query.page && this.state.count) {
           output.links = generatePaginationLinks.call(self, this.state.model, parseInt(this.query.page, 10), this.state.count, parseInt(this.query.limit, 10));
         }
-        if (this.query && this.query.include) {
+        if (this.request.query && this.request.query.include) {
           if (Array.isArray(output.data)) {
             for (let item of output.data) {              
               let d = yield getIncludes.call(self, this.query.include, item);

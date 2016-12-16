@@ -195,3 +195,48 @@ results.forEach((post) => {
     console.log(post.get('author.name')); // Bob
 });
 ```
+
+### Middleware
+
+Schema support middleware, which are mounted using in a model's `configure()` method:
+
+```
+/* models/post.ts /*
+import { User } from './user';
+import * as _ from 'lodash';
+
+class Post extends Model {
+    schema() {
+        return {
+            title: { type: 'string', required: true },
+            body: { type: 'string', required: true },
+            author: { type: 'ObjectId', ref: User },
+            slug: { type: 'string' }
+        };
+    }
+
+    async generateSlug(next: any) {
+        const title: string = this.get('title');
+        const slug: string = _.kebabCase(title);
+        this.set('slug', slug);
+
+        await next;
+    }
+
+    configure() {
+        this.before('create', 'generateSlug'); // note the function name is a string
+    }
+}
+```
+
+**Available Hooks**
+
+`this.before`, `this.after`, `this.around`
+
+`create`: Triggered when the `save()` method is called on a model that has not been written to the database before (has no id).
+
+`update`: Triggered when the `save()` method is called on a model that's been committed to the database in the past.
+
+`save`: Triggered when the `save()` method is called, whether or not the model is new.
+
+`remove`: Triggered when the `remove()` method is called.

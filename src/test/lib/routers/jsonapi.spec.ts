@@ -76,9 +76,8 @@ describe('JSON API Router', () => {
 
             relationships() {
                 return [{
-                    type: 'test-items',
+                    router: Route,
                     path: 'friends',
-                    Model: TestModel
                 }];
             }
         }
@@ -96,7 +95,6 @@ describe('JSON API Router', () => {
         for (let include of response.body.included) {
             expect(include).to.have.property('id');
             expect(include).to.have.property('type');
-            expect(include).to.have.property('relationships');
             expect(include).to.have.property('links');
             expect(include.type).to.equal('test-items');
         }

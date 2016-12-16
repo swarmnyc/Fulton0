@@ -19,11 +19,11 @@ Don't forget to add `export * from './user';` to `routes/index.ts`!
 
 ## Authentication
 
-By default, the JSONAPIRouter class uses oauth authentication provided via `koa-oauth-server` to authenticate requests. Specifically, it uses the `ClientGrant` class to authorize oauth tokens. Tweak `/src/app/oauth/client.ts` to fit your needs or modify either classes to authenticate requests as you like.
+By default, the JSONAPIRouter class uses oauth authentication provided via `koa-oauth-server` to authenticate requests. Specifically, it uses the `PasswordGrant` class to authorize oauth tokens. Tweak `/src/app/oauth/password.ts` to fit your needs or modify either classes to authenticate requests as you like.
 
 ## Defining Relationships
 
-So the router knows how models are related to each other when handling requests, definitions need to be defined in the JSONAPIRouter class. This is done via the `relationships()` method, which returns an array of relationships objects:
+Define relationships by associating other children of `JSONAPIRouter` to model paths. This is done via the `relationships()` method, which returns an array of relationships objects:
 
 ```
 /* routes/user.ts */
@@ -31,7 +31,7 @@ So the router knows how models are related to each other when handling requests,
 export class UserRoute extends JSONAPIRouter {
     relationships() {
         return [
-            { type: 'users', path: 'friends' }
+            { router: UserRoute, path: 'friends' }
         ];
     }
 }
