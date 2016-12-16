@@ -133,8 +133,11 @@ export class Schema {
       let q = {};
       let val = doc.get(path.pathName);
       q[path.pathName] = val;
-      let docsWithVal = await Model.count(q);
-      if (docsWithVal > 0) {
+      let docsWithVal = await Model.find(q);
+      let notOwnDocsWithVal = docsWithVal.filter((item: Model) => {
+        return !item.get('_id').equals(doc.get('_id'));
+      });
+      if (notOwnDocsWithVal.length > 0) {
         throw new UniqueError(`Document already exists with value "${val}" at path ${path.pathName}`, path.pathName, val);
       }
     }

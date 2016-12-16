@@ -25,7 +25,7 @@ describe('JSON API Router', () => {
 
         schema() {
             return {
-                name: { type: 'string' },
+                name: { type: 'string', unique: true },
                 motto: { type: 'string', required: true },
                 age: { type: 'number'},
                 friends: { type: 'ObjectId[]', ref: TestModel }
@@ -105,7 +105,7 @@ describe('JSON API Router', () => {
         return;
     });
 
-    it('should return code 422 and error object on including wrong type on /api/test-items POST', async() => {        
+    it('should return code 422 and error object on including wrong type on /api/test-items POST', async () => {        
         let testData = {
             name: `${faker.name.firstName()} ${faker.name.lastName()}`,
             age: 'Cool',
@@ -137,6 +137,170 @@ describe('JSON API Router', () => {
             expect(response.response.body.errors.length).to.equal(1);
             expect(response.response.body.errors[0].title).to.equal('TypeError');
             expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/age');
+            return;
+        }
+    });
+
+    it('should return code 409 on duplicate unique properties on /api/test-items POST', async () => {
+        let duplicateData = factory();
+        let testData = _.sample(data.items);
+        duplicateData['name'] = testData.get('name');
+
+        let adapter = new JSONAPIAdapter({ type: 'test-items', namespace: 'api' });
+        let app = new TestApp();
+        let route = new Route();
+        let response: any;
+        let payload = adapter.serialize(duplicateData);
+
+        await app.init();
+        app.use(route.routes());
+
+        try {
+            response = await chai['request'](app.listener())
+                .post('/api/test-items')
+                .set('Content-Type', 'application/vnd.api+json')
+                .send(payload);            
+        } catch(e) {
+            response = e;
+        } finally {
+            expect(response).to.have['status'](409);
+            expect(response.response).to.be['json'];
+            expect(response.response.body).to.have.property('errors');
+            expect(response.response.body.errors).to.be.a('array');
+            expect(response.response.body.errors.length).to.equal(1);
+            expect(response.response.body.errors[0].title).to.equal('UniqueError');
+            expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/name');
+            return;
+        }
+    });
+
+    it('should return code 422 on missing required property on /api/test-items POST', async () => {
+        let testData = factory();
+        delete testData.motto;
+
+        let adapter = new JSONAPIAdapter({ type: 'test-items', namespace: 'api' });
+        let app = new TestApp();
+        let route = new Route();
+        let response: any;
+        let payload = adapter.serialize(testData);
+
+        await app.init();
+        app.use(route.routes());
+
+        try {
+            response = await chai['request'](app.listener())
+                .post('/api/test-items')
+                .set('Content-Type', 'application/vnd.api+json')
+                .send(payload);            
+        } catch(e) {
+            response = e;
+        } finally {
+            expect(response).to.have['status'](422);
+            expect(response.response).to.be['json'];
+            expect(response.response.body).to.have.property('errors');
+            expect(response.response.body.errors).to.be.a('array');
+            expect(response.response.body.errors.length).to.equal(1);
+            expect(response.response.body.errors[0].title).to.equal('RequiredError');
+            expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/motto');
+            return;
+        }
+    });
+
+        it('should return code 422 and error object on including wrong type on /api/test-items/:id PATCH', async () => {        
+        let testData = _.sample(data.items);
+        testData.set('age', 'Cool');
+        
+        let adapter = new JSONAPIAdapter({ type: 'test-items', namespace: 'api', idPath: '_id' });
+        let app = new TestApp();
+        let route = new Route();
+        let response: any;
+        let payload = adapter.serialize(testData.toJSON());
+        
+        await app.init();
+        app.use(route.routes());
+
+        try { 
+            response = await chai['request'](app.listener())
+                .patch(`/api/test-items/${testData.get('_id')}`)
+                .set('Content-Type', 'application/vnd.api+json')
+                .send(payload);
+        } catch(e) {
+            response = e;
+        } finally {
+
+            expect(response).to.have['status'](422);
+            expect(response.response).to.be['json'];
+            expect(response.response.body).to.have.property('errors');
+            expect(response.response.body.errors).to.be.a('array');
+            expect(response.response.body.errors.length).to.equal(1);
+            expect(response.response.body.errors[0].title).to.equal('TypeError');
+            expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/age');
+            return;
+        }
+    });
+
+    it('should return code 409 on duplicate unique properties on /api/test-items/:id PATCH', async () => {
+        let testData = _.sample(data.items);
+        let dupeName = _.sample(data.items).get('name');
+
+        testData.set('name', dupeName);
+
+        let adapter = new JSONAPIAdapter({ type: 'test-items', namespace: 'api' });
+        let app = new TestApp();
+        let route = new Route();
+        let response: any;
+        let payload = adapter.serialize(testData.toJSON());
+
+        await app.init();
+        app.use(route.routes());
+
+        try {
+            response = await chai['request'](app.listener())
+                .patch(`/api/test-items/${testData.get('_id')}`)
+                .set('Content-Type', 'application/vnd.api+json')
+                .send(payload);            
+        } catch(e) {
+            response = e;
+        } finally {
+            expect(response).to.have['status'](409);
+            expect(response.response).to.be['json'];
+            expect(response.response.body).to.have.property('errors');
+            expect(response.response.body.errors).to.be.a('array');
+            expect(response.response.body.errors.length).to.equal(1);
+            expect(response.response.body.errors[0].title).to.equal('UniqueError');
+            expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/name');
+            return;
+        }
+    });
+
+    it('should return code 422 on missing required property on /api/test-items/:id PATCH', async () => {
+        let testData = _.sample(data.items);
+        delete testData.attributes.motto;
+
+        let adapter = new JSONAPIAdapter({ type: 'test-items', namespace: 'api' });
+        let app = new TestApp();
+        let route = new Route();
+        let response: any;
+        let payload = adapter.serialize(testData.toJSON());
+
+        await app.init();
+        app.use(route.routes());
+
+        try {
+            response = await chai['request'](app.listener())
+                .patch(`/api/test-items/${testData.get('_id')}`)
+                .set('Content-Type', 'application/vnd.api+json')
+                .send(payload);            
+        } catch(e) {
+            response = e;
+        } finally {
+            expect(response).to.have['status'](422);
+            expect(response.response).to.be['json'];
+            expect(response.response.body).to.have.property('errors');
+            expect(response.response.body.errors).to.be.a('array');
+            expect(response.response.body.errors.length).to.equal(1);
+            expect(response.response.body.errors[0].title).to.equal('RequiredError');
+            expect(response.response.body.errors[0].source.pointer).to.equal('/data/attributes/motto');
             return;
         }
     });

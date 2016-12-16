@@ -1,6 +1,7 @@
 export class ValidationError extends Error {
     path: string
     value: any
+    name = 'ValidationError'
 
     constructor(message: string, path: string, value: any) {
         super(message);
@@ -11,6 +12,7 @@ export class ValidationError extends Error {
 export class UniqueError extends Error {
     path: string
     value: any
+    name = 'UniqueError'
 
     constructor(message: string, path: string, value: any) {
         super(message);
@@ -20,6 +22,7 @@ export class UniqueError extends Error {
 }
 export class RequiredError extends Error {
     path: string
+    name = 'RequiredError'
 
     constructor(message: string, path: string) {
         super(message);

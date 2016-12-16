@@ -1,6 +1,6 @@
 import { Router, Model } from '../..';
 import { JSONAPIAdapter } from '../../adapters/jsonapi';
-import { forEach as _forEach, flatten as _flatten, startsWith as _startsWith, isObject as _isObject, omit as _omit, invokeMap as _invokeMap, map as _map } from 'lodash';
+import { forEach as _forEach, isNil as _isNil, flatten as _flatten, startsWith as _startsWith, isObject as _isObject, omit as _omit, invokeMap as _invokeMap, map as _map } from 'lodash';
 import { queryHelper, countHelper } from '../../helpers/query';
 import { Context } from 'koa';
 import { ObjectID } from 'mongodb';
@@ -257,10 +257,17 @@ export class JSONAPIRouter extends Router {
   async update(id: string, payload: JSONModel) {
     const Model = this.Model();
     const model = await Model.findById(id);
-
+    const deletedKeys: any = {};
+        
     for (let key in payload) {
       if (key !== '_id' && key !== 'id') {
         model.set(key, payload[key]);
+      }
+    }
+
+    for (let key in model.attributes) {
+      if (!payload[key]) {
+        delete model.attributes[key];
       }
     }
 
