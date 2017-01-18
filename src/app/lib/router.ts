@@ -3,13 +3,26 @@ import * as Application from 'koa/lib/application';
 import { get as _get, forEach as _forEach, isNil as _isNil } from 'lodash'; 
 import { RequestHandler } from './request-handler';
 
-export class Router { 
+export class Router {
   router: KoaRouter<KoaRouter.Context>
 
   protected prefix(): string {
     const namespace = this.namespace();
     return (!!namespace) ? `/${namespace}` : '';
   };
+
+    /**
+   * Auth middleware to use on request
+   * 
+   * @returns {RequestHandler}
+   * 
+   * @memberof Router
+   */
+  auth() {
+    return function*(next: any) {
+      yield next;
+    }
+  }
 
   /**
    * Returns the underlying router's event listeners.
@@ -49,6 +62,7 @@ export class Router {
 
   constructor() {
     this.router = new KoaRouter({ prefix: this.prefix()});
+    this.router.use(this.auth());
     this.configure(this.router);
   }
 }

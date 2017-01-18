@@ -81,19 +81,6 @@ export class JSONAPIRouter extends Router {
   }
 
   /**
-   * Auth middleware to use on request
-   * 
-   * @returns {RequestHandler}
-   * 
-   * @memberof JSONAPIRouter
-   */
-  auth() {
-    return function*(next: any) {
-      yield next;
-    }
-  }
-
-  /**
    * Set the type, used by the json api serializer. Defaults to the collection name of the model.  
    * 
    * @returns {string}
@@ -446,7 +433,6 @@ export class JSONAPIRouter extends Router {
     }
     
     router.use(this.setHeaders());
-    router.use(this.auth());    
     router.use(this._responder());
     router.get('/', this._find());
     router.get('/:item_id', this._findById());
