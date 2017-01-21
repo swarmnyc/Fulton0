@@ -18,6 +18,7 @@
     "express": "registry:npm/express#4.14.0+20160925001530",
     "koa": "registry:npm/koa#2.0.0+20161018080506",
     "lodash": "registry:npm/lodash#4.0.0+20161015015725",
+    "redis": "registry:npm/redis#2.6.0+20160901110043",
     "request": "registry:npm/request#2.69.0+20160428223725",
     "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   },

@@ -1,11 +1,13 @@
 import * as models from '../models';
 import * as oauth2lib from '.';
 import * as moment from 'moment';
+import * as _ from 'lodash';
 
 export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
   return function*(next: any) {
     this.state.oauth = {};
     const bearerToken: string = _getTokenFromRequest.call(this);
+    let user: any;
     let token: oauth2lib.OAuth2AccessToken;
     let isValidToken: boolean;
     let isValidScope: boolean;
@@ -32,7 +34,7 @@ export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
       }
       this.set('X-Accepted-OAuth-Scopes', scope);
       this.set('X-OAuth-Scopes', token.scope);
-    }    
+    }
     
     this.state.oauth.accessToken = token;
     yield next;

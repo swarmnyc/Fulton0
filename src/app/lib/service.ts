@@ -1,9 +1,16 @@
-interface ServiceCallback {
-  (err?: any, instance?: Service): void
-}
+import { App } from './app';
 
 export class Service {
-  instance: any
+  private _instance: any
+  private _services: ServiceHash
+
+  get instance() {
+    return this._instance;
+  }
+
+  get services() {
+    return this._services;
+  }
 
   /**
    * Name to use for the service in the app. Defaults to the name of the service class.
@@ -33,7 +40,7 @@ export class Service {
    * @memberof Service
    */
   async load(): Promise<void> {
-    this.instance = await this.init();
+    this._instance = await this.init();
     return;
   }
 
@@ -58,6 +65,14 @@ export class Service {
   get() {
     return this.instance;
   }
+
+  constructor(services?: ServiceHash) {
+    this._services = services;
+  }
+}
+
+interface ServiceHash {
+  [K: string]: any
 }
 
 export default Service

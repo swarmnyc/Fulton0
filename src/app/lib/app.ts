@@ -14,15 +14,6 @@ import * as bodyParser from 'koa-bodyparser';
 import * as conditional from 'koa-conditional-get';
 import * as etag from 'koa-etag';
 
-interface AppInitOptions {
-  loadRoutes?: boolean
-  loadServices?: boolean
-}
-
-interface ServiceHash {
-  [K: string]: any
-}
-
 /**
  * Base App class
  * 
@@ -199,6 +190,15 @@ export class App extends EventEmitter {
 
     return app;
   }
+}
+
+interface AppInitOptions {
+  loadRoutes?: boolean
+  loadServices?: boolean
+}
+
+interface ServiceHash {
+  [K: string]: any
 }
 
 export default App

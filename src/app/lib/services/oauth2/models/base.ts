@@ -16,4 +16,5 @@ export class OAuth2BaseModel {
     async validateScope(token: OAuth2AccessToken, scope: string[] | string): Promise<boolean> {
         return false;
     }
+
 }
