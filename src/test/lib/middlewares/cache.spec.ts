@@ -4,7 +4,7 @@ import * as faker from 'faker';
 import * as _ from 'lodash';
 import { RedisClient } from 'redis';
 import { App, Router } from '../../../app/lib';
-import { RedisService } from '../../../app/lib/services/redis';
+import { BaseRedisService } from '../../../app/lib/services/redis';
 import { cache } from '../../../app/lib/middlewares/cache';
 import { CacheHelper } from '../../../app/lib/helpers/cache';
 
@@ -15,7 +15,7 @@ chai.use(chaiHttp);
 let app: App;
 let server: Server;
 let router: Router;
-let redisSvc: RedisService;
+let redisSvc: BaseRedisService;
 let cacheHelper: CacheHelper;
 let services: ServiceHash;
 let data: TestData[] = [];
@@ -34,7 +34,7 @@ describe('cache middleware', () => {
         router = new TestRouter();        
         await app.init({ loadRoutes: false, loadServices: false });
         app.use(router.routes());
-        redisSvc = new RedisService();
+        redisSvc = new BaseRedisService();
         await redisSvc.load();
         services = { redis: redisSvc.instance };
         cacheHelper = new CacheHelper(redisSvc.instance);

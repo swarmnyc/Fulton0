@@ -2,7 +2,7 @@ import { promisify } from 'bluebird';
 import { Service } from '../../service';
 import { RedisClient, createClient } from 'redis';
 
-export class RedisService extends Service {
+export class BaseRedisService extends Service {
     host: string
     port: number
     instance: RedisClient

@@ -1,5 +1,5 @@
 import { CacheHelper } from '../../../app/lib/helpers/cache';
-import { RedisService } from '../../../app/lib/services/redis';
+import { BaseRedisService } from '../../../app/lib/services/redis';
 import * as chai from 'chai';
 import * as faker from 'faker';
 
@@ -30,7 +30,7 @@ interface TestData {
 describe('BaseCacheService', () => {
     before(async () => {
         let services: any = {};
-        let redis = new RedisService();
+        let redis = new BaseRedisService();
         await redis.load();
         services.redis = redis.instance;
         cache = new CacheHelper(redis.instance);
