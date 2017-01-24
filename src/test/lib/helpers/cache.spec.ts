@@ -1,11 +1,11 @@
-import { BaseCacheService } from '../../../app/lib/services/cache';
+import { CacheHelper } from '../../../app/lib/helpers/cache';
 import { RedisService } from '../../../app/lib/services/redis';
 import * as chai from 'chai';
 import * as faker from 'faker';
 
 const { assert } = chai;
 
-let cache: BaseCacheService;
+let cache: CacheHelper;
 let key: string;
 let data: TestData;
 
@@ -33,12 +33,12 @@ describe('BaseCacheService', () => {
         let redis = new RedisService();
         await redis.load();
         services.redis = redis.instance;
-        cache = new BaseCacheService(services);
+        cache = new CacheHelper(redis.instance);
         return;
     });
 
     it('should return undefined when fetching an uncached key', async () => {
-        let results: any = await cache.fetch(keyFactory());
+        let results: any = await cache.fetch<TestData>(keyFactory());
         assert.isUndefined(results);
         return;
     });
@@ -47,13 +47,13 @@ describe('BaseCacheService', () => {
         key = keyFactory();
         data = dataFactory();
 
-        let results: boolean = await cache.cache(key, data);
+        let results: boolean = await cache.cache<TestData>(key, data);
         assert.isOk(results);
         return;
     });
 
     it('should retrieve data from cache on cache.fetch(key)', async() => {
-        let results: TestData = <TestData>await cache.fetch(key);
+        let results: TestData = <TestData>await cache.fetch<TestData>(key);
 
         assert.equal(results.name, data.name);
         assert.equal(results.price, data.price);

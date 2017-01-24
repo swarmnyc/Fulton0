@@ -1,23 +1,16 @@
-import { Service } from '../../service';
-import { RedisService } from '../redis';
 import { RedisClient } from 'redis';
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 
-export class BaseCacheService extends Service {
-    private _packageData(data: any) {
-        return JSON.stringify(data);
+export class CacheHelper {
+    private _packageData<T>(data: T): string {        
+        return JSON.stringify({ data: data, cached_at: Date.now() });
     }
-    private _initData(data: string): CacheData {
-        let result: CacheData;
-        try {
-            result = JSON.parse(data);
-        } catch(e) {
-            result = undefined;
-        }
-
-        return result;
+    private _initData<T>(data: string): T {
+        let result: CacheData<T> = JSON.parse(data);
+        return result.data;
     }
+    private _redis: RedisClient
 
     cacheTimeout(): number {
         return 120000;
@@ -27,29 +20,37 @@ export class BaseCacheService extends Service {
         return 'cache';
     }
 
-    async load() {
+    async init() {
         return this;
     }
 
     get redis(): RedisClient {
-        return this.services['redis'];
+        return this._redis;
     }
 
-    async cache(key: string, resp: CacheData): Promise<boolean> {
+    async cache<T>(key: string, resp: T): Promise<boolean> {
         let redis = this.redis;
-        let data = this._packageData(resp);
+        let data = this._packageData<T>(resp);
         let set = Bluebird.promisify(redis.set, { context: redis });        
+        let isSuccess: boolean;
+        let result: any;
 
-        let success: boolean = !!(await set(key, data));
+        try {
+            result = await set(key, data);
+        } catch(e) {
+            throw e;
+        }
+        
+        isSuccess = !!(result);
         redis.expire(key, this.cacheTimeout());
-        return success;
+        return isSuccess;
     }
 
-    async fetch(key: string): Promise<CacheData> {
+    async fetch<T>(key: string): Promise<T> {
         let redis = this.redis;
         let get = Bluebird.promisify(redis.get, { context: redis });
         let data: string;
-        let result: CacheData;
+        let result: T;
 
         try {
             data = await get(key);
@@ -60,7 +61,7 @@ export class BaseCacheService extends Service {
         if (!data) {
             result = undefined;
         } else {
-            result = this._initData(data);
+            result = this._initData<T>(data);
         }
 
         return result;
@@ -73,10 +74,15 @@ export class BaseCacheService extends Service {
         await !!(del(key));
         return;
     }
+
+    constructor(redis: RedisClient) {
+        this._redis = redis;
+    }
 }
 
-interface CacheData {
-    [K: string]: any
+interface CacheData<T> {
+    data: T
+    cached_at: Date
 }
 
 interface DEL {
