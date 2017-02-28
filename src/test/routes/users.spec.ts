@@ -35,15 +35,14 @@ describe('JSON API Users Route', () => {
         };
     }
 
-    before(async () => {
-        const testUserCount = 30;
+    beforeEach(async () => {
+        const testUserCount = 5;
         const u = factory();
         let users: User[] = [];
         let user: User;
         let testclient: OAuthClient;
         let accesstoken: OAuthToken;
         let expiredToken: OAuthToken;
-        await mongorito.connect('mongodb://localhost:27017/spec-tests');
 
         app = new TestApp();
         user = new User(u);

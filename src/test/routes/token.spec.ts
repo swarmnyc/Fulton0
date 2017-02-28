@@ -27,11 +27,10 @@ describe('OAuthToken', () => {
         };
     }
 
-    before(async () => {
-        const u = factory();
+    beforeEach(async () => {
+        const u = factory();        
         let user: User;
         let testclient: OAuthClient;
-        await mongorito.connect('mongodb://localhost:27017/spec-tests');
                 
         user = new User(u);
         user = await user.save();

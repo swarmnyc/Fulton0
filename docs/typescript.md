@@ -23,9 +23,9 @@ TypeScript works best in editors that support the TypeScript compiler. Not surpr
 
 The TypeScript compiler uses a file named `tsconfig.json` for configuration. While the sample app comes with a pre-configured `tsconfig.json` file that outputs a TypeScript files found in the `src` folder to `build`, if working on a custom project or your own thing, you can generate a fresh `tsconfig.json` with the `tsc --init` command.
 
-Read over the [guide](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html) for more information about configuring the TypeScript compiler.  
+Read over the [guide](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html) for more information about configuring the TypeScript compiler.
 
-### 4. Interfaces...not just for interfaces any more?
+### 4. Interfaces
 
 TypeScript makes extensive use of interfaces to define the properties of dynamic JavaScript objects and functions. It tells the compiler how a particular function should behave or what key/value pairs belong on an object. 
 
@@ -106,6 +106,8 @@ const worstService = new EmailService(undefined); // you guessed it, this would 
 So in summary...don't use `any` unless you really really need to.
 
 ### 5. Third-party Node Library Support & Type Definitions
+
+*NOTE:* TypeScript can now be configured to auto-generate d.ts files on compile. However, the compiler only includes exported members of a module, which can lead to lots of compilation errors. Therefore it is necessary to refactor much of this framework so it works properly with auto-generated d.ts files. Once this is done, we can export this module as an npm module and import it into projects as needed.
 
 For TypeScript to truly work, and to take advantage of the huge ecosystem of packages available on npm, it is necessary to install *type definition* files for third-party modules. 
 

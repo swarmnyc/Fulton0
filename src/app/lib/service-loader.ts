@@ -13,7 +13,7 @@ export class ServiceLoader {
     let loadedServices: Service[] = [];
     
     for (let Svc of services) {
-      let instance = new Svc(app.services);
+      let instance = new Svc();
       let asName: string;
       await instance.load();
       asName = instance.as();

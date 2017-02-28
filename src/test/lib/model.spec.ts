@@ -19,10 +19,7 @@ class TestModel extends Model {
 }
 
 describe('Model', () => {
-    before(async () => {
-        return mongorito.connect('mongodb://localhost:27017/spec-tests');
-    });
-
+    
     it('should use the specified collection on model.collection()', async () => {
         let collections;
         let collectionNames;

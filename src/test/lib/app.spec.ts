@@ -58,6 +58,7 @@ describe('App', () => {
         const responseText = 'success';
         const listener = function *(next: any) {            
             yield next;
+            this.response.set('Content-Type', 'text/html');
             this.body = responseText;
         };
         

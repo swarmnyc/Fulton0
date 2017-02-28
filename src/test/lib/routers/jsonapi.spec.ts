@@ -56,10 +56,8 @@ describe('JSON API Router', () => {
         };
     }
 
-    before(async () => {
-        const testModelCount = 25;
-        await mongorito.connect('mongodb://localhost:27017/spec-tests');
-        await mongorito.db.dropDatabase();
+    beforeEach(async () => {
+        const testModelCount = 5;
 
         data = {
             items: []
@@ -241,7 +239,9 @@ describe('JSON API Router', () => {
 
     it('should return code 409 on duplicate unique properties on /api/test-items/:id PATCH', async () => {
         let testData = _.sample(data.items);
-        let dupeName = _.sample(data.items).get('name');
+        let dupeName = _.find(data.items, (item) => {
+            return item.get('name') !== testData.get('name');
+        }).get('name');
 
         testData.set('name', dupeName);
 

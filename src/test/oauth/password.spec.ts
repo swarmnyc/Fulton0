@@ -14,18 +14,21 @@ describe('OAuth PasswordGrant', () => {
             password: faker.internet.password()
         };
     }
-    const data = {
+    let data = {
         users: [],
         tokens: [],
         clients: [],
         originalPasswords: []
     };
 
-    before(async () => {
-        await mongorito.connect('mongodb://localhost:27017/spec-tests');
-        await mongorito.db.dropDatabase();
-        
+    beforeEach(async () => {
         const users = _.times(5, factory);
+        data = {
+            users: [],
+            tokens: [],
+            clients: [],
+            originalPasswords: []
+        };
 
         for (let user of users) {
             let token: OAuthToken;

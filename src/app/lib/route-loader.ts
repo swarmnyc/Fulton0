@@ -4,11 +4,11 @@ import { forEach as _forEach } from 'lodash';
 import * as Routes from '../routes';
 
 
-export class RouteLoader extends ModuleLoader {
+export class RouteLoader {
   path = 'routes'
 
   async load(app: App) {
-    _forEach(Routes, (Route) => {
+    _forEach(Routes, (Route) => {      
       const router = new Route();
       app.use(router.routes());  
     });

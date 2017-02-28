@@ -38,10 +38,9 @@ describe('Query Helper', () => {
     let data: QueryHelperTest[] = [];
     const totalTestRecords = 100;
 
-    before(async () => {
-        await mongorito.connect('mongodb://localhost:27017/spec-tests');
-        await mongorito.db.dropDatabase();
+    beforeEach(async () => {
         let items = _.times(totalTestRecords, factory);
+        data = [];
 
         for (let item of items) {
             let m = await new QueryHelperTest(item);

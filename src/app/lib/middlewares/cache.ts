@@ -32,7 +32,7 @@ export function cache() {
             key += getTokenFromAuthHeader(this.request.headers.authorization);
         }
 
-        key += this.request.url;
+        key += this.request.originalUrl;
 
         if (invalidateMethods.indexOf(this.request.method.toLowerCase()) >= 0) {
             yield cacheHelper.invalidate(key);
@@ -44,7 +44,9 @@ export function cache() {
                 yield hydrateResponse(resp, this);
             } else {
                 yield next;
-                yield cacheHelper.cache<PackagedResponse>(key, packageResponse(this));
+                if (this.status === 200) {
+                    yield cacheHelper.cache<PackagedResponse>(key, packageResponse(this));
+                }                
             }
 
         } else {

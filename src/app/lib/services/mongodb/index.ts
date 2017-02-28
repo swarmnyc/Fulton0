@@ -47,7 +47,7 @@ export class BaseMongoDBService extends Service {
 
   async deinit() {
     await this.instance.disconnect();
-    return this;
+    return;
   }
 
   async setIndex(ParentModel: ModelConstructor) {

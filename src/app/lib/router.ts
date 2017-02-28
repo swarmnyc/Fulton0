@@ -1,10 +1,10 @@
-import * as BaseKoaRouter  from 'koa-router';
+import * as KoaRouter  from 'koa-router';
 import * as Application from 'koa/lib/application';
 import { get as _get, forEach as _forEach, isNil as _isNil } from 'lodash'; 
 import { RequestHandler } from './request-handler';
 
 export class Router {
-  router: BaseKoaRouter<BaseKoaRouter.Context>
+  router: KoaRouter
 
   protected prefix(): string {
     const namespace = this.namespace();
@@ -58,17 +58,13 @@ export class Router {
  * 
  * @memberOf Router
  */
-  configure(router: BaseKoaRouter<BaseKoaRouter.Context>) {}
+  configure(router: KoaRouter) {}
 
   constructor() {
-    this.router = new BaseKoaRouter({ prefix: this.prefix()});
+    this.router = new KoaRouter({ prefix: this.prefix()});
     this.router.use(this.auth());
     this.configure(this.router);
   }
-}
-
-export namespace Router {
-  export class KoaRouter extends BaseKoaRouter<BaseKoaRouter.Context> {}
 }
 
 export default Router;

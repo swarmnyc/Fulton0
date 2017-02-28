@@ -1,6 +1,6 @@
 {
-  "name": "swarm-monitor",
-  "version": "1.0.0",
+  "name": "swarm-web-framework",
+  "version": "1.0.1",
   "description": "A web app framework for koa written in typescript",
   "main": "build/main.js",
   "types": "./src/app/framework/index.d.ts",
@@ -44,8 +44,13 @@
     "winston": "2.3.0"
   },
   "devDependencies": {
+    "@types/dotenv": "2.0.20",
+    "@types/koa": "2.0.38",
+    "@types/koa-bodyparser": "3.0.23",
+    "@types/koa-router": "7.0.21",
     "chai": "3.5.0",
     "chai-http": "3.0.0",
+    "dotenv": "4.0.0",
     "faker": "3.1.0",
     "istanbul": "0.4.5",
     "mocha": "3.1.2",

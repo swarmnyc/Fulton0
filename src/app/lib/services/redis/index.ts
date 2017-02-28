@@ -27,6 +27,7 @@ export class BaseRedisService extends Service {
 
     async deinit() {
         let quit = promisify(this.instance.quit);
-        return quit();
+        await quit();
+        return;
     }
 }

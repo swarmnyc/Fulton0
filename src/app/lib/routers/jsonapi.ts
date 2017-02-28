@@ -1,71 +1,11 @@
-import { Router, Model } from '../..';
-import { JSONAPIAdapter } from '../../adapters/jsonapi';
+import { Router } from '../router';
+import { Model } from '../model';
+import { JSONAPIAdapter } from '../adapters/jsonapi';
 import { forEach as _forEach, isNil as _isNil, flatten as _flatten, startsWith as _startsWith, isObject as _isObject, omit as _omit, invokeMap as _invokeMap, map as _map } from 'lodash';
-import { queryHelper, countHelper } from '../../helpers/query';
+import { queryHelper, countHelper } from '../helpers/query';
 import { Context } from 'koa';
 import { ObjectID } from 'mongodb';
 import * as assert from 'assert';
-
-interface IAdapterOptions {
-  type: string;
-  idPath?: string;
-  relationships?: IRelationshipDefinition[];
-  namespace: string;
-}
-
-interface IRelationshipDefinition {
-  router: typeof JSONAPIRouter
-  path: string
-}
-
-interface JSONAPIRelationshipData {
-  type: string
-  id: string
-}
-
-interface JSONAPIRelationship {
-  links: JSONAPILinksObject,
-  data: JSONAPIRelationshipData
-}
-
-interface JSONAPIRelationships {
-  [K: string]: JSONAPIRelationship
-}
-
-interface JSONModel {
-  [path: string]: any
-}
-
-interface IQueryObject {
-  limit?: number
-  skip?: number
-  [K: string]: any
-}
-
-interface JSONAPILinksObject {
-  [linkType: string]: string
-}
-
-interface JSONAPIErrorSource {
-  pointer: string
-  parameter?: string
-}
-
-interface JSONAPIError {
-  title?: string
-  source?: JSONAPIErrorSource
-  detail?: string
-  code?: number
-  meta?: JSONModel
-}
-
-interface JSONAPIResponse {
-  data?: JSONModel | JSONModel[]
-  included?: JSONModel[]
-  links?: JSONAPILinksObject
-  errors?: JSONAPIError[]
-  meta?: JSONModel
-}
 
 export class JSONAPIRouter extends Router {
   Model(): typeof Model {
@@ -432,7 +372,7 @@ export class JSONAPIRouter extends Router {
       throw new TypeError(`Return type of router.Model() is not an instance of Model`);
     }
     
-    router.use(this.setHeaders());
+    router.use(this.setHeaders());    
     router.use(this._responder());
     router.get('/', this._find());
     router.get('/:item_id', this._findById());
@@ -442,4 +382,63 @@ export class JSONAPIRouter extends Router {
   }
 }
 
-export default JSONAPIRouter
+interface IAdapterOptions {
+  type: string;
+  idPath?: string;
+  relationships?: IRelationshipDefinition[];
+  namespace: string;
+}
+
+interface IRelationshipDefinition {
+  router: typeof JSONAPIRouter
+  path: string
+}
+
+interface JSONAPIRelationshipData {
+  type: string
+  id: string
+}
+
+interface JSONAPIRelationship {
+  links: JSONAPILinksObject,
+  data: JSONAPIRelationshipData
+}
+
+interface JSONAPIRelationships {
+  [K: string]: JSONAPIRelationship
+}
+
+interface JSONModel {
+  [path: string]: any
+}
+
+interface IQueryObject {
+  limit?: number
+  skip?: number
+  [K: string]: any
+}
+
+interface JSONAPILinksObject {
+  [linkType: string]: string
+}
+
+interface JSONAPIErrorSource {
+  pointer: string
+  parameter?: string
+}
+
+interface JSONAPIError {
+  title?: string
+  source?: JSONAPIErrorSource
+  detail?: string
+  code?: number
+  meta?: JSONModel
+}
+
+interface JSONAPIResponse {
+  data?: JSONModel | JSONModel[]
+  included?: JSONModel[]
+  links?: JSONAPILinksObject
+  errors?: JSONAPIError[]
+  meta?: JSONModel
+}
