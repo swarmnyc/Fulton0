@@ -1,54 +1,61 @@
 import * as models from '../models';
 import * as oauth2lib from '.';
 import * as moment from 'moment';
+import { Context } from 'koa';
 
 export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
-  return function*(next: any) {
-    this.state.oauth = {};
-    const bearerToken: string = _getTokenFromRequest.call(this);
+  return async function(ctx: Context): Promise<void> {
+    ctx.state.oauth = {};
+    const bearerToken: string = _getTokenFromRequest(ctx);
     let token: oauth2lib.OAuth2AccessToken;
     let isValidToken: boolean;
     let isValidScope: boolean;
 
     if (!bearerToken) {
-      oauth2lib.errorHandler.call(this, 'unauthorized');
+      return oauth2lib.errorHandler(ctx, 'unauthorized');
     }
 
-    token = yield model.getAccessToken(bearerToken);
+    token = await model.getAccessToken(bearerToken);
 
     if (!token) {
-      oauth2lib.errorHandler.call(this, 'unauthorized');
+      return oauth2lib.errorHandler(ctx, 'unauthorized');
     }
 
     isValidToken = _validateAccessToken(token);
     if (isValidToken === false) {
-      oauth2lib.errorHandler.call(this, 'unauthorized');
+      return oauth2lib.errorHandler(ctx, 'unauthorized');
     }
 
     if (scope) {
-      isValidScope = yield model.validateScope(token, scope);
+      isValidScope = await model.validateScope(token, scope);
       if (isValidScope === false) {
-        oauth2lib.errorHandler.call(this, 'unauthorized');
+        return oauth2lib.errorHandler(ctx, 'unauthorized');
       }
-      this.set('X-Accepted-OAuth-Scopes', scope);
-      this.set('X-OAuth-Scopes', token.scope);
+      ctx.set('X-Accepted-OAuth-Scopes', scope);
+      ctx.set('X-OAuth-Scopes', token.scope);
     }
     
-    this.state.oauth.accessToken = token;
+    ctx.state.oauth.accessToken = token;
 
-    yield next;
+    return;
   };
 }
 
-function _getTokenFromRequest(): string {
+function _getTokenFromRequest(ctx: Context): string {
   let token: string;
+  let arr: string[];
 
-  if (this.headers['authorization']) {
-    token = this.headers['authorization'].split(' ').pop();
-  } else if (this.request.body['access_token']) {
-    token = this.request.body['access_token'];
-  } else if (this.request.query['access_token']) {
-    token = this.request.query['access_token'];
+  if (ctx.request.headers['authorization']) {
+    arr = ctx.request.headers['authorization'].split(' ');
+    if (arr.length > 1) {
+      token = arr[1];
+    } else {
+      return ctx.throw(401);
+    }
+  } else if (ctx.request.body['access_token']) {
+    token = ctx.request.body['access_token'];
+  } else if (ctx.request.query['access_token']) {
+    token = ctx.request.query['access_token'];
   }
 
   return token;

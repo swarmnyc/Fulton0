@@ -5,7 +5,7 @@ import * as models from '../models';
 import { BaseGrantHandler } from './base';
 
 export class PasswordGrantHandler extends BaseGrantHandler {
-  model: models.OAuth2PasswordModel
+  model: models.OAuth2PasswordModel;
 
   constructor(model: models.OAuth2PasswordModel) {
     super();
@@ -13,8 +13,9 @@ export class PasswordGrantHandler extends BaseGrantHandler {
   }
 
   async handle(ctx: Context) {
-    const username = ctx.request['body']['username'];
-    const password = ctx.request['body']['password'];
+    const usernameField = this.model.usernameField();
+    const username = ctx.request.body[usernameField];
+    const password = ctx.request.body.password;
     const scope: OAuth2Scope = this._getScope(ctx);
     let user: OAuth2User;
     let token: OAuth2AccessToken;  
@@ -22,19 +23,21 @@ export class PasswordGrantHandler extends BaseGrantHandler {
     ctx.state.oauth.scope = scope;
 
     if (!username || !password) {
-      return errorHandler.call(ctx, 'bad request');
+      errorHandler(ctx, 'bad request');
+      return;
     }
 
     user = await this.model.getUser(username, password);
 
     if (!user) {
-      return errorHandler.call(ctx, 'unauthorized');
+      errorHandler(ctx, 'unauthorized');
+      return;
     }
 
     token = await this.model.saveToken(user, ctx.state.oauth.client, scope);
     ctx.state.oauth.accessToken = token;
     ctx.state.oauth.user = user;
 
-    return true;
+    return;
   }
 }

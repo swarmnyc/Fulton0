@@ -1,17 +1,16 @@
-import ModuleLoader from './loader';
 import App from './app';
-import { forEach as _forEach } from 'lodash';
-import * as Routes from '../routes';
+import Routes from '../routes';
 
 
 export class RouteLoader {
-  path = 'routes'
+  path = 'routes';
 
-  async load(app: App) {
-    _forEach(Routes, (Route) => {      
+  load(app: App) {
+    Routes.forEach((Route) => {
       const router = new Route();
-      app.use(router.routes());  
+      app.register(router);
     });
+    return;
   }
 }
 

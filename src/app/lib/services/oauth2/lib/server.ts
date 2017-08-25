@@ -17,10 +17,10 @@ export interface OAuthOptions {
 }
 
 export class OAuth2Server {
-    protected _tokenEndpoint: string
-    grants: string[]
-    model: typeof OAuth2BaseModel
-    
+    protected _tokenEndpoint: string;
+    grants: string[];
+    model: typeof OAuth2BaseModel;
+
     tokenEndpoint(): string {
       return this._tokenEndpoint;
     }    

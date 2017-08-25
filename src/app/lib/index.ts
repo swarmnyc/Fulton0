@@ -9,6 +9,7 @@ export * from './service';
 export * from './model';
 export * from './oauth-grants';
 export * from './schema';
+export * from './context';
 
 interface DeserializedObject {
   [K: string]: any

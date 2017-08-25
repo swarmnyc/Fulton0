@@ -1,27 +1,59 @@
-import * as KoaRouter  from 'koa-router';
+import * as KoaRouter  from 'koa-joi-router';
 import * as Application from 'koa/lib/application';
-import { get as _get, forEach as _forEach, isNil as _isNil } from 'lodash'; 
 import { RequestHandler } from './request-handler';
+import { Context as AppContext } from './'
 
+/**
+ * The generic Router class. Wraps around koa-router to provide some convenience function
+ * 
+ * @export
+ * @class Router
+ */
 export class Router {
-  router: KoaRouter
+  router: KoaRouter;
 
-  protected prefix(): string {
+  prefix(): string {
     const namespace = this.namespace();
     return (!!namespace) ? `/${namespace}` : '';
   };
 
-    /**
-   * Auth middleware to use on request
+  isAPI(): boolean {
+    return false;
+  }
+
+  name(): string {
+    return this.constructor.name;
+  }
+
+  description(): string {
+    return;
+  }
+
+  /**
+   * Auth middleware to use on request. This middleware is called _before_ any routes in configure()
    * 
    * @returns {RequestHandler}
    * 
    * @memberof Router
    */
   auth() {
-    return function*(next: any) {
-      yield next;
+    return;
+  }
+
+  /**
+   * Permissions middleware. This must be invoked manually in configure() as we can't be sure at what stage
+   * of the request permissions will need to be checked.
+   * 
+   * @memberof Router
+   */
+  permissions(): IPermissionsHandler {
+    return async function(ctx: Router.Context, model?: any) {
+      return true;
     }
+  }
+
+  async querySet(ctx: Router.Context): Promise<any> {
+    return ctx.query;
   }
 
   /**
@@ -30,10 +62,10 @@ export class Router {
    * 
    * @returns {KoaRouter}
    * 
-   * @memberOf Router
+   * @memberof Router
    */
   routes() {
-    return this.router.routes();
+    return this.router.middleware();
   }
 
   allowedMethods() {
@@ -45,7 +77,7 @@ export class Router {
    * 
    * @returns {string}
    * 
-   * @memberOf Router
+   * @memberof Router
    */
   namespace(): string {
     return undefined;
@@ -56,15 +88,29 @@ export class Router {
  * 
  * @param {KoaRouter<KoaRouter.Context>} router
  * 
- * @memberOf Router
+ * @memberof Router
  */
   configure(router: KoaRouter) {}
 
   constructor() {
-    this.router = new KoaRouter({ prefix: this.prefix()});
-    this.router.use(this.auth());
+    this.router = KoaRouter();
+    this.router.prefix(this.prefix());
+    if (this.auth()) {
+      this.router.use(this.auth());
+    }
+
     this.configure(this.router);
   }
+}
+
+export namespace Router {
+  export type Context = AppContext
+  export type Router = KoaRouter
+}
+
+
+interface IPermissionsHandler {
+  (ctx: Router.Context, model?: any): Promise<boolean>
 }
 
 export default Router;

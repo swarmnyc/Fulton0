@@ -42,8 +42,8 @@ export abstract class ModuleLoader {
       return join(absPath, filePath);
     }
     const absPath = join(this.appRoot, this.path);
-    const ensureDir = promisify(fs.ensureDir);
-    const readdir: any = promisify(fs.readdir);
+    const ensureDir = promisify<any, string>(fs.ensureDir);
+    const readdir: any = promisify<any, string>(fs.readdir);
     const isFileValid = this.isFileValid.bind(this);
     let files: any;
 
