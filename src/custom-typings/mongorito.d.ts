@@ -97,7 +97,7 @@ declare module "mongorito" {
         previous: IPreviousValueHash
         changed: IChangedValuesHash
         get: (attr?: string) => any
-        set: (attr: string, value: any) => void        
+        set: (key: any/*string if only one*/, value?: any) => void        
         save: () => Promise<this>
         remove: () => void
         update: () => Promise<this>

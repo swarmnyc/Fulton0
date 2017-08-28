@@ -90,10 +90,11 @@ export class Router {
  * 
  * @memberof Router
  */
-  configure(router: KoaRouter) {}
+  configure(router: KoaRouter) {
+  }
 
-  constructor() {
-    this.router = KoaRouter();
+  constructor(router: KoaRouter = KoaRouter()) {
+    this.router = router;
     this.router.prefix(this.prefix());
     if (this.auth()) {
       this.router.use(this.auth());

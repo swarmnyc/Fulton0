@@ -46,8 +46,7 @@ export class SchemaValidator {
 
       static number(value, schemaPath) {
         var validateNumber = function(value) {
-          let number = Number(value);
-          if (typeof number !== "number" || _.isNaN(number) == true) {
+          if (typeof value !== "number" || _.isNaN(value) == true) {
             throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`)
           }
           return;

@@ -13,23 +13,30 @@ export class SchemaFormatter {
         if (isArray != _.isArray(value)) {
           throw new TypeError(`Mismatch type at path ${schemaPath.pathName}`)
         }
-        return this[schemaPathType](value, schemaPath, schemaPathType);
+        try {
+          return formatter(value, schemaPath, schemaPathType);
+        } catch(error) {
+          throw error
+        }
       }
 
 
       static ObjectId(value, schemaPath) {
         var makeObjectId = function(value) {
-
-          if ((!(value instanceof schemaPath.ref)) && typeof value !== "string" && typeof value !== "number" && typeof value !== "object") {
-            throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
-          }
           if (value instanceof schemaPath.ref) {
             return value.get("_id");
           }
-          let objectId = new ObjectID(value);
+          let objectId;
+          try{
+            objectId = new ObjectID(value);
+          } catch(error) {
+          }
           if (typeof objectId !== "undefined") {
             return objectId
           } else {
+            if ((!(value instanceof schemaPath.ref)) && typeof value !== "string" && typeof value !== "number") {
+              throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
+            }
             throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
           }
         }
@@ -42,10 +49,11 @@ export class SchemaFormatter {
 
       static string(value, schemaPath) {
         var makeString = function(value) {
-          if (typeof value !== "string") {
+          let v = value.toString();
+          if (typeof v !== "string") {
             throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`)
           } 
-          return value;
+          return v;
         }
         if (_.isArray(value)) {
           return _.map(value, makeString);
@@ -69,13 +77,18 @@ export class SchemaFormatter {
 
       static date(value, schemaPath) {
         var makeDate = function(value) {
-          if (typeof value !== "number" && typeof value !== "string" && _.isDate(value) == false) {
-            throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`)
-          }
+           if (typeof value !== "number" && typeof value !== "string" && _.isDate(value) == false) { 
+            throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`) 
+          } 
           if (_.isDate(value)) {
             return value;
           }
-          return new Date(value);
+          let date = new Date(value);
+          if (typeof date === "undefined") {
+            throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`) 
+          }
+          console.log(date);
+          return date; 
         }
         if (_.isArray(value)) {
           return _.map(value, makeDate)
@@ -85,13 +98,11 @@ export class SchemaFormatter {
 
       static boolean(value, schemaPath) {
         var makeBoolean = function(value) {
-          if (typeof value !== "string" && _.isBoolean(value) == false && typeof value !== "number") {
-            throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`) 
+          if (value !== "true" && value !== "false" && value !== 1 && value !== 0 && value !== true && value !== false) {
+             throw new TypeError(`Found type ${typeof value} at path ${schemaPath.pathName} ${schemaPath.type} expected.`) 
           }
-          if (_.isBoolean(value)) {
-            return value;
-          }
-          return new Boolean(value)
+          var booleanValue = (value === "true" || value === 1 || value === true)
+          return booleanValue
         }
         if (_.isArray(value)) {
           return _.map(value, makeBoolean);

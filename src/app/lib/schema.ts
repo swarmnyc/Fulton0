@@ -33,7 +33,7 @@ export interface IValidator {
   (value: any): boolean | string
 }
 
-type SchemaModel = typeof Model;
+export type SchemaModel = typeof Model;
 
 export class Schema {
   private _paths: ISchemaPath[];
