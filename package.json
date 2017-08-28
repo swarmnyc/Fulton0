@@ -9,7 +9,7 @@
     "start": "node build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
-    "test": "npm run build && alsatian \"./build/app/**/*.spec.js\"",
+    "test": "rm -r build && npm run build && alsatian \"./build/app/**/*.spec.js\"",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "build": "tsc -p ./src || true",
     "package": "rm -f docker/worker/app.package.tar.gz && rm -f docker/worker/package.json && rimraf build && tsc -p && cp package.json docker/worker/package.json && tar czf app.package.tar.gz build && mv app.package.tar.gz docker/worker/app.package.tar.gz && rimraf build",

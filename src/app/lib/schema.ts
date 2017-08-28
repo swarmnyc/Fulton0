@@ -6,6 +6,35 @@ import { IAttributesHash } from 'mongorito';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
 import { SchemaFormatter } from './schema-formatter';
 import { SchemaValidator } from './schema-validator';
+
+export class SchemaTypes {
+  static ToOne = "ObjectId"
+  static ToMany = "ObjectId[]"
+  static isRef(type: String) {
+    return type == SchemaTypes.ToOne || type == SchemaTypes.ToMany
+  }
+  static String = "string"
+  static StringArray = "string[]"
+  static isString(type: String) {
+    return type == SchemaTypes.String || type == SchemaTypes.StringArray
+  }
+  static Number = "number"
+  static NumberArray = "number[]"
+  static isNumber(type: String) {
+    return type == SchemaTypes.Number || type == SchemaTypes.NumberArray
+  }
+  static Date = "date"
+  static DateArray = "date[]"
+  static isDate(type: String) {
+    return type == SchemaTypes.Date || type == SchemaTypes.DateArray
+  }
+  static Boolean = "boolean"
+  static BooleanArray = "boolean[]"
+  static isBoolean(type: String) {
+    return type == SchemaTypes.Boolean || type == SchemaTypes.BooleanArray
+  }
+}
+
 export interface ISchemaPathDefinition {
   type: string
   unique?: boolean
@@ -53,7 +82,7 @@ export class Schema {
     this._paths.push(schemaPath);
   }
 
-  async validate(doc: Model) {
+  async validate(doc: Model): Promise<Model> {
     assert(doc instanceof this.Model());
     const methods = this._validationMethods;
 
@@ -82,7 +111,7 @@ export class Schema {
    * 
    * @memberOf Schema
    */
-  protected async _removeExtraneousPaths(doc: Model) {
+  protected async _removeExtraneousPaths(doc: Model): Promise<Model> {
     const pathNames = _.map(this.paths(), (path): string => {
       return path.pathName;
     });
@@ -94,7 +123,7 @@ export class Schema {
       }
     }
 
-    await doc;
+    return doc;
   }
 
   /**
@@ -110,16 +139,15 @@ export class Schema {
         doc.set(path.pathName, doc.previous[path.pathName]);
       }
     }
+
     const paths = this.paths();
     const readOnlyPaths = paths.filter((path) => {
        return path.readonly === true;
     });
-
     // Skip enforcement on document creation
     if (doc.isNew() === false) {
       readOnlyPaths.forEach(enforce);
-    }
-
+    } 
     return doc;
   }
 
@@ -158,10 +186,12 @@ export class Schema {
     const Model = this.Model();
     const paths = this.paths();
     const uniquePaths = _.filter(paths, { unique: true });
-
     for (let path of uniquePaths) {
       let q = {};
       let val = doc.get(path.pathName);
+      if (typeof val === "undefined") {
+        continue;
+      }
       q[path.pathName] = val;
       let docsWithVal = await Model.find(q);
       let notOwnDocsWithVal = docsWithVal.filter((item: Model) => {
@@ -171,7 +201,6 @@ export class Schema {
         throw new UniqueError(`Document already exists with value "${val}" at path ${path.pathName}`, path.pathName, val);
       }
     }
-
     return doc;
   }
 
@@ -269,7 +298,7 @@ export class Schema {
    * 
    * @memberOf Schema
    */
-  protected async _assignDefaultValues(doc: Model) {
+  protected async _assignDefaultValues(doc: Model): Promise<Model> {
     const paths = this.paths();
     const pathsWithDefaultValues = _.filter(paths, (path) => {
       return _.has(path, 'defaultValue');
@@ -279,11 +308,11 @@ export class Schema {
       if (_.isNil(value) && typeof schemaPath.defaultValue !== 'function') {
         doc.set(schemaPath.pathName, schemaPath.defaultValue);
       } else if (typeof schemaPath.defaultValue === 'function' && _.isNil(value)) {
-        doc.set(schemaPath.pathName, schemaPath.defaultValue.apply(this));
+        doc.set(schemaPath.pathName, schemaPath.defaultValue.bind(doc)());
       }
     });
 
-    await doc;
+    return doc;
   }
 }
 

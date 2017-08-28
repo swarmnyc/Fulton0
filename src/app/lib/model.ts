@@ -195,6 +195,7 @@ export class Model extends MongoritoModel {
     const schema = this.schema();
     const collection = this.collection;
 
+   
     this._isNew = (!_.get(attr, '_id'));
 
     // The underlying mongorito class constructor overrides the collection() function with a string

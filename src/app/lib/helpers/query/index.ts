@@ -9,7 +9,6 @@ import MongoritoQueryCreator from './mongorito-query-creator';
 export async function _queryHelper(model: typeof Model, query?: QueryParams, method = 'find') {
     let q = APIQueryConverter.convertQueryToQueryObject(query);
     let docs = MongoritoQueryCreator.createModelQuery(q, model);
-
     return docs[method]();
 }
 

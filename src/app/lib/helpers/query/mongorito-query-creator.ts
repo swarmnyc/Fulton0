@@ -3,7 +3,7 @@ import { forEach as _forEach } from 'lodash';
 import * as _ from 'lodash';
 import { Model as MongoritoModel, IQuery } from 'mongorito';
 import { Model } from '../..';
-import { ISchemaDefinition, Schema } from '../..';
+import { ISchemaDefinition, Schema, SchemaTypes } from '../..';
 import { ObjectID } from 'mongodb';
 export default class MongoritoQueryCreator {
     static straightReturn = function(value) {
@@ -56,11 +56,11 @@ export default class MongoritoQueryCreator {
             let value = this.query.filter[key];
             if ((this.model as typeof Model).isSchemaKeyRelationship(key)) {
                 this.queryModel = this._queryCreator(this.queryModel, key, value, MongoritoQueryCreator.ObjectIDCreator)
-            } else if (schema[key].type === "string") {
+            } else if (SchemaTypes.isString(schema[key].type)) {
                 this.queryModel = this.queryModel.where(key, new RegExp(value,"i"));
-            } else if (schema[key].type === "number") {
+            } else if (SchemaTypes.isNumber(schema[key].type)) {
                 this.queryModel = this._queryCreator(this.queryModel, key, value, Number)
-            } else if (schema[key].type === "boolean") {
+            } else if (SchemaTypes.isBoolean(schema[key].type)) {
                  this.queryModel = this._queryCreator(this.queryModel, key, value, MongoritoQueryCreator.booleanCheck)
             } else {
                  this.queryModel = this._queryCreator(this.queryModel, key, value, MongoritoQueryCreator.straightReturn)

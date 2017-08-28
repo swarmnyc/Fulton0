@@ -105,7 +105,7 @@ declare module "mongorito" {
         static populate(pathName: string, model: PopulationOption<typeof Model>): typeof Model
         static index(pathName: string, options?: IIndexOptions): void
         static where(attr: string, value: any): typeof Model
-        static sort(attr: string, order: number): typeof Model
+        static sort(attr: any, order?: number): typeof Model
         static limit(amount: number): typeof Model
         static count(query?: IQuery): Promise<number>
         static find<T extends Model>(query?: IQuery, options?: IQueryOptions): Promise<T[]>
