@@ -5,26 +5,37 @@ import * as _ from 'lodash';
 import { JSONAPIRouter } from './jsonapi';
 
 
-export interface ValidationMap {
+export interface ValidationProperties {
     Model(): typeof Model
     hidePaths(): string[]
-    relationships(): any[]
+    relationships(): JSONAPIRouter.RouterRelationship[]
     type(): string
 }
 
-export class ValidateRequest {
+export class RequestValidator {
 
-    static createValidatorForBody(router: ValidationMap): any {
-        let validator = new ValidateRequest(router);
+    static createValidatorForJSONAPIHeaders(): any {
+        let validator = new RequestValidator()
+        return validator.createHeaderValidator();
+    }
+
+    static createValidatorForBody(router: ValidationProperties): any {
+        let validator = new RequestValidator(router);
         return validator.createBodyValidator()
     }
 
-    static createValidatorForArrayBody(router: ValidationMap): any {
-        let validator = new ValidateRequest(router);
+    static createValidatorForArrayBody(router: ValidationProperties): any {
+        let validator = new RequestValidator(router);
         return validator.createArrayBodyValidator()
     }
 
-    constructor(private router: ValidationMap) {
+    constructor(private router?: ValidationProperties) {
+    }
+
+    createHeaderValidator(): any {
+        return KoaRouter.Joi.object().keys({
+            'Content-Type': KoaRouter.Joi.string().valid(['application/vnd.api+json', 'application/json']).required()
+          }).optionalKeys('Authorization', 'Content-Type').unknown();
     }
 
     createArrayBodyValidator(): any {
@@ -39,13 +50,15 @@ export class ValidateRequest {
         //for each property in the schema return a joi validation object
         attributes = _.mapValues(attributes, function(schemaKey: ISchemaPathDefinition) {
             return this.generateJoiValidationObjForSchemaType(schemaKey.type);
-          }.bind(this));
-        
-        let relationshipKeys = _.mapKeys(this.router.relationships());
-        let relationships = _.pick(attributes, relationshipKeys);
-        
+        }.bind(this));
+
+        let relationshipKeys = _.map(this.router.relationships(), function(relationship) {
+            return relationship.path;
+        });
+        let relationships = _.pick(attributes, relationshipKeys);        
+    
         attributes = _.omit(attributes, relationshipKeys);
-        
+    
         let data = KoaRouter.Joi.object().keys({
           type: KoaRouter.Joi.string().required().valid(this.router.type()),
           attributes: KoaRouter.Joi.object().keys(attributes),

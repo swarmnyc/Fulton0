@@ -2,6 +2,7 @@ import * as KoaRouter from 'koa-joi-router';
 import { Router } from '../router';
 import { Model } from '../model';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
+import { RequestValidator, ValidationProperties } from './jsonapi-request-validator';
 import { queryHelper, countHelper } from '../helpers/query';
 import qs from '../middlewares/qs';
 import { ObjectID } from 'mongodb';
@@ -12,7 +13,7 @@ import { QueryParams } from '../helpers/query/types';
 
 const { Joi } = KoaRouter;
 
-export class JSONAPIRouter extends Router {
+export class JSONAPIRouter extends Router implements ValidationProperties {
 
   name(): string {
     return _.startCase(this.type());
@@ -433,144 +434,6 @@ export class JSONAPIRouter extends Router {
     return /^Bearer [a-zA-Z0-9]+$/;
   }
 
-  validHeaders(): any {
-    return Joi.object().keys({
-      'Authorization': KoaRouter.Joi.string().regex(this.validAuthorization()).required(),
-      'Content-Type': KoaRouter.Joi.string().valid(['application/vnd.api+json', 'application/json']).required()
-    }).optionalKeys('Authorization', 'Content-Type').unknown();
-  }
-
-  /**
-   * Gets teh Joi definition for the current model
-   */
-  def(): any {
-    const Model = this.Model();
-    let model = new Model();
-    let schema = Object.assign({}, model.schema());
-    schema['id'] = { type: 'string' };
-    if (model.timestamps()) {
-      schema['updated-at'] = { type: 'date' };
-      schema['created-at'] = { type: 'date' };
-    }
-    let j = _.mapValues(schema, (path) => {
-      let typeSplit: string[] = path.type.split('[');
-      let type = typeSplit[0];
-      let isArray: boolean = typeSplit.length > 1;
-      let v;
-      switch (type) {
-        case 'boolean':
-          v = Joi.boolean();
-          break;
-
-        case 'string':
-          v = Joi.string();
-          break;
-
-        case 'number':
-          v = Joi.number().allow(Infinity, -Infinity);
-          break;
-
-        case 'ObjectId':
-          v = Joi.string();
-          break;
-
-        case 'date':
-          v = Joi.date();
-          break;
-
-        case 'any':
-        default:
-          v = KoaRouter.Joi.any();
-          break;
-      }
-
-      // Stick above inside a typed array
-      if (isArray) {
-        v = KoaRouter.Joi.array().items(v);
-      }
-
-      if (path.required) {
-        v.required();
-      } else {
-        v.optional();
-      }
-
-      if (path.description) {
-        v.description(path.description);
-      }
-
-      if (path.example) {
-        v.example(path.example);
-      }
-
-      return v;
-    });
-
-    j = _.omitBy(j, function omit(val, key) {
-      if (key === 'id') {
-        return true;
-      } else if (_.startsWith(key, '_')) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-
-    j = _.mapKeys(j, function kebab(val, key) {
-      return _.kebabCase(key);
-    });
-
-    let o = KoaRouter.Joi.object().keys(j);
-    o.unknown();
-    return o;
-  }
-
-  validBody(isArray = false) {
-    let o: any;
-    let attributes = this.def();
-    let relationships = {};
-    let data: any;
-
-    // Iterate through route's relationships. Refs that aren't explicitly stated in the route can be assumed to be
-    // private and not meant to be exposed to the API.
-    for (let rel of this.relationships()) {
-      let data = KoaRouter.Joi.object().keys({
-        type: KoaRouter.Joi.string().valid(rel.type),
-        id: KoaRouter.Joi.any()
-      });
-
-      // Convert to array for to many relationships
-      if (rel.relationshipType === JSONAPIRouter.RelationshipType.TO_MANY) {
-        data = KoaRouter.Joi.array().items(data);
-        data.sparse();
-      }
-
-      relationships[_.kebabCase(rel.path)] = KoaRouter.Joi.object().keys({
-        data: data,
-        links: {
-          self: Joi.string(),
-          related: Joi.string()
-        }
-      }).unknown().optionalKeys('links', 'links.related');
-
-      delete attributes[rel.path];
-    }
-
-    data = Joi.object().keys({
-      type: KoaRouter.Joi.string().valid(this.type()),
-      id: KoaRouter.Joi.any(),
-      attributes: attributes,
-      relationships: relationships
-    }).unknown().optionalKeys('attributes', 'relationships', 'id');
-
-    o = KoaRouter.Joi.object().keys({
-      data: isArray ? Joi.array().items(data) : data
-    });
-
-    o.unknown();
-    return o;
-  }
-
   protected _create() {
     const self = this;
     const create = this.create;
@@ -584,9 +447,9 @@ export class JSONAPIRouter extends Router {
       },
       validate: {
         // type: 'json',
-        continueOnError: true,
-        // header: this.validHeaders(),
-        // body: this.validBody()
+        continueOnError: false,
+        header: RequestValidator.createValidatorForJSONAPIHeaders(),
+        body: RequestValidator.createValidatorForBody(self)
       },
       handler: [this._permissions(), async function(ctx: Router.Context, next: Function) {
         if (!ctx.state.data) {
@@ -616,7 +479,9 @@ export class JSONAPIRouter extends Router {
         description: `Update an existing ${this.singularType()}`
       },
       validate: {
-        continueOnError: true,
+        continueOnError: false,
+        body: RequestValidator.createValidatorForBody(self),
+        header: RequestValidator.createValidatorForJSONAPIHeaders(),        
       },
       handler: this._findById().handler.concat([async function(ctx: Router.Context, next: Function) {
         if (!ctx.state.data) {
@@ -647,7 +512,7 @@ export class JSONAPIRouter extends Router {
         description: `Deletes a ${this.singularType()}`
       },
       validate: {
-        header: this.validHeaders(),
+        header: RequestValidator.createValidatorForJSONAPIHeaders(),
         params: {
           'item_id': KoaRouter.Joi.string().required().description(`The id of the ${this.singularType()} to delete`)
         }
