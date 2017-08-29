@@ -4,7 +4,14 @@ import { Schema, ISchemaPath, ISchemaDefinition, SchemaModel, SchemaTypes } from
 import { ObjectID } from 'mongodb';
 import { Model } from './model';
 
+
+let primitiveOnlyFindReturn: MongoritoModel
+
 class PrimitiveOnlyModel extends Model {
+    static async find<T extends MongoritoModel>(query?: IQuery, options?: IQueryOptions): Promise<T[]> {
+        return [primitiveOnlyFindReturn as T]
+    }
+    
     setIsNewToFalse() {
         this._isNew = false;
     }
@@ -120,6 +127,10 @@ export class SchemaTest {
 
     @AsyncTest("Test unique field validation")
     public async testUniqueValidation() {
+        primitiveOnlyFindReturn = new PrimitiveOnlyModel({
+            "_id": new ObjectID(),
+            "uniqueKey": 2
+        })
         let testValidation = async function(model: PrimitiveOnlyModel) {
             let schema = new Schema(model.schema(), PrimitiveOnlyModel);
             let validatedModel: PrimitiveOnlyModel
@@ -132,15 +143,6 @@ export class SchemaTest {
              Expect.fail("validation should have failed")
         }
 
-        let findReturn = new PrimitiveOnlyModel({
-            "_id": new ObjectID(),
-            "uniqueKey": 2
-        })
-
-        MongoritoModel.find = async function<T extends MongoritoModel>(query?: IQuery, options?: IQueryOptions): Promise<T[]> {
-            //make it always return a path
-            return [findReturn as MongoritoModel as T]
-        }
 
         let testModel = new PrimitiveOnlyModel({
             "_id": new ObjectID(),

@@ -8,6 +8,9 @@ import { SchemaFormatter } from './schema-formatter';
 import { SchemaValidator } from './schema-validator';
 
 export class SchemaTypes {
+  static getTypeOfArray(type: string): string {
+    return type.split("[]")[0];
+  }
   static ToOne = "ObjectId"
   static ToMany = "ObjectId[]"
   static isRef(type: String) {

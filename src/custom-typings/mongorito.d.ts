@@ -118,7 +118,7 @@ declare module "mongorito" {
 
       
       const db: Db
-      function connect(mongoURI: string): void
+      function connect(mongoURI: string, options?: any): void
       function disconnect(): void
   }
 

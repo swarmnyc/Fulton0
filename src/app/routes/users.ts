@@ -2,6 +2,7 @@ import { JSONAPIRouter } from '../lib/routers/jsonapi';
 import { User } from '../models';
 
 export class UserRouter extends JSONAPIRouter {
+
   Model() {
     return User;
   }
@@ -16,6 +17,7 @@ export class UserRouter extends JSONAPIRouter {
       yield oauth.call(this, next); // use call to preserve context
     };
   }
+  
 }
 
 export default UserRouter;

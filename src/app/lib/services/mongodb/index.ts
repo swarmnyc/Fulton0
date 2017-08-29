@@ -58,4 +58,20 @@ export class BaseMongoDBService extends Service {
     await this.instance.disconnect();
     return;
   }
+
+
+  // static populate(pathName: string, model: PopulationOption<typeof Model>): typeof Model
+  // static index(pathName: string, options?: IIndexOptions): void
+  // static where(attr: string, value: any): typeof Model
+  // static sort(attr: any, order?: number): typeof Model
+  // static limit(amount: number): typeof Model
+  // static count(query?: IQuery): Promise<number>
+  // static find<T extends Model>(query?: IQuery, options?: IQueryOptions): Promise<T[]>
+  // static all<T extends Model>(): Promise<T[]>
+  // static findOne<T extends Model>(query?: IQuery): Promise<T>
+  // static findById<T extends Model>(id: string): Promise<T>
+  // static update(query: IQuery, update: IUpdateObject, options?: IUpdateOptions): Promise<IResultsObject>
+  // static remove(query?: IQuery): Promise<IResultsObject>
+
+
 }
