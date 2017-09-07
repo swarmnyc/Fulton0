@@ -37,6 +37,7 @@ export class RequestValidator {
             'Content-Type': KoaRouter.Joi.string().valid(['application/vnd.api+json', 'application/json']),
             'Authorization': KoaRouter.Joi.string()
           }).optionalKeys('Authorization').unknown(true);
+          //unknown true -> allow properties that we haven't specified explicitly
     }
 
     createArrayBodyValidator(): any {

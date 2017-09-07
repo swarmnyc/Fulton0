@@ -570,7 +570,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         return ctx.throw(400, err);
       }
       if (writablePaths.length) {
-        data = _.pickBy(data, writablePaths);
+        data = _.pick(data, writablePaths);
       }
       ctx.state.data = data;
     }
@@ -604,7 +604,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         if (ctx.state.query && ctx.state.query.page && ctx.state.query.page.offset && ctx.state.query.page.size && ctx.state.count) {
           output.links = generatePaginationLinks.call(self, Number(ctx.state.query.page.offset), ctx.state.count, Number(ctx.state.query.page.size));
         }
-        
+
         if (typeof ctx.state.count !== "undefined") {
           output.meta['total'] = ctx.state.count;
           if (ctx.state.query.page) {

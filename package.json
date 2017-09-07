@@ -9,7 +9,7 @@
     "start": "node --inspect=0.0.0.0:5858 build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
-    "test": "rm -r build && npm run build && alsatian \"./build/app/**/*.spec.js\"",
+    "test": "rm -r build || true && npm run build && alsatian \"./build/app/**/*.spec.js\"",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "build": "tsc -p ./src || true",
     "package": "rm -f docker/worker/app.package.tar.gz && rm -f docker/worker/package.json && rimraf build && tsc -p && cp package.json docker/worker/package.json && tar czf app.package.tar.gz build && mv app.package.tar.gz docker/worker/app.package.tar.gz && rimraf build",
@@ -17,9 +17,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/joeyfromspace/swarm-monitor"
+    "url": "https://github.com/swarmnyc/swarm-web-framework"
   },
-  "author": "Joey Lappin <joey@swarmnyc.com>",
+  "author": "SWARM <hello@swarmnyc.com>",
   "license": "UNLICENSED",
   "dependencies": {
     "alsatian": "^2.0.0",
