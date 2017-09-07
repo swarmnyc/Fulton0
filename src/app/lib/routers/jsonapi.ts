@@ -2,7 +2,7 @@ import * as KoaRouter from 'koa-joi-router';
 import { Router } from '../router';
 import { Model } from '../model';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
-import { RequestValidator, ValidationProperties } from './jsonapi-request-validator';
+import { RequestValidator, ValidationProperties } from './jsonapi-route-components/jsonapi-request-validator';
 import { queryHelper, countHelper } from '../helpers/query';
 import qs from '../middlewares/qs';
 import { ObjectID } from 'mongodb';
@@ -10,7 +10,8 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as pluralize from 'pluralize';
 import { QueryParams } from '../helpers/query/types';
-
+import { onRequestError } from './jsonapi-route-components/jsonapi-errors';
+import { JSONAPIRelationshipData, JSONAPIRelationship, JSONAPIRelationships, JSONModel, JSONAPILinksObject, JSONAPIErrorSource, JSONAPIError, JSONAPIVersion, JSONAPIResponse} from './jsonapi-route-components/jsonapi-types';
 const { Joi } = KoaRouter;
 
 export class JSONAPIRouter extends Router implements ValidationProperties {
@@ -68,7 +69,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
    * List of operations permitted at this endpoint
    * @returns {[JSONAPIRouter.OPERATION,JSONAPIRouter.OPERATION,JSONAPIRouter.OPERATION,JSONAPIRouter.OPERATION]}
    */
-  operations(): number[] {
+  operations(): JSONAPIRouter.OPERATION[] {
     return [JSONAPIRouter.OPERATION.GET,JSONAPIRouter.OPERATION.CREATE, JSONAPIRouter.OPERATION.UPDATE, JSONAPIRouter.OPERATION.REMOVE];
   }
 
@@ -144,37 +145,6 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
    */
   adapter() {
     return new JSONAPIAdapter(this.adapterOptions());
-  }
-
-  onRequestError(err: Error) {
-      let code: number;
-      let mesg: JSONAPIError;
-      let path: string;
-      if (err instanceof Model.ValidationError) {
-        code = 422;
-        path = err.path;
-      } else if (err instanceof Model.RequiredError) {
-        code = 422;
-        path = err.path;
-      } else if (err instanceof Model.UniqueError) {
-        code = 409;
-        path = err.path; 
-      } else if (err instanceof TypeError) {
-        let pathstr = 'at path ';
-        let pathIndex: number = (err.message.indexOf(pathstr)) + pathstr.length;
-        code = 422;            
-        path = err.message.substring(pathIndex, err.message.indexOf(' ', pathIndex));
-      }
-      mesg = { 
-        title: err.name,
-        code: code,
-        detail: err.message,
-        source: {
-          pointer: `/data/attributes/${path}`
-        }
-      };
-      
-      return mesg;
   }
 
   private _generatePaginationLinks(offset: number, count: number, limit: number): JSONAPILinksObject {
@@ -374,7 +344,8 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         description: `Find ${this.type()}. Provide query filters, sort options, and pagination to customize results.`
       },
       validate: {
-        continueOnError: true,
+        continueOnError: false,
+        header: RequestValidator.createValidatorForJSONAPIHeaders(),
         query: Joi.object().keys({
           'include': KoaRouter.Joi.string().description('Include related documents at the specified paths').optional(),
           'lessThan[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute with values less than').optional(),
@@ -387,7 +358,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
           sort: KoaRouter.Joi.string().description('Ascending sort results by specified model paths separated by commas. Placing - in front of  path name will make the sort descending. Example: ?sort=-created-at,updated-at').optional()
         }).optionalKeys('include', 'page[limit]', 'page[offset]', 'filter[attr]').unknown(),
       },
-      handler: [async function (ctx: Router.Context, next: Function) {
+      handler: [self.deserializerMiddleware(), async function (ctx: Router.Context, next: Function) {
         let query: QueryParams = {};
 
         if (ctx.state.query) {
@@ -414,14 +385,12 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         description: `Get a single ${this.singularType()}`
       },
       validate: {
-        continueOnError: true,
-        // output: {
-        //   200: {
-        //     body: this.validBody()
-        //   }
-        // }
+        type: 'json',
+        continueOnError: false,
+        header: RequestValidator.createValidatorForJSONAPIHeaders(),
+        body: RequestValidator.createValidatorForBody(self)
       },
-      handler: [async function(ctx: Router.Context, next: Function) {
+      handler: [self.deserializerMiddleware(), async function(ctx: Router.Context, next: Function) {
         const id: string = ctx.params.item_id;
         ctx.state.model = await findById.call(self, id, ctx);
         ctx.state.status = ctx.state.model ? 200 : 404;
@@ -437,7 +406,6 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
   protected _create() {
     const self = this;
     const create = this.create;
-    const onRequestError = this.onRequestError;
     return {
       method: 'post',
       path: `/`,
@@ -446,12 +414,12 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         description: `Creates a new ${this.singularType()}`
       },
       validate: {
-        // type: 'json',
+        type: 'json',
         continueOnError: false,
         header: RequestValidator.createValidatorForJSONAPIHeaders(),
         body: RequestValidator.createValidatorForBody(self)
       },
-      handler: [this._permissions(), async function(ctx: Router.Context, next: Function) {
+      handler: [self.deserializerMiddleware(), this._permissions(), async function(ctx: Router.Context, next: Function) {
         if (!ctx.state.data) {
           ctx.throw(400);
         }
@@ -470,7 +438,6 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
   protected _update() {
     const self = this;
     const update = this.update;
-    const onRequestError = this.onRequestError;
     return {
       method: 'patch',
       path: `/:item_id`,
@@ -479,6 +446,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         description: `Update an existing ${this.singularType()}`
       },
       validate: {
+        type: 'json',
         continueOnError: false,
         body: RequestValidator.createValidatorForBody(self),
         header: RequestValidator.createValidatorForJSONAPIHeaders(),        
@@ -577,8 +545,6 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
   }
 
   protected _init() {
-    const deserialize = this.adapter().deserialize;
-    const writablePaths: string[] = this.writablePaths();
     const getOperation = this._getOperation;
     return async function(ctx: Router.Context, next: Function) {
       ctx.state.errors = [];
@@ -588,16 +554,30 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         return ctx.throw(403);
       }
 
-      if (_.isObject(ctx.request.body) && Object.keys(ctx.request.body).length) {
-        let data: any = deserialize(ctx.request.body);
-        if (writablePaths.length) {
-          data = _.pickBy(data, writablePaths);
-        }
-        ctx.state.data = data;
-      }
       await next();
     };
   }
+  
+ deserializerMiddleware() {
+  const deserialize = this.adapter().deserialize;
+  const writablePaths: string[] = this.writablePaths();
+  return async function(ctx: Router.Context, next: Function) {
+    if (_.isObject(ctx.request.body) && Object.keys(ctx.request.body).length) {
+      let data: any
+      try { 
+        data = deserialize(ctx.request.body);
+      } catch (err) {
+        return ctx.throw(400, err);
+      }
+      if (writablePaths.length) {
+        data = _.pickBy(data, writablePaths);
+      }
+      ctx.state.data = data;
+    }
+    await next();
+  }
+  }
+
 
   _responder() {
     const self = this;
@@ -623,8 +603,8 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
 
         if (ctx.state.query && ctx.state.query.page && ctx.state.query.page.offset && ctx.state.query.page.size && ctx.state.count) {
           output.links = generatePaginationLinks.call(self, Number(ctx.state.query.page.offset), ctx.state.count, Number(ctx.state.query.page.size));
-          
         }
+        
         if (typeof ctx.state.count !== "undefined") {
           output.meta['total'] = ctx.state.count;
           if (ctx.state.query.page) {
@@ -675,7 +655,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
     };
   }
 
-  protected _canUseHandler(operation: number): boolean {
+  protected _canUseHandler(operation: JSONAPIRouter.OPERATION): boolean {
     const operations = this.operations();
     return operations.indexOf(operation) >= 0;
   }
@@ -755,59 +735,3 @@ export namespace JSONAPIRouter {
 }
 
 
-
-
-interface JSONAPIRelationshipData {
-  type: string
-  id: string
-}
-
-interface JSONAPIRelationship {
-  links: JSONAPILinksObject,
-  data: JSONAPIRelationshipData
-}
-
-interface JSONAPIRelationships {
-  [K: string]: JSONAPIRelationship
-}
-
-interface JSONModel {
-  [path: string]: any
-}
-
-
-
-interface JSONAPILinksObject {
-  self?: string
-  related?: string
-  first?: string
-  next?: string
-  prev?: string
-  last?: string
-}
-
-interface JSONAPIErrorSource {
-  pointer: string
-  parameter?: string
-}
-
-interface JSONAPIError {
-  title?: string
-  source?: JSONAPIErrorSource
-  detail?: string
-  code?: number
-  meta?: JSONModel
-}
-
-interface JSONAPIVersion {
-  version: string
-}
-
-interface JSONAPIResponse {
-  data?: JSONModel | JSONModel[]
-  included?: JSONModel[]
-  links?: JSONAPILinksObject
-  errors?: JSONAPIError[]
-  meta?: JSONModel
-  jsonapi: JSONAPIVersion
-}

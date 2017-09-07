@@ -1,7 +1,7 @@
 import { AsyncTest, Expect, Test, TestCase, TestFixture } from "alsatian";
-import { Model } from '../model';
+import { Model } from '../../model';
 import { RequestValidator, ValidationProperties } from './jsonapi-request-validator';
-import { ISchemaPath, SchemaTypes } from '../schema';
+import { ISchemaPath, SchemaTypes } from '../../schema';
 class ArticleWriter extends Model {
     schema() {
         return {

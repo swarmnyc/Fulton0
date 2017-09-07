@@ -14,6 +14,19 @@
       "sourceMaps": true
     },
     {
+      "name": "Attach To DockerCompose",
+      "type": "node2",
+      "request": "attach",
+      "port": 5858,
+      "address": "localhost",
+      "restart": true,
+      "sourceMaps": true,
+      "diagnosticLogging": true,
+      "outDir": "${workspaceRoot}/build/",
+      "localRoot": "${workspaceRoot}/",
+      "remoteRoot": "/usr/src/app"
+    },
+    {
       "type": "node",
       "request": "attach",
       "name": "Attach to Process",

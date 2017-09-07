@@ -11,10 +11,10 @@ export class Article extends Model {
     return {
       title: { type: SchemaTypes.String, required: true },
       body: { type: SchemaTypes.String, required: true },
-      user: { type: SchemaTypes.ToOne, required: true, ref: User }
+      user: { type: SchemaTypes.ToOne, required: false, ref: User }
     };
   }
 
 }
 
-export default User;
+export default Article;

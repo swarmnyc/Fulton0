@@ -6,7 +6,7 @@
   "types": "./src/app/framework/index.d.ts",
   "private": true,
   "scripts": {
-    "start": "node build/main.js",
+    "start": "node --inspect=0.0.0.0:5858 build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
     "test": "rm -r build && npm run build && alsatian \"./build/app/**/*.spec.js\"",
@@ -28,6 +28,7 @@
     "bluebird": "3.4.6",
     "co": "4.6.0",
     "csv-parse": "^1.2.1",
+    "dotenv": "^4.0.0",
     "express": "4.14.0",
     "fs-extra": "1.0.0",
     "grant-koa": "3.6.5",

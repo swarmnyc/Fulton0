@@ -1,4 +1,6 @@
 //import * as Application from 'koa/lib/application';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import * as Koa from 'koa';
 import * as KoaRouter from 'koa-joi-router';
 import { Router } from './router';
@@ -63,7 +65,7 @@ export class App extends EventEmitter {
    * @memberof App
    */
   bodyParser() {
-    return true;
+    return false;
   }
 
   /**
@@ -207,7 +209,9 @@ export class App extends EventEmitter {
           description: 'Issues new API token to user'
         },
         validate: {
+          type: 'json',
           continueOnError: true,
+          body: {},
           header: {
             authorization: Joi.string().required().label('Client ID & Secret').description('The client ID and client secret of requesting app, encoded in base64').example('Basic dGhpc2F0ZXN0Y2xpZW50aWQ6dGhpc2lzYXRlc3RjbGllbnRzZWNyZXQ=')
           }

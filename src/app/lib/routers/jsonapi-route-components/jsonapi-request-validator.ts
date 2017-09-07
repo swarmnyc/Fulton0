@@ -1,8 +1,8 @@
 import * as KoaRouter from 'koa-joi-router';
-import { Model } from '../model';
-import { SchemaTypes, ISchemaPathDefinition } from '../schema';
+import { Model } from '../../model';
+import { SchemaTypes, ISchemaPathDefinition } from '../../schema';
 import * as _ from 'lodash';
-import { JSONAPIRouter } from './jsonapi';
+import { JSONAPIRouter } from './../jsonapi';
 
 
 export interface ValidationProperties {
@@ -34,8 +34,9 @@ export class RequestValidator {
 
     createHeaderValidator(): any {
         return KoaRouter.Joi.object().keys({
-            'Content-Type': KoaRouter.Joi.string().valid(['application/vnd.api+json', 'application/json']).required()
-          }).optionalKeys('Authorization', 'Content-Type').unknown();
+            'Content-Type': KoaRouter.Joi.string().valid(['application/vnd.api+json', 'application/json']),
+            'Authorization': KoaRouter.Joi.string()
+          }).optionalKeys('Authorization').unknown(true);
     }
 
     createArrayBodyValidator(): any {
@@ -67,7 +68,7 @@ export class RequestValidator {
         
         return KoaRouter.Joi.object().keys({
             data: data
-        });
+        }).optional();
       }
 
       generateJoiValidationObjForSchemaType(type: string, joi: any = KoaRouter.Joi): any {
