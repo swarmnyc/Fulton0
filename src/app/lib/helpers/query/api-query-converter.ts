@@ -64,6 +64,26 @@ export default class APIQueryConverter {
         if (typeof filters == "undefined") {
             return 
         }
+        /*
+            filter will be formatted one of two ways, depending on if you have a greater than or less than query in the filter:
+            
+            ?filter[attributeKey]=valueFilteringWith&filter[2ndAttributeKey]=valueFilteringWith2
+            {
+                "attributeKey": "valueFilteringWith",
+                "2ndAttributeKey": "valueFilteringWith2"
+            }
+            or
+
+            ?filter[attributeKey]=valueFilteringWith&filter[attributeKey][$gt]=valueFilteringGreaterThan&filter[2ndAttributeKey]=valueFilteringWith2
+            {
+                "attributeKey": {
+                    "$gt": "valueFilteringGreaterThan",
+                    "valueFilteringWith": true (the true is added because there is no real value that makes sense here)
+                },
+                "2ndAttributeKey": "valueFilteringWith2"
+            }
+
+        */
         _.each(filters, function(v: any, attribute: string) {
         	if (typeof v !== "object") {
                     this.query.filter[attribute] = v;
