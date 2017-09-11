@@ -20,7 +20,7 @@ export default class APIQueryConverter {
 
     constructor(private startingQuery?: QueryParams) {
         this.query = {
-            filter: this.startingQuery.filter || {},
+            filter: {},
             lessThan: this.startingQuery.lessThan || {},
             greaterThan: this.startingQuery.greaterThan || {},
             options: {
@@ -60,10 +60,26 @@ export default class APIQueryConverter {
     }
 
     addFilter() {
-        let filters = this.startingQuery["__base"]
-        if (typeof filters !== "undefined") {
-            Object.assign(this.query.filter, filters);
+        let filters = this.startingQuery["filter"]
+        if (typeof filters == "undefined") {
+            return 
         }
+        _.each(filters, function(v: any, attribute: string) {
+        	if (typeof v !== "object") {
+                    this.query.filter[attribute] = v;
+        	} else {
+                    _.each(v, function(value: any, key: string) {
+                        if (key === "$gt") {
+                            this.query.greaterThan[attribute] = value;
+                        } else if (key === "$lt") {
+                            this.query.lessThan[attribute] = value;
+                        } else {
+                            this.query.filter[attribute] = key;
+                	}
+            	}.bind(this))
+	    }
+        }.bind(this));
+        
         return this.query
     }
 
