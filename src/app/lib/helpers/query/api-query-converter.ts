@@ -64,37 +64,43 @@ export default class APIQueryConverter {
         if (typeof filters == "undefined") {
             return 
         }
-        /*
-            filter will be formatted one of two ways, depending on if you have a greater than or less than query in the filter:
-            
-            ?filter[attributeKey]=valueFilteringWith&filter[2ndAttributeKey]=valueFilteringWith2
-            {
-                "attributeKey": "valueFilteringWith",
-                "2ndAttributeKey": "valueFilteringWith2"
-            }
-            or
-
-            ?filter[attributeKey]=valueFilteringWith&filter[attributeKey][$gt]=valueFilteringGreaterThan&filter[2ndAttributeKey]=valueFilteringWith2
-            {
-                "attributeKey": {
-                    "$gt": "valueFilteringGreaterThan",
-                    "valueFilteringWith": true (the true is added because there is no real value that makes sense here)
-                },
-                "2ndAttributeKey": "valueFilteringWith2"
-            }
-
-        */
+    
         _.each(filters, function(v: any, attribute: string) {
         	if (typeof v !== "object") {
-                    this.query.filter[attribute] = v;
+                //filter key value will not be an object when query string has no greater than or less than values
+                /*
+                    Example:
+                    A query string of:
+                        ?filter[attributeKey]=valueFilteringWith&filter[2ndAttributeKey]=valueFilteringWith2
+                    Will result in the filters object above formatted as:
+                        filters = {
+                            "attributeKey": "valueFilteringWith",
+                            "2ndAttributeKey": "valueFilteringWith2"
+                        }
+                */
+                this.query.filter[attribute] = v;
         	} else {
-                    _.each(v, function(value: any, key: string) {
-                        if (key === "$gt") {
-                            this.query.greaterThan[attribute] = value;
-                        } else if (key === "$lt") {
-                            this.query.lessThan[attribute] = value;
-                        } else {
-                            this.query.filter[attribute] = key;
+                //filter key value will be an object when a query string has a greater than or less than value
+                /*
+                    Example:
+                    A query string of:
+                        ?filter[attributeKey]=valueFilteringWith&filter[attributeKey][$gt]=valueFilteringGreaterThan&filter[2ndAttributeKey]=valueFilteringWith2
+                    Will result in the filters object above formatted as:
+                        {
+                            "attributeKey": {
+                                "$gt": "valueFilteringGreaterThan",
+                                "valueFilteringWith": true (the true is added because there is no real value that makes sense here)
+                            },
+                            "2ndAttributeKey": "valueFilteringWith2"
+                        }
+                */
+                _.each(v, function(value: any, key: string) {
+                    if (key === "$gt") {
+                        this.query.greaterThan[attribute] = value;
+                    } else if (key === "$lt") {
+                        this.query.lessThan[attribute] = value;
+                    } else {
+                        this.query.filter[attribute] = key;
                 	}
             	}.bind(this))
 	    }
