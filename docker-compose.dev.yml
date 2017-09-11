@@ -1,0 +1,34 @@
+version: '3'
+services:
+  redis:
+    image: redis
+    networks:
+      - backend
+    ports:
+      - "6379:6379"
+    depends_on:
+      - mongo
+  mongo:
+    networks:
+      - backend
+    image: mongo
+    volumes:
+      - "/data/db:/data/db2"
+  api:
+    restart: always
+    build: 
+      context: .
+      args:
+        env: dev
+    ports:
+      - "8080:3000"
+      - "5858:5858"
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - mongo
+      - redis
+networks:
+  frontend:
+  backend:

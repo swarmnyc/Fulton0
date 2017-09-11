@@ -1,17 +1,25 @@
 import { Model as MongoritoModel } from 'mongorito';
-import { get as _get, keys as _keys, pickBy as _pickBy, forEach as _forEach, isNil as _isNil, has as _has, endsWith as _endsWith, isArray as _isArray  } from 'lodash';
+import { IAttributesHash } from 'mongorito';
+import * as _ from 'lodash';
 import { ISchemaDefinition, Schema } from './schema';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
 import { ObjectID } from 'mongodb';
 
+
 export class Model extends MongoritoModel {
-  static ValidationError = ValidationError
-  static UniqueError = UniqueError
-  static RequiredError = RequiredError
-  static ObjectID = ObjectID  
+  static ValidationError = ValidationError;
+  static UniqueError = UniqueError;
+  static RequiredError = RequiredError;
+  static ObjectID = ObjectID;
+  static appliedIndex: boolean;
+  collectionName: string;
 
-  collectionName: string
-
+  get changedKeys() {
+    let changedKeys = this.changed;
+    return _.omitBy(changedKeys, function(value) {
+      return value === false;
+    });
+  }
   /**
    * Define a schema for your model here.
    * 
@@ -21,6 +29,31 @@ export class Model extends MongoritoModel {
    */
   schema(): ISchemaDefinition {
     return undefined;
+  }
+
+  static schema(): ISchemaDefinition {
+    return new this().schema();
+  }
+  
+  static isSchemaKeyRelationship(key: string): boolean {
+    let schema = this.schema();
+    const schemaEntry = schema[key];
+    if (typeof schemaEntry !== "undefined") {
+      return typeof schemaEntry["ref"] !== "undefined"
+    }
+    return false;
+  }
+  
+  static isSchemaKeyArray(key: string): boolean {
+    let schema = this.schema();
+    const schemaEntry = schema[key];
+    if (typeof schemaEntry !== "undefined") {
+      let typeSplit: string[] = schemaEntry.type.split('[');
+      let type = typeSplit[0];
+      let isArray: boolean = typeSplit.length > 1;
+      return isArray;
+    }
+    return false
   }
 
   protected _schema: Schema
@@ -54,6 +87,7 @@ export class Model extends MongoritoModel {
     return false;
   }
 
+
   /**
    * Check if a document is a newly created document.
    * 
@@ -63,6 +97,30 @@ export class Model extends MongoritoModel {
    */
   isNew() {
     return this._isNew;
+  }
+
+  async setAndValidate(newAttr: any): Promise<Model> {
+    let newAttributes: IAttributesHash = this.validateAndTypecastAttributes(newAttr);
+    this.set(newAttributes);
+    return this.validate();
+  }
+
+ validateAndTypecastAttributes(attrs: IAttributesHash): IAttributesHash {
+    return this._schema.validateAndTypeCastObject(attrs);
+  }
+
+  /**
+   * Validates the model against its schema. Setup a catch on the returned Promise to catch validation errors.
+   * 
+   * @returns {Promise<Model>} 
+   * 
+   * @memberof Model
+   */
+  async validate(): Promise<Model> {
+    if (!this._schema) {
+      throw new ReferenceError('Called validate on model with no schema');
+    }
+    return this._schema.validate(this);
   }
 
   /**
@@ -94,7 +152,7 @@ export class Model extends MongoritoModel {
    */
   protected async _updateTimestamps(next: any) {
     const timestamp = new Date();
-    if (_isNil(this.get('createdAt'))) {
+    if (_.isNil(this.get('createdAt'))) {
       this.set('createdAt', timestamp);
     }
     this.set('updatedAt', timestamp);
@@ -107,6 +165,29 @@ export class Model extends MongoritoModel {
     await next;
   }
 
+  async setIndex() {
+    let indexPaths: any;
+    let ParentModel = this._getParent();
+    ParentModel.appliedIndex = true;
+
+    indexPaths = _.pickBy(this.schema(), (schemaPath, pathName) => {
+      return !!schemaPath.unique || !!schemaPath.index;
+    });
+
+    _.forEach(indexPaths, (schemaPath, pathName) => {
+      let o: any = {};
+
+      if (!!schemaPath.unique) {
+        ParentModel.index(pathName, { unique: true });
+      } else if (schemaPath.indexType) {
+        o[pathName] = schemaPath.indexType;
+        ParentModel.index(o);
+      } else {
+        ParentModel.index(pathName);
+      }
+    });
+  }
+
   constructor(attr?: any, opts?: any) {    
     super(attr, opts);
 
@@ -114,11 +195,14 @@ export class Model extends MongoritoModel {
     const schema = this.schema();
     const collection = this.collection;
 
-    this._isNew = (!_get(attr, '_id'));
-    
+   
+    this._isNew = (!_.get(attr, '_id'));
+
     // The underlying mongorito class constructor overrides the collection() function with a string
     if (typeof collection === 'string') {
       this.collectionName = collection;
+    } else if (_.isFunction(collection)) {
+      this.collectionName = collection();
     }
 
     // Register schema hooks BEFORE any registered middleware handlers
@@ -131,6 +215,11 @@ export class Model extends MongoritoModel {
         this._hooks.before.save.unshift(this._updateTimestamps);
         this._setTimestampPaths();
       }
+      if (!Parent.appliedIndex) {
+        this.setIndex();
+      }
     }
   }
 }
+
+export default Model

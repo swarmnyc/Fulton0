@@ -1,18 +1,25 @@
 //import * as Application from 'koa/lib/application';
-import * as koa from 'koa';
-import * as KoaRouter from 'koa-router';
-import Router from './router';
-import { Service } from './service';
+import * as dotenv from 'dotenv';
+dotenv.config();
+import * as Koa from 'koa';
+import * as KoaRouter from 'koa-joi-router';
+import { Router } from './router';
+import { BaseLoggerService } from './services/logger';
 import { ServiceLoader } from './service-loader';
 import RequestHandler from './request-handler';
 import { resolve } from 'path';
-import { toArray as _toArray, map as _map, set as _set, get as _get, assign as _assign } from 'lodash';
 import RouteLoader from './route-loader';
-import Context from './context';
+import { Context } from 'koa';
 import { EventEmitter } from 'events';
+import * as _ from 'lodash';
 import * as bodyParser from 'koa-bodyparser';
 import * as conditional from 'koa-conditional-get';
 import * as etag from 'koa-etag';
+import * as docs from 'koa-docs';
+
+const _set = _.set;
+const _get = _.get;
+const { Joi } = KoaRouter;
 
 interface AppInitOptions {
   loadRoutes?: boolean
@@ -31,10 +38,12 @@ interface ServiceHash {
  * @extends {EventEmitter}
  */
 export class App extends EventEmitter {
-  protected app: koa
-  services: ServiceHash
+  protected app: Koa;
+  protected _groups: APIRouter[];
+  log: BaseLoggerService;
+  services: ServiceHash;
 
-  appRoot: string
+  appRoot: string;
   
   /**
    * Returns an array of request handler middlewares to apply to each incoming request before passing the request off to the router.
@@ -56,7 +65,7 @@ export class App extends EventEmitter {
    * @memberof App
    */
   bodyParser() {
-    return true;
+    return false;
   }
 
   /**
@@ -81,8 +90,9 @@ export class App extends EventEmitter {
     super();
     this.appRoot = resolve(`${__dirname}/..`);
 
-    this.app = new koa();
+    this.app = new Koa();
     this.services = {};
+    this._groups = [];
     this.on('didInit', this.didInit.bind(this));
   }
 
@@ -115,7 +125,7 @@ export class App extends EventEmitter {
    * 
    * @memberOf App
    */
-  didError(err: Error | string) {}
+  didError(err: Error | string, ctx?: Context) {}
 
   /**
    * Bind a middleware to the app
@@ -152,6 +162,16 @@ export class App extends EventEmitter {
     return _get(this.app.context, key);
   }
 
+  register(router: Router) {
+    if (router.isAPI() === true) {
+      this._groups.push({ groupName: router.name(), description: router.description(), prefix: router.prefix(), routes: router.router.routes });
+    }
+    this.use(router.routes());
+  }
+
+  apiGroups() {
+    return this._groups;
+  }
   /**
    * Returns a new Koa app instance with routes and services loaded into the app 
    * 
@@ -165,7 +185,7 @@ export class App extends EventEmitter {
     const routeLoader = new RouteLoader();
     let oauth: any;
 
-    app.on('error', this.didError);
+    app.on('error', this.didError.bind(this));
         
     if (opts.loadServices === true) {
       await serviceLoader.load(this);
@@ -173,6 +193,33 @@ export class App extends EventEmitter {
 
     if (this.bodyParser() === true) {
       app.use(bodyParser());
+    }
+
+    if (this.services['log']) {
+      this.log = this.services['log'];
+    }
+
+    if (opts.loadServices === true && this.services['oauth']) {
+      oauth = new KoaRouter();
+      oauth.route({
+        method: 'post',
+        path: `/${this.services['oauth'].tokenEndpoint()}`,
+        meta: {
+          friendlyName: 'Get API Token',
+          description: 'Issues new API token to user'
+        },
+        validate: {
+          type: 'json',
+          continueOnError: true,
+          body: {},
+          header: {
+            authorization: Joi.string().required().label('Client ID & Secret').description('The client ID and client secret of requesting app, encoded in base64').example('Basic dGhpc2F0ZXN0Y2xpZW50aWQ6dGhpc2lzYXRlc3RjbGllbnRzZWNyZXQ=')
+          }
+        },
+        handler: this.services['oauth'].token()
+      });
+
+      app.use(oauth.middleware());
     }
 
     if (this.etag() === true) {
@@ -184,21 +231,28 @@ export class App extends EventEmitter {
       app.use(middleware());
     }
 
-    if (opts.loadServices === true && this.services['oauth']) {
-      oauth = new KoaRouter();
-      oauth.post(`/${this.services['oauth'].tokenEndpoint()}`, this.services['oauth'].token());
-      app.use(oauth.routes());
-    }
-    
     if (opts.loadRoutes === true) {
-      await routeLoader.load(this);
+      routeLoader.load(this);
     }
-    
+
+    app.use(docs.get('/api/docs', {
+      title: `${this.constructor.name} API`,
+      version: `1.0.0`,
+      theme: 'lumen',
+      routeHandlers: 'disabled',
+      groups: this.apiGroups()
+    }));
 
     this.emit('didInit');
-
     return app;
   }
+}
+
+interface APIRouter {
+  groupName: string
+  description?: string
+  prefix: string
+  routes: KoaRouter
 }
 
 export default App

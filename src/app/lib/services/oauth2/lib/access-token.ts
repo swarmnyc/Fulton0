@@ -1,10 +1,10 @@
 export interface OAuth2AccessToken {
-  accessToken: string
-  refreshToken?: string
+  access_token: string
+  refresh_token?: string
   accessTokenExpiresOn: Date
-  refreshTokenExpiresOn?: Date
-  clientId: string
+  refresh_token_expires_on?: Date
+  client_id: string
   scope?: string[]  
-  authorizationCode?: string
-  userId?: string
+  authorization_code?: string
+  user_id?: string
 }

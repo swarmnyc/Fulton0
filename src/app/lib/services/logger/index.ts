@@ -20,9 +20,12 @@ interface LoggerConfig {
 
 export class BaseLoggerService extends Service {
     instance: winston.LoggerInstance
+    name = 'app'
     as() {
       return 'log';
     }
+
+    exitOnError: boolean = true
 
     /**
      * Event handler called when an unhandledException or unhandledRejection bubbles up through the process.
@@ -48,12 +51,19 @@ export class BaseLoggerService extends Service {
 
     private _onException(err: Error) {
       this.onException(err);
-      process.exit(1);
+      //process.exit(1);
     }
 
     async init() {
         const transports: TransportConfig = this.transports();
-        const instance = new winston.Logger();        
+        let instance: winston.LoggerInstance;
+        
+        try {
+            instance = winston.loggers.add(this.name, { exitOnError: this.exitOnError });
+        } catch(e) {
+            instance = winston.loggers.get(this.name);
+        }
+
         _.forEach(transports, (settings: TransportConfigOptions, name: string) => {
             if (settings.enabled === false) {
                 return;
@@ -61,13 +71,17 @@ export class BaseLoggerService extends Service {
 
             const ts = _.omit(settings, 'enabled');
             if (winston.transports[_.upperFirst(name)]) {
-                instance.add(winston.transports[_.upperFirst(name)], ts);
+                try {
+                    instance.add(winston.transports[_.upperFirst(name)], ts);
+                } catch(e) {
+                    // Instance already mounted                    
+                }
             }
         });
 
-        process.on('unhandledException', this._onException.bind(this));
-        process.on('unhandledRejection', this._onException.bind(this));
-
+        //process.on('unhandledException', this._onException.bind(this));
+        //process.on('unhandledRejection', this._onException.bind(this));
+        
         return instance;
     }
 

@@ -16,6 +16,8 @@ export class BaseRedisService extends Service {
     }
 
     async init() {
+        this.host = process.env['REDIS_HOST'] || "localhost"
+        this.port = Number(process.env['REDIS_PORT'] || 6379)
         return new Promise<RedisClient>((resolve) => {
             const instance: RedisClient = createClient({ host: this.host, port: this.port });
             instance.on('error', this.onError);

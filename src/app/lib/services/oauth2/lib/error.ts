@@ -1,6 +1,10 @@
-export function errorHandler(mesg: string) {
+import { Context } from 'koa';
+
+export function errorHandler(ctx: Context, mesg: string) {
   const code = _getCode(mesg);
-  this.throw(code);
+  ctx.response.set('content-type', 'text/plain');
+  // TODO: Review this for later
+  return ctx.throw(code, JSON.stringify({ error: mesg }));
 }
 
 function _getCode(mesg: string) {

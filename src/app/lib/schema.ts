@@ -2,7 +2,41 @@ import { Model } from './model';
 import * as _ from 'lodash';
 import * as assert from 'assert';
 import { ObjectID } from 'mongodb';
+import { IAttributesHash } from 'mongorito';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
+import { SchemaFormatter } from './schema-formatter';
+import { SchemaValidator } from './schema-validator';
+
+export class SchemaTypes {
+  static getTypeOfArray(type: string): string {
+    return type.split("[]")[0];
+  }
+  static ToOne = "ObjectId"
+  static ToMany = "ObjectId[]"
+  static isRef(type: String) {
+    return type == SchemaTypes.ToOne || type == SchemaTypes.ToMany
+  }
+  static String = "string"
+  static StringArray = "string[]"
+  static isString(type: String) {
+    return type == SchemaTypes.String || type == SchemaTypes.StringArray
+  }
+  static Number = "number"
+  static NumberArray = "number[]"
+  static isNumber(type: String) {
+    return type == SchemaTypes.Number || type == SchemaTypes.NumberArray
+  }
+  static Date = "date"
+  static DateArray = "date[]"
+  static isDate(type: String) {
+    return type == SchemaTypes.Date || type == SchemaTypes.DateArray
+  }
+  static Boolean = "boolean"
+  static BooleanArray = "boolean[]"
+  static isBoolean(type: String) {
+    return type == SchemaTypes.Boolean || type == SchemaTypes.BooleanArray
+  }
+}
 
 export interface ISchemaPathDefinition {
   type: string
@@ -10,29 +44,33 @@ export interface ISchemaPathDefinition {
   required?: boolean
   index?: boolean
   indexType?: string
+  description?: string
+  example?: string
   validator?: IValidator
   ref?: typeof Model
   defaultValue?: any
+  label?: string // Can be used in routes to gain information about a class
+  readonly?: boolean
 }
 
 export interface ISchemaDefinition {
   [Path: string]: ISchemaPathDefinition
 }
 
-interface ISchemaPath extends ISchemaPathDefinition {
+export interface ISchemaPath extends ISchemaPathDefinition {
   pathName: string
 }
 
-interface IValidator {
-  (): boolean | string
+export interface IValidator {
+  (value: any): boolean | string
 }
 
-type SchemaModel = typeof Model;
+export type SchemaModel = typeof Model;
 
 export class Schema {
-  private _paths: ISchemaPath[]
-  private _Model: SchemaModel
-  private _validationMethods = ['_removeExtraneousPaths', '_validateRequiredPaths', '_assignDefaultValues', '_validateTypeCasting', '_validateUniquePaths', '_validateValidators']
+  private _paths: ISchemaPath[];
+  private _Model: SchemaModel;
+  private _validationMethods = ['_removeExtraneousPaths', '_enforceReadOnlyPaths', '_validateRequiredPaths', '_assignDefaultValues', '_validateTypeCasting', '_validateUniquePaths', '_validateValidators'];
 
   paths(): ISchemaPath[] {
     return this._paths;
@@ -47,7 +85,7 @@ export class Schema {
     this._paths.push(schemaPath);
   }
 
-  async validate(doc: Model) {
+  async validate(doc: Model): Promise<Model> {
     assert(doc instanceof this.Model());
     const methods = this._validationMethods;
 
@@ -76,7 +114,7 @@ export class Schema {
    * 
    * @memberOf Schema
    */
-  protected async _removeExtraneousPaths(doc: Model) {
+  protected async _removeExtraneousPaths(doc: Model): Promise<Model> {
     const pathNames = _.map(this.paths(), (path): string => {
       return path.pathName;
     });
@@ -88,15 +126,38 @@ export class Schema {
       }
     }
 
-    await doc;
+    return doc;
+  }
+
+  /**
+   * Sets read only paths to their previous values
+   * @param {Model} doc
+   * @returns {Promise<Model>}
+   * @protected
+   * @memberOf Schema
+   */
+  protected async _enforceReadOnlyPaths(doc: Model) {
+    function enforce(path: ISchemaPath) {
+      if (doc.changed[path.pathName]) {
+        doc.set(path.pathName, doc.previous[path.pathName]);
+      }
+    }
+
+    const paths = this.paths();
+    const readOnlyPaths = paths.filter((path) => {
+       return path.readonly === true;
+    });
+    // Skip enforcement on document creation
+    if (doc.isNew() === false) {
+      readOnlyPaths.forEach(enforce);
+    } 
+    return doc;
   }
 
   /**
    * Validate model's requires paths
-   * 
    * @protected
    * @param {Model} doc - Instance of Model
-   * 
    * @returns {Promise<Model>}
    * @memberOf Schema
    */
@@ -128,10 +189,12 @@ export class Schema {
     const Model = this.Model();
     const paths = this.paths();
     const uniquePaths = _.filter(paths, { unique: true });
-
     for (let path of uniquePaths) {
       let q = {};
       let val = doc.get(path.pathName);
+      if (typeof val === "undefined") {
+        continue;
+      }
       q[path.pathName] = val;
       let docsWithVal = await Model.find(q);
       let notOwnDocsWithVal = docsWithVal.filter((item: Model) => {
@@ -141,7 +204,6 @@ export class Schema {
         throw new UniqueError(`Document already exists with value "${val}" at path ${path.pathName}`, path.pathName, val);
       }
     }
-
     return doc;
   }
 
@@ -155,30 +217,38 @@ export class Schema {
    * 
    * @memberOf Schema
    */
-  protected async _validateTypeCasting(doc: Model) {
+  protected _validateTypeCasting(doc: Model) {
     const paths = this.paths();
     _.forEach(paths, (schemaPath: ISchemaPath) => {
       let isArray: boolean = _.endsWith(schemaPath.type, '[]');      
       let schemaPathType = isArray ? schemaPath.type.slice(0, -2) : schemaPath.type;
       let value = doc.get(schemaPath.pathName);
 
-      const _test = (val: any, index?: any | number) => {
-        let docType = typeof val;
-        
-        if (schemaPathType !== 'ObjectId' && schemaPathType !== 'date' && docType !== schemaPathType) {
-          throw new TypeError(`Found type ${docType} at path ${schemaPath.pathName} ${schemaPath.type} expected.`);        
-        } else if (schemaPathType === 'date' && !(val instanceof Date)) {
-          throw new TypeError(`Cast to type Date failed at path ${schemaPath.pathName} with value ${val}`);
-        } else if (schemaPathType === 'ObjectId') {
-          if (ObjectID.isValid(val) === false && !(val instanceof schemaPath.ref)) {
-            throw new TypeError(`Cast to type ObjectId failed at path ${schemaPath.pathName}`);
-          } else if (val instanceof schemaPath.ref) {
-            doc.set(schemaPath.pathName, val.get('_id'));
-          }
-        }
-      };
+      if (schemaPathType === 'any' || schemaPathType === 'object') { 
+        return;
+      }
 
-      if (schemaPathType === 'any') { 
+      if (_.isNil(value)) {
+        return;
+      }
+      if (schemaPath.required || (typeof value !== "undefined" && _.isNaN(value) == false)) {
+        SchemaValidator.runTypecastingValidator(value, schemaPath);
+      }
+
+    });
+    return doc;
+  }
+
+ 
+  validateAndTypeCastObject(obj: IAttributesHash): IAttributesHash {
+    const paths = this.paths();
+    let newObj = {};
+    _.forEach(paths, (schemaPath: ISchemaPath) => {
+      let isArray: boolean = _.endsWith(schemaPath.type, '[]');      
+      let schemaPathType = isArray ? schemaPath.type.slice(0, -2) : schemaPath.type;
+      let value = obj[schemaPath.pathName];
+
+      if (schemaPathType === 'any' || schemaPathType === 'object') { 
         return;
       }
 
@@ -186,17 +256,12 @@ export class Schema {
         return;
       }
 
-      if (isArray === true) {
-        if (_.isNil(value) === false && _.isArray(value) === false) {
-          throw new TypeError(`Cast to type ${schemaPath.type} failed at path ${schemaPath.pathName}`);
-        }
-        _.forEach(value, _test);
-      } else {
-        _test(value);
+      
+      if (schemaPath.required || (typeof value !== "undefined" && _.isNaN(value) == false)) {
+        newObj[schemaPath.pathName] = SchemaFormatter.runFormatter(value, schemaPath);
       }
     });
-
-    await doc;
+    return newObj;
   }
 
   /**
@@ -212,7 +277,7 @@ export class Schema {
   protected async _validateValidators(doc: Model) {
     const paths = this.paths();
     const pathsWithValidators = _.filter(paths, (path) => {
-      return path.validator && typeof path.validator === 'function';
+      return path.validator && _.isFunction(path.validator);
     });
     _.forEach(pathsWithValidators, (schemaPath: ISchemaPath) => {
       const isValid: boolean | string = schemaPath.validator.apply(doc, doc.get(schemaPath.pathName));
@@ -236,7 +301,7 @@ export class Schema {
    * 
    * @memberOf Schema
    */
-  protected async _assignDefaultValues(doc: Model) {
+  protected async _assignDefaultValues(doc: Model): Promise<Model> {
     const paths = this.paths();
     const pathsWithDefaultValues = _.filter(paths, (path) => {
       return _.has(path, 'defaultValue');
@@ -246,11 +311,11 @@ export class Schema {
       if (_.isNil(value) && typeof schemaPath.defaultValue !== 'function') {
         doc.set(schemaPath.pathName, schemaPath.defaultValue);
       } else if (typeof schemaPath.defaultValue === 'function' && _.isNil(value)) {
-        doc.set(schemaPath.pathName, schemaPath.defaultValue.apply(this));
+        doc.set(schemaPath.pathName, schemaPath.defaultValue.bind(doc)());
       }
     });
 
-    await doc;
+    return doc;
   }
 }
 
