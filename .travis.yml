@@ -4,3 +4,7 @@ node_js:
 before_script:
   - npm install -g alsatian
   - npm install -g typescript
+  - npm install -g nyc
+script:
+  - npm install
+  - npm run check-coverage

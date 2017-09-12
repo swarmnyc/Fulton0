@@ -5,4 +5,5 @@ src/typings
 app.package.tar.gz
 *.pyc
 coverage
+.nyc_output
 .DS_STORE
