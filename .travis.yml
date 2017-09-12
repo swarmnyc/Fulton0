@@ -1,4 +1,6 @@
 language: node_js
-
 node_js:
-  - 0.7
+  - "stable"
+before_install:
+  - sudo npm install -g alsatian
+  - sudo npm install -g typescript
