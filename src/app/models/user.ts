@@ -2,8 +2,17 @@ import { Model } from '../lib/model';
 import { hashPassword, comparePassword } from '../helpers/user';
 import { OAuthToken } from '.';
 import { SchemaTypes } from '../lib/schema';
+import { OAuth2User } from '../lib/services/oauth2/lib'
 
-export class User extends Model {
+export class User extends Model implements OAuth2User {
+  //implementing Oauth2User with custom getters and setters
+  get id() {
+    return this.get("_id");
+  }
+  set id(id: string) {
+    this.set("_id", id);
+  }
+
   collection() {
     return 'users';
   }

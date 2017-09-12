@@ -30,7 +30,8 @@ export function token(model: models.OAuth2BaseModel, grants?: string[]) {
         break;
     }
 
-    ctx.body = ctx.state.oauth.accessToken;
+    
+    ctx.body = ctx.state.oauth.accessToken; 
     ctx.status = 200;
     ctx.response.set('Cache-Control', 'no-store');
     ctx.response.set('Pragma', 'no-cache');
@@ -82,7 +83,7 @@ async function _getClient(ctx: Context, model: models.OAuth2BaseModel) {
 
   // If no clientId in body, check for base64 encoded clientId/secret in auth header
   if (!clientId) {
-    manifest = _getClientFromHeader(ctx.headers.authorization);
+    manifest = _getClientFromHeader(ctx.headers.authorization as string);
     clientId = manifest.clientId;
     clientSecret = manifest.clientSecret;
   }

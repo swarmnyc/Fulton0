@@ -46,11 +46,12 @@ function _getTokenFromRequest(ctx: Context): string {
   let arr: string[];
 
   if (ctx.request.headers['authorization']) {
-    arr = ctx.request.headers['authorization'].split(' ');
+    arr = (ctx.request.headers['authorization'] as String).split(' ');
     if (arr.length > 1) {
       token = arr[1];
     } else {
-      return ctx.throw(401);
+      ctx.throw(401);
+      return "";
     }
   } else if (ctx.request.body['access_token']) {
     token = ctx.request.body['access_token'];

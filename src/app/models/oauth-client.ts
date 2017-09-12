@@ -1,9 +1,25 @@
 import { generateClientSecret } from '../helpers/oauth';
 import { Model } from '../lib/model';
+import { OAuth2Client } from '../lib/services/oauth2/lib'
 import { User } from './user';
 import * as _ from 'lodash';
 
-export class OAuthClient extends Model {
+export class OAuthClient extends Model implements OAuth2Client {
+    //implementing OAuth2Client with custom getters and setters for each property
+    get id(): string {
+        return this.get("_id")
+    }
+    set id(id: string) {
+        this.set("_id", id)
+    }
+
+    get secret(): string {
+        return this.get("secret")
+    }
+    set secret(secret: string) {
+        this.set("secret", secret)
+    }
+    
     collection() {
         return 'oauth-clients';
     }

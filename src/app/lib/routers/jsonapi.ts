@@ -1,5 +1,5 @@
 import * as KoaRouter from 'koa-joi-router';
-import { Router } from '../router';
+import { Router, JoiRouterDefinition } from '../router';
 import { Model } from '../model';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
 import { RequestValidator, ValidationProperties } from './jsonapi-route-components/jsonapi-request-validator';
@@ -330,7 +330,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
     return {};
   }
   
-  protected _find() {
+  protected _find(): JoiRouterDefinition {
     const self = this;
     const find = this.find;
     const count = this.count;
@@ -374,7 +374,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
     };
   }
 
-  protected _findById() {
+  protected _findById(): JoiRouterDefinition {
     const findById = this.findById;
     const self = this;
     return {
@@ -403,7 +403,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
     return /^Bearer [a-zA-Z0-9]+$/;
   }
 
-  protected _create() {
+  protected _create(): JoiRouterDefinition {
     const self = this;
     const create = this.create;
     return {
@@ -435,7 +435,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
     };
   }
 
-  protected _update() {
+  protected _update(): JoiRouterDefinition {
     const self = this;
     const update = this.update;
     return {
@@ -451,7 +451,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         body: RequestValidator.createValidatorForBody(self),
         header: RequestValidator.createValidatorForJSONAPIHeaders(),        
       },
-      handler: this._findById().handler.concat([async function(ctx: Router.Context, next: Function) {
+      handler: (this._findById().handler as Function[]).concat([async function(ctx: Router.Context, next: Function) {
         if (!ctx.state.data) {
           ctx.throw(400);
         }
@@ -469,7 +469,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
   }
 
 
-  protected _remove() {
+  protected _remove(): JoiRouterDefinition {
     const self = this;
     const remove = this.remove;
     return {
@@ -485,7 +485,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
           'item_id': KoaRouter.Joi.string().required().description(`The id of the ${this.singularType()} to delete`)
         }
       },
-      handler: this._findById().handler.concat(async function(ctx: Router.Context, next: Function) {
+      handler: (this._findById().handler as Function[]).concat(async function(ctx: Router.Context, next: Function) {
         let isRemoved: Promise<boolean> = await remove.call(self, ctx.state.model, ctx);
         if (isRemoved) {
           ctx.state.status = 204;
