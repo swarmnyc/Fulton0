@@ -72,8 +72,8 @@ export class PasswordGrantTest {
         let client = await this.passwordGrant.getClient("whatever", "whatever");
         let token = await this.passwordGrant.saveToken(user, client, []) as OAuth2AccessToken;
     
-        Expect(token.client_id).toBe(client.id);
-        Expect(token.user_id).toBe(user.id as string);
+        Expect(token.client_id.toString()).toBe(client.id.toString());
+        Expect(token.user_id.toString()).toBe(user.id.toString());
     }
 
 }
