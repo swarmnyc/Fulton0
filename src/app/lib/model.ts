@@ -121,11 +121,20 @@ export class Model extends MongoritoModel {
   }
 
   canUpdateBasedOnConcurrencyControl(newAttr): Boolean {
+    if (this.concurrencyControl() == false) {
+      return true
+    }
+    if (typeof this.get("_v") == "undefined") {
+      return true
+    }
     let currentVersion = this.get("_v")
     return newAttr["_v"] == currentVersion
   }
 
   updateVersion(newAttr): any {
+    if (this.concurrencyControl() == false) {
+      return newAttr
+    }
     newAttr["_v"] += 1;
     return newAttr
   }
@@ -188,12 +197,6 @@ export class Model extends MongoritoModel {
     this.set('updatedAt', timestamp);
 
     await next;
-  }
-
-  protected async _updateConcurrencyControls(next: any) {
-    const version = this.get("_v");
-    let currentModel = await Object.getPrototypeOf(this).constructor.findById(this.get("_id").toString())
-    
   }
 
   protected async _setIsNew(next: any) {
