@@ -69,6 +69,13 @@ export class ModelTests {
         Expect(model.get("_v")).toEqual(1)
     }
 
+    @AsyncTest("Test allows setAndValidate for first time")
+    async testInitialSetAndValidate() {
+        let model = new TestModel()
+        model = await model.setAndValidate({"what": "what"}) as TestModel
+        Expect(model.get("_v")).toEqual(0)
+    }
+
     @AsyncTest("Savimg Concurrency Controlled Model That Has Been Updated")
     async testSavingModelFail() {
         addTimestamps = false
