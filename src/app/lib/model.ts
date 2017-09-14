@@ -12,6 +12,7 @@ export class Model extends MongoritoModel {
   static RequiredError = RequiredError;
   static ObjectID = ObjectID;
   static appliedIndex: boolean;
+  static versionKey: string = "_v"
   collectionName: string;
 
   get changedKeys() {
@@ -112,7 +113,7 @@ export class Model extends MongoritoModel {
 
   async setAndValidate(newAttr: any): Promise<Model> {
     if (this.canUpdateBasedOnConcurrencyControl(newAttr) == false) {
-      throw TypeError("The model has been updated since you recieved it. Can't safely make your changes"); 
+      throw new UniqueError("The model has been updated since you recieved it. Can't safely make your changes", Model.versionKey, ""); 
     }
     newAttr = this.updateVersion(newAttr)
     let newAttributes: IAttributesHash = this.validateAndTypecastAttributes(newAttr);
@@ -124,18 +125,18 @@ export class Model extends MongoritoModel {
     if (this.concurrencyControl() == false) {
       return true
     }
-    if (typeof this.get("_v") == "undefined") {
+    if (typeof this.get(Model.versionKey) == "undefined") {
       return true
     }
-    let currentVersion = this.get("_v")
-    return newAttr["_v"] == currentVersion
+    let currentVersion = this.get(Model.versionKey)
+    return newAttr[Model.versionKey] == currentVersion
   }
 
   updateVersion(newAttr): any {
     if (this.concurrencyControl() == false) {
       return newAttr
     }
-    newAttr["_v"] += 1;
+    newAttr[Model.versionKey] += 1;
     return newAttr
   }
 
@@ -178,7 +179,7 @@ export class Model extends MongoritoModel {
 
   protected _setConcurrencyControls() {
     const schema = this._schema;
-    schema.add('_v', { type: 'number', defaultValue: 0 });
+    schema.add(Model.versionKey, { type: 'number', defaultValue: 0 });
   }
 
   /**
