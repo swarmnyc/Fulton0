@@ -121,6 +121,7 @@ export class Model extends MongoritoModel {
     return this.validate();
   }
 
+<<<<<<<
   canUpdateBasedOnConcurrencyControl(newAttr): Boolean {
     if (this.concurrencyControl() == false) {
       return true
@@ -140,6 +141,27 @@ export class Model extends MongoritoModel {
     return newAttr
   }
 
+=======
+  canUpdateBasedOnConcurrencyControl(newAttr): Boolean {
+    if (this.concurrencyControl() == false) {
+      return true
+    }
+    if (typeof this.get("_v") == "undefined") {
+      return true
+    }
+    let currentVersion = this.get("_v")
+    return newAttr["_v"] == currentVersion
+  }
+
+  updateVersion(newAttr): any {
+    if (this.concurrencyControl() == false) {
+      return newAttr
+    }
+    newAttr["_v"] += 1;
+    return newAttr
+  }
+
+>>>>>>>
  validateAndTypecastAttributes(attrs: IAttributesHash): IAttributesHash {
     return this._schema.validateAndTypeCastObject(attrs);
   }
@@ -177,11 +199,19 @@ export class Model extends MongoritoModel {
     schema.add('updatedAt', { type: 'date', defaultValue: Date.now });    
   }
 
+<<<<<<<
   protected _setConcurrencyControls() {
     const schema = this._schema;
     schema.add(Model.versionKey, { type: 'number', defaultValue: 0 });
   }
 
+=======
+  protected _setConcurrencyControls() {
+    const schema = this._schema;
+    schema.add('_v', { type: 'number', defaultValue: 0 });
+  }
+
+>>>>>>>
   /**
    * Sets timestamp paths if model.timestamps() returns true
    * 
