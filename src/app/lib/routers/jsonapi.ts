@@ -335,6 +335,13 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
     const find = this.find;
     const count = this.count;
     const setupQuery = this.setupQuery;
+    const getSizeValidator = function() { 
+      let validator = KoaRouter.Joi.number().description(`Limit response size by the specified amount`).default(self.defaultLimit()) 
+      if (self.maxLimit() !== 0) { 
+        validator = validator.max(this.maxLimit()) 
+      } 
+      return validator.optional() 
+    }
     const querySet = this.querySet;
     return {
       method: 'get',
@@ -344,15 +351,15 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         description: `Find ${this.type()}. Provide query filters, sort options, and pagination to customize results.`
       },
       validate: {
-        continueOnError: false,
+        continueOnError: true,
         header: RequestValidator.createValidatorForJSONAPIHeaders(),
         query: Joi.object().keys({
           'include': KoaRouter.Joi.string().description('Include related documents at the specified paths').optional(),
           'lessThan[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute with values less than').optional(),
           'greaterThan[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute with values greater than').optional(),
           'filter[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute (and/or queries by comma seperating values, this does not work on string types)').optional(),
-          'page[limit]': KoaRouter.Joi.number().description(`Limit response size by the specified amount`).default(this.defaultLimit()).max(this.maxLimit()).optional(),
-          'page[size]': KoaRouter.Joi.number().description(`same as limit`).default(this.defaultLimit()).max(this.maxLimit()).optional(),
+          'page[limit]': getSizeValidator(),
+          'page[size]': getSizeValidator(),
           'page[offset]': KoaRouter.Joi.number().description(`Offset response set by specified number of documents`).default(0).optional(),
           'page[page]': KoaRouter.Joi.number().description(`The page number of the request`).default(0).optional(),
           sort: KoaRouter.Joi.string().description('Ascending sort results by specified model paths separated by commas. Placing - in front of  path name will make the sort descending. Example: ?sort=-created-at,updated-at').optional()
@@ -386,7 +393,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
       },
       validate: {
         type: 'json',
-        continueOnError: false,
+        continueOnError: true,
         header: RequestValidator.createValidatorForJSONAPIHeaders(),
         body: RequestValidator.createValidatorForBody(self)
       },
@@ -415,7 +422,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
       },
       validate: {
         type: 'json',
-        continueOnError: false,
+        continueOnError: true,
         header: RequestValidator.createValidatorForJSONAPIHeaders(),
         body: RequestValidator.createValidatorForBody(self)
       },
@@ -447,7 +454,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
       },
       validate: {
         type: 'json',
-        continueOnError: false,
+        continueOnError: true,
         body: RequestValidator.createValidatorForBody(self),
         header: RequestValidator.createValidatorForJSONAPIHeaders(),        
       },
