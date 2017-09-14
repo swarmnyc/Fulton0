@@ -7,6 +7,10 @@ export class Article extends Model {
     return 'articles';
   }
 
+  concurrencyControl(): boolean {
+    return true
+  }
+
   schema(): ISchemaDefinition {
     return {
       title: { type: SchemaTypes.String, required: true },
