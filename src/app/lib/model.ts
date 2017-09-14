@@ -113,7 +113,7 @@ export class Model extends MongoritoModel {
 
   async setAndValidate(newAttr: any): Promise<Model> {
     if (this.canUpdateBasedOnConcurrencyControl(newAttr) == false) {
-      throw new UniqueError("The model has been updated since you recieved it. Can't safely make your changes", Model.versionKey, ""); 
+      throw new UniqueError(`The model has been updated since you recieved it. Can't safely make your changes. ***Make sure you are sending up the key ${Model.versionKey} with your request***`, Model.versionKey, ""); 
     }
     newAttr = this.updateVersion(newAttr)
     let newAttributes: IAttributesHash = this.validateAndTypecastAttributes(newAttr);
