@@ -1,4 +1,4 @@
-## SWARM JSON API Framework
+## Fulton - Generate JSON API Compliant Backends
 A starter node/typescript project that generates JSON API compliant backends from mongorito models in typescript. It provides you with basic crud operations and filtering.
 Also includes docker scripts for easy setup and development.
 [JSON API docs](http://jsonapi.org/)

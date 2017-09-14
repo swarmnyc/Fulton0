@@ -253,6 +253,7 @@ export class Schema {
       }
 
       if (_.isNil(value)) {
+        newObj[schemaPath.pathName] = null; 
         return;
       }
 
