@@ -65,7 +65,7 @@ export class App extends EventEmitter {
    * @memberof App
    */
   bodyParser() {
-    return false;
+    return true;
   }
 
   /**

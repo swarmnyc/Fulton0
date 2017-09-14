@@ -33,6 +33,7 @@
     "express": "4.14.0",
     "fs-extra": "1.0.0",
     "grant-koa": "3.6.5",
+    "kcors": "^2.2.1",
     "koa": "2.2.0",
     "koa-body": "^2.3.0",
     "koa-bodyparser": "4.2.0",

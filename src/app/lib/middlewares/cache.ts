@@ -1,5 +1,7 @@
 import { Context } from 'koa';
 import { CacheHelper } from '../helpers/cache';
+import { RedisClient } from 'redis';
+
 import * as _ from 'lodash';
 
 function getTokenFromAuthHeader(authHeader: string): string {
@@ -30,7 +32,7 @@ export function cache() {
     return async function(ctx: Context, next: Function) {
         const log = ctx.app.context['services'].log;
         let invalidateMethods = ['patch', 'put', 'post', 'delete'];
-        const redis = _.get(ctx.app, 'context.services.redis');
+        const redis = _.get(ctx.app, 'context.services.redis') as RedisClient;
         let cacheHelper = new CacheHelper(redis);
         let key: string = '';
         let resp: PackagedResponse;
