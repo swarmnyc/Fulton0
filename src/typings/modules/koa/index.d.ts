@@ -412,7 +412,6 @@ namespace req {
         req: IncomingMessage;
         res: ServerResponse;
         ctx: Context;
-        body: any
         response: Response;
         originalUrl: string;
         accept: any;
@@ -898,6 +897,7 @@ class Application extends EventEmitter {
 }
 
 namespace Application {
+    export type Request = _Request;
     export type Response = _Response;
     export type Context = _Context;
 }
