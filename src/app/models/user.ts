@@ -1,4 +1,4 @@
-import { Model } from '../lib/model';
+import { Model } from '../../lib';
 import { hashPassword, comparePassword } from '../helpers/user';
 import { OAuthToken } from '.';
 import { SchemaTypes } from '../lib/schema';

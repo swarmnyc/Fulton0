@@ -1,4 +1,4 @@
-import { JSONAPIRouter } from '../lib/routers/jsonapi';
+import { JSONAPIRouter } from '../../lib';
 import { User } from '../models';
 
 export class UserRouter extends JSONAPIRouter {

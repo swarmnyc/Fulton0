@@ -1,6 +1,5 @@
 import App from './app'
 import Service from './service';
-import * as Services from '../services';
 import * as _ from 'lodash';
 
 type ServiceConstructor = typeof Service;
@@ -8,7 +7,7 @@ type ServiceConstructor = typeof Service;
 export class ServiceLoader {
 
   async load(app: App) {
-    let services: typeof Service[] = <typeof Service[]>_.values(Services);
+    let services: typeof Service[] = app.services()
     let loadedServices: Service[] = [];
     
     for (let Svc of services) {
@@ -17,7 +16,7 @@ export class ServiceLoader {
       await instance.load();
       asName = instance.as();
       app.set(`services.${asName}`, instance.get());
-      app.services[asName] = instance.get();
+      app._services[asName] = instance.get();
     }
 
     return;

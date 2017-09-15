@@ -11,26 +11,26 @@ export class PasswordGrant extends OAuth2PasswordModel {
         return 'email';
     }
 
-    async getAccessToken(token: string): Promise<OAuth2AccessToken> {
-        //TODO: not sure why compiler is complaining here, OauthToken conforms to Oauth2AccessToken
-        let obj: OAuth2AccessToken = await OAuthToken.findOne({ accessToken: token });
-        if (!obj) {
-            return undefined;
-        }
-        return obj;
-    }
-
-    async getClient(id: string, secret: string): Promise<OAuth2Client> {
-        let obj = await OAuthClient.findOne({ _id: id, secret: secret }) as OAuthClient;
+    async getAccessToken(token: string) {
+        const obj = await OAuthToken.findOne({ accessToken: token });
         if (!obj) {
             return undefined;
         }
 
-        return obj;
+        return obj.toJSON();
     }
 
-    async getUser(username: string, password: string): Promise<OAuth2User> {
-        const user = await User.findOne({ email: username }) as User;
+    async getClient(id: string, secret: string) {
+        let obj = await OAuthClient.findOne({ _id: id, secret: secret });
+        if (!obj) {
+            return undefined;
+        }
+
+        return obj.toJSON();
+    }
+
+    async getUser(username: string, password: string) {
+        const user = await User.findOne({ email: username });
         let hashPassword: string, isValidPassword: boolean;
         if (!user) {
             return undefined;
@@ -43,23 +43,33 @@ export class PasswordGrant extends OAuth2PasswordModel {
             return undefined;
         }
 
-        return user;
+        let o = _.mapKeys(user.toJSON(), (v: any, key: string) => {
+            if (key === '_id') {
+                return 'id';
+            } else {
+                return key;
+            }
+        });
+
+        return o;
     }
 
     async saveToken(user: OAuth2User, client: OAuth2Client, scope?: OAuth2Scope) {
         const userId = user.id;
-        let obj = new OAuthToken({
+        const obj = new OAuthToken({
             userId: user.id,
             clientId: client.id
         });
-        obj = await obj.save()
-        return {
-            id: obj.get("_id"),
-            access_token: obj.access_token,
-            accessTokenExpiresOn: obj.accessTokenExpiresOn,
-            client_id: obj.client_id.toString(),
-            user_id: obj.user_id.toString()
-        }
+        let out: OAuth2AccessToken;
+        await obj.save();
+        
+        out = {
+            access_token: obj.get('accessToken'),
+            accessTokenExpiresOn: obj.get('accessTokenExpiresOn'),
+            client_id: obj.get('clientId'),
+            user_id: obj.get('userId')
+        };
+        return out;
     }
 };
 

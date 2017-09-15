@@ -1,11 +1,10 @@
 import App from './app';
-import Routes from '../routes';
-
 
 export class RouteLoader {
   path = 'routes';
 
   load(app: App) {
+    const Routes = app.routers()
     Routes.forEach((Route) => {
       const router = new Route();
       app.register(router);

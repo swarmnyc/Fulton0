@@ -1,6 +1,6 @@
-import { Model } from '../lib/model';
+import { Model } from '../../lib';
 import { User } from './user';
-import { SchemaTypes, ISchemaDefinition } from '../lib/schema';
+import { SchemaTypes, ISchemaDefinition } from '../../lib';
 export class Article extends Model {
   
   collection(): string {

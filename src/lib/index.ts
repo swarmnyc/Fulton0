@@ -10,7 +10,11 @@ export * from './model';
 export * from './oauth-grants';
 export * from './schema';
 export * from './context';
-
+export * from './services/logger';
+export * from './services/mongodb';
+export * from './services/oauth2';
+export * from './services/redis';
+export * from './routers/jsonapi';
 interface DeserializedObject {
   [K: string]: any
 }
