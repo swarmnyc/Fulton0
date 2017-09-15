@@ -1,6 +1,7 @@
 import { token } from './token';
 import { authenticate } from './authenticate';
 import { OAuth2BaseModel } from '../models';
+import { JoiRouterDefinition } from '../../../router'
 
 export interface OAuthConfig {
     enabled: boolean
@@ -20,7 +21,7 @@ export class OAuth2Server {
     protected _tokenEndpoint: string;
     grants: string[];
     model: typeof OAuth2BaseModel;
-
+    routeDefinition: JoiRouterDefinition
     tokenEndpoint(): string {
       return this._tokenEndpoint;
     }    
@@ -39,9 +40,15 @@ export class OAuth2Server {
 
     }
 
-    constructor(opts: OAuthOptions) {
+    constructor(opts: OAuthOptions, routeDefinitionFactory: (OAuth2Server) => JoiRouterDefinition) {
         this.model = opts.model;
         this._tokenEndpoint = opts.tokenEndpoint;
         this.grants = opts.grants;
+        this.routeDefinition = routeDefinitionFactory(this);
     }
+
+    getRoute(): JoiRouterDefinition {
+        return this.routeDefinition;
+    }
+
 }

@@ -201,24 +201,8 @@ export class App extends EventEmitter {
 
     if (opts.loadServices === true && this.services['oauth']) {
       oauth = new KoaRouter();
-      oauth.route({
-        method: 'post',
-        path: `/${this.services['oauth'].tokenEndpoint()}`,
-        meta: {
-          friendlyName: 'Get API Token',
-          description: 'Issues new API token to user'
-        },
-        validate: {
-          type: 'json',
-          continueOnError: true,
-          body: {},
-          header: {
-            authorization: Joi.string().required().label('Client ID & Secret').description('The client ID and client secret of requesting app, encoded in base64').example('Basic dGhpc2F0ZXN0Y2xpZW50aWQ6dGhpc2lzYXRlc3RjbGllbnRzZWNyZXQ=')
-          }
-        },
-        handler: this.services['oauth'].token()
-      });
-
+      oauth.route(this.services['oauth'].getRoute());
+      this._groups.push({ groupName: "Token", description: "OAuth Authentication", prefix: "", routes: oauth.routes });
       app.use(oauth.middleware());
     }
 

@@ -2,7 +2,13 @@ import * as KoaRouter  from 'koa-joi-router';
 import * as Application from 'koa/lib/application';
 import { RequestHandler } from './request-handler';
 import { Context as AppContext } from './'
-
+export interface JoiRouterDefinition {
+  method: string
+  path: string
+  validate: any
+  handler: Function | Function[]
+  meta: any
+}
 /**
  * The generic Router class. Wraps around koa-router to provide some convenience function
  * 

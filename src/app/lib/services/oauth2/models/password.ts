@@ -6,7 +6,7 @@ export class OAuth2PasswordModel extends OAuth2BaseModel {
     return 'username';
   }
   
-  getUser(username: string, password: string) {
+  async getUser(username: string, password: string): Promise<OAuth2User> {
     return undefined;
   }
 }
