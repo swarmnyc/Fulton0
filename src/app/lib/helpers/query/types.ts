@@ -29,5 +29,11 @@ export interface QueryParams {
   offset?: number
   page?: number
   skip?: number
+  size?: number,
+  filter?: any,
+  lessThan?: any,
+  greaterThan?: any,
+  sort?: any
   [K: string]: any
+  
 }

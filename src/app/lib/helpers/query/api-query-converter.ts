@@ -20,7 +20,7 @@ export default class APIQueryConverter {
 
     constructor(private startingQuery?: QueryParams) {
         this.query = {
-            filter: this.startingQuery.filter || {},
+            filter: {},
             lessThan: this.startingQuery.lessThan || {},
             greaterThan: this.startingQuery.greaterThan || {},
             options: {
@@ -60,10 +60,52 @@ export default class APIQueryConverter {
     }
 
     addFilter() {
-        let filters = this.startingQuery["__base"]
-        if (typeof filters !== "undefined") {
-            Object.assign(this.query.filter, filters);
+        let filters = this.startingQuery["filter"]
+        if (typeof filters == "undefined") {
+            return 
         }
+    
+        _.each(filters, function(v: any, attribute: string) {
+        	if (typeof v !== "object") {
+                //filter key value will not be an object when query string has no greater than or less than values
+                /*
+                    Example:
+                    A query string of:
+                        ?filter[attributeKey]=valueFilteringWith&filter[2ndAttributeKey]=valueFilteringWith2
+                    Will result in the filters object above formatted as:
+                        filters = {
+                            "attributeKey": "valueFilteringWith",
+                            "2ndAttributeKey": "valueFilteringWith2"
+                        }
+                */
+                this.query.filter[attribute] = v;
+        	} else {
+                //filter key value will be an object when a query string has a greater than or less than value
+                /*
+                    Example:
+                    A query string of:
+                        ?filter[attributeKey]=valueFilteringWith&filter[attributeKey][$gt]=valueFilteringGreaterThan&filter[2ndAttributeKey]=valueFilteringWith2
+                    Will result in the filters object above formatted as:
+                        {
+                            "attributeKey": {
+                                "$gt": "valueFilteringGreaterThan",
+                                "valueFilteringWith": true (the true is added because there is no real value that makes sense here)
+                            },
+                            "2ndAttributeKey": "valueFilteringWith2"
+                        }
+                */
+                _.each(v, function(value: any, key: string) {
+                    if (key === "$gt") {
+                        this.query.greaterThan[attribute] = value;
+                    } else if (key === "$lt") {
+                        this.query.lessThan[attribute] = value;
+                    } else {
+                        this.query.filter[attribute] = key;
+                	}
+            	}.bind(this))
+	    }
+        }.bind(this));
+        
         return this.query
     }
 

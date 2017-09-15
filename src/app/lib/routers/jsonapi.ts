@@ -10,11 +10,12 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as pluralize from 'pluralize';
 import { QueryParams } from '../helpers/query/types';
+import { QueryParamSettings, QueryReader } from './jsonapi-route-components/jsonapi-query-reader';
 import { onRequestError } from './jsonapi-route-components/jsonapi-errors';
 import { JSONAPIRelationshipData, JSONAPIRelationship, JSONAPIRelationships, JSONModel, JSONAPILinksObject, JSONAPIErrorSource, JSONAPIError, JSONAPIVersion, JSONAPIResponse} from './jsonapi-route-components/jsonapi-types';
 const { Joi } = KoaRouter;
 
-export class JSONAPIRouter extends Router implements ValidationProperties {
+export class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
 
   name(): string {
     return _.startCase(this.type());
@@ -205,7 +206,15 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
 
   async find(query: QueryParams, ctx: Router.Context): Promise<JSONModel[]> {
     const Model = this.Model();
-    return queryHelper(Model, query);
+    let q: any;
+    try {
+      q = await queryHelper(Model, query);
+    } catch(error) {
+      error.message = "Couldn't put query together. Check your params and try again."
+      ctx.state.status = 422;
+      ctx.state.errors.push(onRequestError(error));
+    }
+    return q;
   }
 
   async findById(id: string, ctx: Router.Context) {
@@ -251,77 +260,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
   }
 
   setupQuery(ctx: Router.Context): QueryParams {
-    const maxLimit = this.maxLimit();
-    let skip;
-    let offset;
-    let size;
-    let pageNumber;
-    let query: any;
-    let filter = _.mapKeys(ctx.state.query.filter, (v: any, k:string) => {
-      return k.charAt(0) !== '$' ? _.camelCase(k) : `$${_.camelCase(k)}`;
-    });
-    let lessThan = _.mapKeys(ctx.state.query.lessThan, (v: any, k:string) => {
-      return k.charAt(0) !== '$' ? _.camelCase(k) : `$${_.camelCase(k)}`;
-    });
-    let greaterThan = _.mapKeys(ctx.state.query.greaterThan, (v: any, k:string) => {
-      return k.charAt(0) !== '$' ? _.camelCase(k) : `$${_.camelCase(k)}`;
-    });
-    let sort;
-    if (typeof ctx.state.query.sort !== "undefined") {
-      let sortKeys = [];
-      const sortValues = ctx.state.query.sort.split(",");
-      for (let value of sortValues) {
-        if (value.charAt(0) == "-") {
-          sortKeys.push("-" + _.camelCase(value))
-        } else {
-          sortKeys.push(_.camelCase(value));
-        }
-      }
-      sort = sortKeys.join(",");
-    }
-    let page = ctx.state.query.page;
-    let limit = this.defaultLimit();
-
-    if (page && page.offset) {
-      offset = Number(page.offset);
-    }
-    if (page && page.skip) {
-      skip = Number(page.skip)
-    }
-    if (page && page.page) {
-      pageNumber = Number(page.page)
-    }
-    
-
-    if (page && page.limit) {
-      if (maxLimit == 0) {
-        limit = Number(page.limit)
-      } else {
-        limit = Math.min(Number(page.limit), maxLimit);
-      }
-    }
-
-    if (page && page.size) {
-      if (maxLimit == 0) {
-        size = Number(page.size)
-      } else {
-        size = Math.min(Number(page.size), maxLimit);
-      }
-    }
-    
-
-    query = {
-      skip: skip,
-      size: size,
-      page: pageNumber,
-      offset: offset,
-      limit: limit,
-      filter: filter,
-      lessThan: lessThan,
-      greaterThan: greaterThan,
-      sort: sort
-    };
-
+    let query = QueryReader.getQueryParams(this, ctx.state.query);    
     ctx.app.context['services'].log.debug(query);
     return query;
   }
@@ -355,9 +294,10 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
         header: RequestValidator.createValidatorForJSONAPIHeaders(),
         query: Joi.object().keys({
           'include': KoaRouter.Joi.string().description('Include related documents at the specified paths').optional(),
-          'lessThan[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute with values less than').optional(),
-          'greaterThan[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute with values greater than').optional(),
+          'lessThan[attr]': KoaRouter.Joi.string().description('**DEPRECATED Filter by the bracketed attribute with values less than **DEPRECATED').optional(),
+          'greaterThan[attr]': KoaRouter.Joi.string().description('**DEPRECATED Filter by the bracketed attribute with values greater than **DEPRECATED').optional(),
           'filter[attr]': KoaRouter.Joi.string().description('Filter by the bracketed attribute (and/or queries by comma seperating values, this does not work on string types)').optional(),
+          'filter[attr][$gt|$lt]': KoaRouter.Joi.string().description('Filter by the bracketed attribute with values less than or greater than. Ex. `filter[likeCount][$gt]=10`').optional(),
           'page[limit]': getSizeValidator(),
           'page[size]': getSizeValidator(),
           'page[offset]': KoaRouter.Joi.number().description(`Offset response set by specified number of documents`).default(0).optional(),
@@ -372,10 +312,11 @@ export class JSONAPIRouter extends Router implements ValidationProperties {
           query = setupQuery.call(self, ctx);
           query.__base = await querySet(ctx);
         }
-
+        
         ctx.state.model = await find.call(self, query, ctx);
         ctx.state.count = await count.call(self, query, ctx);
         ctx.state.status = 200;
+        
         await next();
       }, this._permissions()]
     };
