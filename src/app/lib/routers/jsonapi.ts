@@ -225,10 +225,11 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
   async create(data: JSONModel, ctx: Router.Context) {
     const Model = this.Model();
     const model = new Model();
-    
     return model.setAndValidate(data)
       .then(() => {
         return model.save();
+      }).catch((err) => {
+        throw err
       });
   }
 
@@ -237,7 +238,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
       .then(() => {
         return model.save();
       }).catch((err) => {
-        console.log(err);
+        throw err
       });
   }
 
