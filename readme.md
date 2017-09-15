@@ -1,4 +1,5 @@
 ## Fulton - Generate JSON API Compliant Backends
+[![Build Status](https://travis-ci.org/swarmnyc/Fulton.svg?branch=dev)](https://travis-ci.org/swarmnyc/Fulton) [![Coverage Status](https://coveralls.io/repos/github/swarmnyc/Fulton/badge.svg?branch=testing%2Fadd_coverage)](https://coveralls.io/github/swarmnyc/Fulton?branch=testing%2Fadd_coverage)
 A starter node/typescript project that generates JSON API compliant backends from mongorito models in typescript. It provides you with basic crud operations and filtering.
 Also includes docker scripts for easy setup and development.
 [JSON API docs](http://jsonapi.org/)
@@ -23,7 +24,7 @@ Check out the docs folder of this repo for more in depth documentation.
 - [X] Migrate less than and greater than filters to new syntax (`?filter[property][$gt]=value` instead of `?greaterThan[property]=value`)
 - [ ] Make sure documentation is up to date
 - [ ] Add tests and examples to the OAuth Module
-- [ ] Set up automated builds and testing
+- [X] Set up automated builds and testing
 - [ ] (In Progress) Add more tests
 - [ ] Break out into an NPM package, rather than being a starter project.
 - [ ] Update mongorito

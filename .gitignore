@@ -5,6 +5,7 @@ src/typings
 app.package.tar.gz
 *.pyc
 coverage
+.nyc_output
 .DS_STORE
 \.nyc_output/2ca8e9c8e5f74700e2b32e924a1a82ed\.json
 
