@@ -1,12 +1,10 @@
 {
-  "name": "swarm-web-framework",
+  "name": "fulton",
   "version": "1.0.1",
   "description": "A web app framework for koa written in typescript",
-  "main": "build/main.js",
-  "types": "./src/app/framework/index.d.ts",
-  "private": true,
+  "main": "js/index.js",
+  "typings": "js/index.d.ts",
   "scripts": {
-    "start": "node --inspect=0.0.0.0:5858 build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
     "test": "rm -r build || true && npm run build && alsatian \"./build/app/**/*.spec.js\"",
@@ -18,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/swarmnyc/swarm-web-framework"
+    "url": "https://github.com/swarmnyc/fulton"
   },
   "author": "SWARM <hello@swarmnyc.com>",
   "license": "UNLICENSED",

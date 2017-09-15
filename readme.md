@@ -8,6 +8,7 @@ Also includes docker scripts for easy setup and development.
 
 # Install
 ```
+cd example_project
 npm install #only need to install and build on host machine if you want to debug
 npm run build
 docker-compose -f docker-compose.dev.yml build
