@@ -1,7 +1,7 @@
 *.log
 build
 node_modules
-src/typings
+*/node_modules
 app.package.tar.gz
 *.pyc
 coverage
