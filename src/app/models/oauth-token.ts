@@ -1,4 +1,4 @@
-import { Model } from '../lib/model';
+import { Model } from '../../lib';
 import { User } from './user';
 import { OAuthClient } from './oauth-client';
 import { generateAccessToken } from '../helpers/oauth';

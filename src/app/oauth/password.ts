@@ -1,5 +1,5 @@
-import { OAuth2PasswordModel } from '../lib/services/oauth2/models'
-import { OAuth2AccessToken, OAuth2Client, OAuth2User, OAuth2Scope } from '../lib/services/oauth2/lib';
+import { OAuth2PasswordModel } from '../../lib'
+import { OAuth2AccessToken, OAuth2Client, OAuth2User, OAuth2Scope } from '../../lib';
 import { User, OAuthToken, OAuthClient } from '../models';
 import { comparePassword } from '../helpers/user';
 import { generateAccessToken } from '../helpers/oauth';
@@ -64,10 +64,10 @@ export class PasswordGrant extends OAuth2PasswordModel {
         await obj.save();
         
         out = {
-            accessToken: obj.get('accessToken'),
+            access_token: obj.get('accessToken'),
             accessTokenExpiresOn: obj.get('accessTokenExpiresOn'),
-            clientId: obj.get('clientId'),
-            userId: obj.get('userId')
+            client_id: obj.get('clientId'),
+            user_id: obj.get('userId')
         };
         return out;
     }

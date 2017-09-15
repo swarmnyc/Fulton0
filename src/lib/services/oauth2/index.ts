@@ -1,6 +1,9 @@
 import { Service } from '../../service';
 import * as oauth2lib from './lib';
 import { OAuth2BaseModel } from './models';
+export * from './models'
+export * from './lib'
+export * from './grants'
 
 export class BaseOAuth2Service extends Service {
     as() {

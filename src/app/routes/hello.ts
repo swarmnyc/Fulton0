@@ -1,4 +1,4 @@
-import { Router, Context } from '../lib';
+import { Router, Context } from '../../lib';
 
 export class HelloWorldRouter extends Router {
   configure(router) {

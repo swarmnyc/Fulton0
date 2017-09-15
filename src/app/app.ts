@@ -1,4 +1,6 @@
-import { App } from './lib';
+import { App, Service, Router } from '../lib';
+import * as Services from './services';
+import * as Routers from './routes';
 import * as cors from 'kcors';
 // Include in app middleware() to enable caching. NOTE: requires redis
 //import { cache } from './lib/middlewares/cache';
@@ -6,6 +8,12 @@ import * as cors from 'kcors';
 class SWARMApp extends App {
     middleware() {
         return [function() { return cors() }];
+    }
+    services(): typeof Service[] {
+        return Services.default
+    }
+    routers(): typeof Router[] {
+        return Routers.default
     }
 }
 

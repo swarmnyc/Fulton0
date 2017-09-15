@@ -1,7 +1,7 @@
-import { Model } from '../lib/model';
+import { Model } from '../../lib';
 import { hashPassword, comparePassword } from '../helpers/user';
 import { OAuthToken } from '.';
-import { SchemaTypes } from '../lib/schema';
+import { SchemaTypes } from '../../lib';
 
 export class User extends Model {
   collection() {

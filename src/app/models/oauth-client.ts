@@ -1,5 +1,5 @@
 import { generateClientSecret } from '../helpers/oauth';
-import { Model } from '../lib/model';
+import { Model } from '../../lib';
 import { User } from './user';
 import * as _ from 'lodash';
 

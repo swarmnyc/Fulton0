@@ -5,6 +5,7 @@ import * as Koa from 'koa';
 import * as KoaRouter from 'koa-joi-router';
 import { Router } from './router';
 import { BaseLoggerService } from './services/logger';
+import { Service } from './service';
 import { ServiceLoader } from './service-loader';
 import RequestHandler from './request-handler';
 import { resolve } from 'path';
@@ -41,10 +42,19 @@ export class App extends EventEmitter {
   protected app: Koa;
   protected _groups: APIRouter[];
   log: BaseLoggerService;
-  services: ServiceHash;
+  _services: ServiceHash;
 
   appRoot: string;
-  
+
+  routers(): typeof Router[] {
+    return []
+  }
+
+
+  services(): typeof Service[] {
+    return []
+  }
+
   /**
    * Returns an array of request handler middlewares to apply to each incoming request before passing the request off to the router.
    * 
@@ -91,7 +101,7 @@ export class App extends EventEmitter {
     this.appRoot = resolve(`${__dirname}/..`);
 
     this.app = new Koa();
-    this.services = {};
+    this._services = {};
     this._groups = [];
     this.on('didInit', this.didInit.bind(this));
   }
@@ -195,15 +205,15 @@ export class App extends EventEmitter {
       app.use(bodyParser());
     }
 
-    if (this.services['log']) {
-      this.log = this.services['log'];
+    if (this._services['log']) {
+      this.log = this._services['log'];
     }
 
-    if (opts.loadServices === true && this.services['oauth']) {
+    if (opts.loadServices === true && this._services['oauth']) {
       oauth = new KoaRouter();
       oauth.route({
         method: 'post',
-        path: `/${this.services['oauth'].tokenEndpoint()}`,
+        path: `/${this._services['oauth'].tokenEndpoint()}`,
         meta: {
           friendlyName: 'Get API Token',
           description: 'Issues new API token to user'
@@ -216,7 +226,7 @@ export class App extends EventEmitter {
             authorization: Joi.string().required().label('Client ID & Secret').description('The client ID and client secret of requesting app, encoded in base64').example('Basic dGhpc2F0ZXN0Y2xpZW50aWQ6dGhpc2lzYXRlc3RjbGllbnRzZWNyZXQ=')
           }
         },
-        handler: this.services['oauth'].token()
+        handler: this._services['oauth'].token()
       });
 
       app.use(oauth.middleware());

@@ -1,4 +1,4 @@
-import { BaseLoggerService } from '../lib/services/logger';
+import { BaseLoggerService } from '../../lib';
 
 export class Logger extends BaseLoggerService {
     as() {

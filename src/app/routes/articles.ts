@@ -1,6 +1,6 @@
-import { JSONAPIRouter } from '../lib/routers/jsonapi';
+import { JSONAPIRouter } from '../../lib';
 import { Article } from '../models';
-import { Context } from '../lib';
+import { Context } from '../../lib';
 export class ArticleRouter extends JSONAPIRouter {
 
   Model() {

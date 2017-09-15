@@ -1,4 +1,4 @@
-import { BaseRedisService } from '../lib/services/redis';
+import { BaseRedisService } from '../../lib';
 
 export class RedisService extends BaseRedisService {
     
