@@ -4,6 +4,7 @@
   "description": "A web app framework for koa written in typescript",
   "main": "js/index.js",
   "typings": "js/index.d.ts",
+  "private": true,
   "scripts": {
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
