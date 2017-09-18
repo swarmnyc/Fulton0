@@ -1,15 +1,14 @@
 {
-  "name": "swarm-web-framework",
+  "name": "fulton",
   "version": "1.0.1",
   "description": "A web app framework for koa written in typescript",
-  "main": "build/main.js",
-  "types": "./src/app/framework/index.d.ts",
+  "main": "js/index.js",
+  "typings": "js/index.d.ts",
   "private": true,
   "scripts": {
-    "start": "node --inspect=0.0.0.0:5858 build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
-    "test": "rm -r build || true && npm run build && alsatian \"./build/app/**/*.spec.js\"",
+    "test": "rm -r js || true && npm run build && alsatian \"./js/**/*.spec.js\"",
     "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report --reporter=text-lcov | coveralls",
     "build": "tsc -p ./src || true",
@@ -18,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/swarmnyc/swarm-web-framework"
+    "url": "https://github.com/swarmnyc/fulton"
   },
   "author": "SWARM <hello@swarmnyc.com>",
   "license": "UNLICENSED",
@@ -59,7 +58,7 @@
     "request-promise": "^4.1.1",
     "request-promise-native": "1.0.3",
     "source-map-support": "0.4.6",
-    "typescript": "^2.0.10",
+    "typescript": "^2.5.2",
     "winston": "2.3.0"
   },
   "devDependencies": {
@@ -75,7 +74,7 @@
     "faker": "3.1.0",
     "rimraf": "2.5.4",
     "sinon": "1.17.6",
-    "typescript": "2.0.10",
+    "typescript": "2.5.2",
     "typings": "2.0.0"
   }
 }

@@ -8,6 +8,7 @@ Also includes docker scripts for easy setup and development.
 
 # Install
 ```
+cd example_project
 npm install #only need to install and build on host machine if you want to debug
 npm run build
 docker-compose -f docker-compose.dev.yml build
@@ -26,7 +27,7 @@ Check out the docs folder of this repo for more in depth documentation.
 - [ ] Add tests and examples to the OAuth Module
 - [X] Set up automated builds and testing
 - [ ] (In Progress) Add more tests
-- [ ] Break out into an NPM package, rather than being a starter project.
+- [X] Break out into an NPM package, rather than being a starter project.
 - [ ] Update mongorito
 
 

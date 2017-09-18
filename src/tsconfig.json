@@ -2,11 +2,19 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
+        "declaration": true,
         "noImplicitAny": false,
         "sourceMap": true,
-        "outDir": "../build",
+        "listFiles": true,
+        "outDir": "../js",
+        "rootDir": "./",
         "removeComments": false,
-        "allowJs": true,
-        "experimentalDecorators": true
-    }
+        "experimentalDecorators": true,
+        "allowJs": true
+    },
+    "exclude": [
+        "example_project/**/*",
+        "example_project",
+        "node_modules"
+    ]
 }
