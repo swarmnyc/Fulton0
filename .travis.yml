@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - "stable"
+before_script:
+  - npm install -g alsatian
+  - npm install -g typescript
+  - npm install -g nyc
+script:
+  - npm install
+  - npm run check-coverage

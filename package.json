@@ -1,23 +1,23 @@
 {
-  "name": "swarm-web-framework",
+  "name": "fulton",
   "version": "1.0.1",
   "description": "A web app framework for koa written in typescript",
-  "main": "build/main.js",
-  "types": "./src/app/framework/index.d.ts",
+  "main": "js/index.js",
+  "typings": "js/index.d.ts",
   "private": true,
   "scripts": {
-    "start": "node --inspect=0.0.0.0:5858 build/main.js",
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
-    "test": "rm -r build || true && npm run build && alsatian \"./build/app/**/*.spec.js\"",
-    "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
+    "test": "rm -r js || true && npm run build && alsatian \"./js/**/*.spec.js\"",
+    "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
+    "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report --reporter=text-lcov | coveralls",
     "build": "tsc -p ./src || true",
     "package": "rm -f docker/worker/app.package.tar.gz && rm -f docker/worker/package.json && rimraf build && tsc -p && cp package.json docker/worker/package.json && tar czf app.package.tar.gz build && mv app.package.tar.gz docker/worker/app.package.tar.gz && rimraf build",
     "clean": "rimraf build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/swarmnyc/swarm-web-framework"
+    "url": "https://github.com/swarmnyc/fulton"
   },
   "author": "SWARM <hello@swarmnyc.com>",
   "license": "UNLICENSED",
@@ -32,6 +32,7 @@
     "express": "4.14.0",
     "fs-extra": "1.0.0",
     "grant-koa": "3.6.5",
+    "kcors": "^2.2.1",
     "koa": "2.2.0",
     "koa-body": "^2.3.0",
     "koa-bodyparser": "4.2.0",
@@ -49,6 +50,7 @@
     "mongodb": "2.2.11",
     "mongorito": "2.2.0",
     "nodemailer": "^4.0.1",
+    "nyc": "^11.2.1",
     "oauth2-server": "2.4.1",
     "qs": "6.4.0",
     "redis": "2.6.5",
@@ -56,7 +58,7 @@
     "request-promise": "^4.1.1",
     "request-promise-native": "1.0.3",
     "source-map-support": "0.4.6",
-    "typescript": "^2.0.10",
+    "typescript": "^2.5.2",
     "winston": "2.3.0"
   },
   "devDependencies": {
@@ -67,11 +69,12 @@
     "@types/koa-router": "7.0.21",
     "@types/node": "^8.0.17",
     "copyfiles": "^1.2.0",
+    "coveralls": "^2.13.1",
     "dotenv": "4.0.0",
     "faker": "3.1.0",
     "rimraf": "2.5.4",
     "sinon": "1.17.6",
-    "typescript": "2.0.10",
+    "typescript": "2.5.2",
     "typings": "2.0.0"
   }
 }
