@@ -1,8 +1,9 @@
 import * as KoaRouter from 'koa-joi-router';
 import { Context } from 'Koa'
+import * as mongorito from 'mongorito'
 import { Router, JoiRouterDefinition } from '../router';
 import { Model } from '../model';
-import { JSONAPIAdapter } from '../adapters/jsonapi';
+import { JSONAPIAdapter, AdapterOptions, JSONAPIAdapterRelationship } from '../adapters/jsonapi';
 import { RequestValidator, ValidationProperties } from './jsonapi-route-components/jsonapi-request-validator';
 import { queryHelper, countHelper } from '../helpers/query';
 import qs from '../middlewares/qs';
@@ -69,10 +70,10 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
 
   /**
    * List of operations permitted at this endpoint
-   * @returns {[JSONAPIRouter.OPERATION,JSONAPIRouter.OPERATION,JSONAPIRouter.OPERATION,JSONAPIRouter.OPERATION]}
+   * @returns {[OPERATION,OPERATION,OPERATION,OPERATION]}
    */
-  operations(): JSONAPIRouter.OPERATION[] {
-    return [JSONAPIRouter.OPERATION.GET,JSONAPIRouter.OPERATION.CREATE, JSONAPIRouter.OPERATION.UPDATE, JSONAPIRouter.OPERATION.REMOVE];
+  operations(): OPERATION[] {
+    return [OPERATION.GET,OPERATION.CREATE, OPERATION.UPDATE, OPERATION.REMOVE];
   }
 
   namespace(): string {
@@ -110,7 +111,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
    * @see {JSONAPIRouter#RouterRelationship}
    * @returns {JSONAPIRouter#RouterRelationship[]}
    */
-  relationships(): JSONAPIRouter.RouterRelationship[] {
+  relationships(): RouterRelationship[] {
     return [];
   }
 
@@ -125,10 +126,10 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     return [];
   }
 
-  adapterOptions(): JSONAPIAdapter.AdapterOptions {
-    let relationships: JSONAPIAdapter.Relationship[] = this.relationships().map((relationship) => {
+  adapterOptions(): AdapterOptions {
+    let relationships: JSONAPIAdapterRelationship[] = this.relationships().map((relationship) => {
       return _.omit(relationship, 'Model');
-    }) as JSONAPIAdapter.Relationship[];
+    }) as RouterRelationship[];
     return {
       type: this.type(),
       idPath: this.idPath(),
@@ -166,13 +167,13 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
   }
 
   protected async _getIncludes(include: string, doc: JSONModel) {
-    const relationships: JSONAPIRouter.RouterRelationship[] = this.relationships();
+    const relationships: RouterRelationship[] = this.relationships();
     let output: JSONModel[] = [];
-    let matchedRelationships: JSONAPIRouter.RouterRelationship[];
+    let matchedRelationships: RouterRelationship[];
     let includes: string[] = include.split(',').map((pathName: string) => {
       return _.camelCase(pathName);
     });
-    matchedRelationships = relationships.filter((item: JSONAPIRouter.RouterRelationship) => {
+    matchedRelationships = relationships.filter((item: RouterRelationship) => {
       return includes.indexOf(item.path) >= 0;
     });
     for (let rel of matchedRelationships) {
@@ -218,7 +219,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     return q;
   }
 
-  async findById(id: string, ctx: Router.Context) {
+  async findById(id: string, ctx: Router.Context): Promise<mongorito.Model> {
     const Model = this.Model();
     return Model.findById(id);
   }
@@ -254,7 +255,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     return isRemoved;
   }
 
-  setHeaders() {
+  setHeaders(): Function {
     return async function(ctx: Router.Context, next: Function) {
       ctx.set('content-type', 'application/vnd.api+json');
       await next();
@@ -447,7 +448,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     };
   }
 
-  protected _permissions() {
+  protected _permissions(): Function {
     const self = this;
     const permissions = this.permissions();
     return async function(ctx: Router.Context, next: Function) {
@@ -475,26 +476,26 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     let operation: number;
     switch (method.toLowerCase()) {
       case 'get':
-        operation = JSONAPIRouter.OPERATION.GET;
+        operation = OPERATION.GET;
         break;
 
       case 'post':
-        operation = JSONAPIRouter.OPERATION.CREATE;
+        operation = OPERATION.CREATE;
         break;
 
       case 'patch':
-        operation = JSONAPIRouter.OPERATION.UPDATE;
+        operation = OPERATION.UPDATE;
         break;
 
       case 'delete':
-        operation = JSONAPIRouter.OPERATION.REMOVE;
+        operation = OPERATION.REMOVE;
         break;
     }
 
     return operation;
   }
 
-  protected _init() {
+  protected _init(): Function {
     const getOperation = this._getOperation;
     return async function(ctx: Router.Context, next: Function) {
       ctx.state.errors = [];
@@ -599,13 +600,13 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
 
   static forbidden(): any {
     return {
-      handler: async function (ctx: JSONAPIRouter.Context) {
+      handler: async function (ctx: Context) {
         ctx.throw(403);
       }
     };
   }
 
-  protected _canUseHandler(operation: JSONAPIRouter.OPERATION): boolean {
+  protected _canUseHandler(operation: OPERATION): boolean {
     const operations = this.operations();
     return operations.indexOf(operation) >= 0;
   }
@@ -630,20 +631,20 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     router.use(this._init());
 
     // mount route handlers
-    if (this._canUseHandler(JSONAPIRouter.OPERATION.GET)) {
+    if (this._canUseHandler(OPERATION.GET)) {
       router.route(find());
       router.route(findById());
     }
 
-    if (this._canUseHandler(JSONAPIRouter.OPERATION.UPDATE)) {
+    if (this._canUseHandler(OPERATION.UPDATE)) {
       router.route(update());
     }
 
-    if (this._canUseHandler(JSONAPIRouter.OPERATION.CREATE)) {
+    if (this._canUseHandler(OPERATION.CREATE)) {
       router.route(create());
     }
 
-    if (this._canUseHandler(JSONAPIRouter.OPERATION.REMOVE)) {
+    if (this._canUseHandler(OPERATION.REMOVE)) {
       router.route(remove());
     }
 
@@ -651,12 +652,6 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     router.use(this._responder());
   }
 }
-
-/**
- * @namespace JSONAPIRouter
- */
-export namespace JSONAPIRouter {
-  export type Context = Router.Context
   /**
    * @typedef RelationshipType
    */
@@ -682,6 +677,5 @@ export namespace JSONAPIRouter {
     link?: string
     Model: typeof Model
   }
-}
 
 

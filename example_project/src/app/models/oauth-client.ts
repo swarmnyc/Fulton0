@@ -1,9 +1,24 @@
 import { generateClientSecret } from '../helpers/oauth';
-import { Model } from 'fulton';
+import { Model, OAuth2Client } from 'fulton';
 import { User } from './user';
 import * as _ from 'lodash';
 
-export class OAuthClient extends Model {
+export class OAuthClient extends Model implements OAuth2Client {
+    //implementing OAuth2Client with custom getters and setters for each property
+    get id(): string {
+        return this.get("_id")
+    }
+    set id(id: string) {
+        this.set("_id", id)
+    }
+
+    get secret(): string {
+        return this.get("secret")
+    }
+    set secret(secret: string) {
+        this.set("secret", secret)
+    }
+
     collection() {
         return 'oauth-clients';
     }

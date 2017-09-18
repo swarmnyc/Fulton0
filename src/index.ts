@@ -15,6 +15,8 @@ export * from './services/mongodb';
 export * from './services/oauth2';
 export * from './services/redis';
 export * from './routers/jsonapi';
+export * from './adapters/jsonapi';
+
 export interface DeserializedObject {
   [K: string]: any
 }

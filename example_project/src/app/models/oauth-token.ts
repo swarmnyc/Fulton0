@@ -1,7 +1,6 @@
-import { Model } from 'fulton';
+import { Model, OAuth2AccessToken } from 'fulton';
 import { User } from './user';
 import { OAuthClient } from './oauth-client';
-import { OAuth2AccessToken } from '../lib/services/oauth2/lib'
 
 import { generateAccessToken } from '../helpers/oauth';
 import * as moment from 'moment';

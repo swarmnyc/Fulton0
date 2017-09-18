@@ -2,6 +2,8 @@ import * as KoaRouter  from 'koa-joi-router';
 import * as Application from 'koa/lib/application';
 import { RequestHandler } from './request-handler';
 import { Context as AppContext } from './'
+import { App } from './app';
+
 export interface JoiRouterDefinition {
   method: string
   path: string
@@ -116,7 +118,7 @@ export namespace Router {
 }
 
 
-interface IPermissionsHandler {
+export interface IPermissionsHandler {
   (ctx: Router.Context, model?: any): Promise<boolean>
 }
 

@@ -1,6 +1,7 @@
 import { AsyncTest, Expect, Test, TestCase, TestFixture } from "alsatian";
 import { PasswordGrantHandler } from 'fulton';
 import { Model } from 'fulton';
+import * as mongorito from 'mongorito'
 import * as moment from 'moment';
 import { ObjectID } from 'mongodb';
 import { hashPassword } from '../helpers/user';

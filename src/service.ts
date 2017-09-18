@@ -4,7 +4,7 @@ interface ServiceCallback {
 
 export class Service {
   instance: any
-
+  
   /**
    * Name to use for the service in the app. Defaults to the name of the service class.
    * 

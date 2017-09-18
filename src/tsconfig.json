@@ -5,15 +5,16 @@
         "declaration": true,
         "noImplicitAny": false,
         "sourceMap": true,
+        "listFiles": true,
         "outDir": "../js",
+        "rootDir": "./",
         "removeComments": false,
-        "allowJs": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "allowJs": true
     },
-    "include": [
-        "./**/*"
-    ],
     "exclude": [
-        "example_project"
+        "example_project/**/*",
+        "example_project",
+        "node_modules"
     ]
 }

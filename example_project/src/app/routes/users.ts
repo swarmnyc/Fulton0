@@ -1,5 +1,7 @@
-import { JSONAPIRouter } from 'fulton';
+import { JSONAPIRouter, Context, BaseContext } from 'fulton';
 import { User } from '../models';
+import { SWARMApp } from '../app'
+import { authTokenMiddleware } from '../middlewares/token-auth'
 
 export class UserRouter extends JSONAPIRouter {
 
@@ -12,10 +14,7 @@ export class UserRouter extends JSONAPIRouter {
   }
 
   auth() {
-    return function*(next: any) {
-      const oauth = this.app.context.services.oauth.authenticate(); // get authenticate middleware from oauth service 
-      yield oauth.call(this, next); // use call to preserve context
-    };
+    return authTokenMiddleware(['GET'])
   }
   
 }

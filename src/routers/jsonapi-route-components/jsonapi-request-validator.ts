@@ -2,13 +2,13 @@ import * as KoaRouter from 'koa-joi-router';
 import { Model } from '../../model';
 import { SchemaTypes, ISchemaPathDefinition } from '../../schema';
 import * as _ from 'lodash';
-import { JSONAPIRouter } from './../jsonapi';
+import { JSONAPIRouter, RouterRelationship } from './../jsonapi';
 
 
 export interface ValidationProperties {
     Model(): typeof Model
     hidePaths(): string[]
-    relationships(): JSONAPIRouter.RouterRelationship[]
+    relationships(): RouterRelationship[]
     type(): string
 }
 

@@ -1,9 +1,15 @@
 import { Model } from 'fulton';
 import { hashPassword, comparePassword } from '../helpers/user';
 import { OAuthToken } from '.';
-import { SchemaTypes } from 'fulton';
+import { SchemaTypes, OAuth2User } from 'fulton';
 
-export class User extends Model {
+export class User extends Model implements OAuth2User {
+  get id() {
+    return this.get("_id");
+  }
+  set id(id: string) {
+    this.set("_id", id)
+  }
   collection() {
     return 'users';
   }

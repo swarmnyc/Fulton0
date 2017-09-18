@@ -415,7 +415,6 @@ namespace req {
         response: Response;
         originalUrl: string;
         accept: any;
-        body: any;
     }
 }
 
@@ -898,6 +897,7 @@ class Application extends EventEmitter {
 }
 
 namespace Application {
+    export type Request = _Request;
     export type Response = _Response;
     export type Context = _Context;
 }

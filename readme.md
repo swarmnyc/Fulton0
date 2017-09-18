@@ -27,7 +27,7 @@ Check out the docs folder of this repo for more in depth documentation.
 - [ ] Add tests and examples to the OAuth Module
 - [X] Set up automated builds and testing
 - [ ] (In Progress) Add more tests
-- [ ] Break out into an NPM package, rather than being a starter project.
+- [X] Break out into an NPM package, rather than being a starter project.
 - [ ] Update mongorito
 
 

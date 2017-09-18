@@ -3,7 +3,7 @@ import { Model } from './model';
 
 var addTimestamps = true
 
-class TestModel extends Model {
+export class TestModel extends Model {
     timestamps() {
         return addTimestamps;
     }
@@ -36,23 +36,23 @@ export class ModelTests {
     }
 
 
-    @TestCase(new TestModel({"_v": 0}))
+    @TestCase(new TestModel({"version": 0}))
     public testIsAllowedToSave(model: TestModel) {
-       let canSave = model.canUpdateBasedOnConcurrencyControl({"_v": 0})
+       let canSave = model.canUpdateBasedOnConcurrencyControl({"version": 0})
         Expect(canSave).toEqual(true)
     }
 
-    @TestCase(new TestModel({"_v": 1}))
+    @TestCase(new TestModel({"version": 1}))
     public testIsNotAllowedToSave(model: TestModel) {
-        let canSave = model.canUpdateBasedOnConcurrencyControl({"_v": 0})
+        let canSave = model.canUpdateBasedOnConcurrencyControl({"version": 0})
         Expect(canSave).toEqual(false)
     }
 
-    @TestCase({"_v": 0})
+    @TestCase({"version": 0})
     public testVersionIsIncrementedProperly(attr: any) {
         let model = new TestModel()
         let newAttr = model.updateVersion(attr)
-        Expect(newAttr["_v"]).toEqual(1)
+        Expect(newAttr["version"]).toEqual(1)
     }
 
     @AsyncTest("Saving Concurrency Controlled Model")
@@ -62,18 +62,18 @@ export class ModelTests {
             return this
         }
         let model = new TestModel()
-        model = await model.validate() as TestModel //will add the default _v value
+        model = await model.validate() as TestModel //will add the default version value
         console.log(model.schema())
-        Expect(model.get("_v")).toEqual(0)
-        model = await model.setAndValidate({"_v": 0}) as TestModel //should update _v to 1
-        Expect(model.get("_v")).toEqual(1)
+        Expect(model.get("version")).toEqual(0)
+        model = await model.setAndValidate({"version": 0}) as TestModel //should update version to 1
+        Expect(model.get("version")).toEqual(1)
     }
 
     @AsyncTest("Test allows setAndValidate for first time")
     async testInitialSetAndValidate() {
         let model = new TestModel()
         model = await model.setAndValidate({"what": "what"}) as TestModel
-        Expect(model.get("_v")).toEqual(0)
+        Expect(model.get("version")).toEqual(0)
     }
 
     @AsyncTest("Savimg Concurrency Controlled Model That Has Been Updated")
@@ -83,14 +83,14 @@ export class ModelTests {
             return this
         }
         let model = new TestModel()
-        model = await model.validate() as TestModel //will add the default _v value
+        model = await model.validate() as TestModel //will add the default version value
         console.log(model.schema())
-        Expect(model.get("_v")).toEqual(0)
+        Expect(model.get("version")).toEqual(0)
 
-        model.set({"_v": 1}) //fake an update
+        model.set({"version": 1}) //fake an update
         let e
         try {
-            model = await model.setAndValidate({"_v": 0}) as TestModel //should update _v to 1
+            model = await model.setAndValidate({"version": 0}) as TestModel //should update version to 1
         } catch(error) {
             e = error
         }

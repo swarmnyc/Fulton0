@@ -1,22 +1,22 @@
 import { IAdapter } from '../..';
 import * as _ from 'lodash';
-import { JSONAPIRouter } from '../../routers/jsonapi';
+import { JSONAPIRouter, RelationshipType } from '../../routers/jsonapi';
 
-class AdapterError extends Error {
+export class AdapterError extends Error {
   static type = 'AdapterError'
 }
 
 
 
 export class JSONAPIAdapter implements IAdapter {
-  private rels: JSONAPIAdapter.Relationship[]
+  private rels: JSONAPIAdapterRelationship[]
   private omitPaths: string[]
   idPath: string;
   type: string;
   namespace: string;
   
 
-  constructor(options: JSONAPIAdapter.AdapterOptions) {
+  constructor(options: AdapterOptions) {
     this.rels = options.relationships;
     this.idPath = options.idPath || '_id';
     this.namespace = options.namespace;
@@ -28,19 +28,19 @@ export class JSONAPIAdapter implements IAdapter {
     return this.rels;
   }
 
-  protected _serialize(base: JSONAPIAdapter.GenericObject) {
+  protected _serialize(base: GenericObject) {
     const o = _.omit(base, this.omitPaths);
     const idPath: string = this.idPath;
     const oType = this.type;
     const namespace = !!this.namespace ? `/${this.namespace}` : '';
     const oId = o[idPath];
-    const relationships: JSONAPIAdapter.Relationship[] = this.relationships || [];
-    let j: JSONAPIAdapter.SerializedObject = { type: oType, id: oId, attributes: {}, relationships: {}, links: {} };
+    const relationships: JSONAPIAdapterRelationship[] = this.relationships || [];
+    let j: SerializedObject = { type: oType, id: oId, attributes: {}, relationships: {}, links: {} };
     j.links = { self: `${namespace}/${oType}/${oId}` };
     
     
     _.forEach(o, (value: any, key: string) => {
-      const rel: JSONAPIAdapter.Relationship = _.find(relationships, { path: key });
+      const rel: JSONAPIAdapterRelationship = _.find(relationships, { path: key });
       const preamble = rel ? 'relationships' : 'attributes';
       
       if (key === idPath) {
@@ -55,7 +55,7 @@ export class JSONAPIAdapter implements IAdapter {
         _.set(j, `${preamble}.${_.kebabCase(key)}`, value);
       } else {
         let relType: string = rel.type;
-        let val: JSONAPIAdapter.SerializedRelationship = {
+        let val: SerializedRelationship = {
           data: undefined,
           links: undefined
         };
@@ -79,9 +79,9 @@ export class JSONAPIAdapter implements IAdapter {
     return j;    
   }
 
-  private _deserialize = (input: JSONAPIAdapter.SerializedObject): JSONAPIAdapter.GenericObject => {
+  private _deserialize = (input: SerializedObject): GenericObject => {
     let data = input;
-    let output: JSONAPIAdapter.GenericObject = {};
+    let output: GenericObject = {};
     let attrs: any, relationships: any;        
 
     if (!data) {
@@ -103,11 +103,11 @@ export class JSONAPIAdapter implements IAdapter {
     return output;
   };
 
-  public serialize = (input: JSONAPIAdapter.GenericObject | JSONAPIAdapter.GenericObject[], page?: number, limit?: number): JSONAPIAdapter.Package => {
-    let output: JSONAPIAdapter.Package;
+  public serialize = (input: GenericObject | GenericObject[], page?: number, limit?: number): Package => {
+    let output: Package;
 
     if (Array.isArray(input)) {
-      output = { data: input.map((o: JSONAPIAdapter.GenericObject) => {
+      output = { data: input.map((o: GenericObject) => {
         return this._serialize(o);
       })};
     } else {
@@ -117,12 +117,12 @@ export class JSONAPIAdapter implements IAdapter {
     return output;
   };
 
-  public deserialize = (input: JSONAPIAdapter.Package): JSONAPIAdapter.GenericObject | JSONAPIAdapter.GenericObject[] => {
-    let output: JSONAPIAdapter.GenericObject | JSONAPIAdapter.GenericObject[];
+  public deserialize = (input: Package): GenericObject | GenericObject[] => {
+    let output: GenericObject | GenericObject[];
     let data = input.data;
 
     if (Array.isArray(data)) {
-      output = data.map((o: JSONAPIAdapter.SerializedObject) => {
+      output = data.map((o: SerializedObject) => {
         return this._deserialize(o);
       });
     } else {
@@ -133,12 +133,11 @@ export class JSONAPIAdapter implements IAdapter {
   } 
 }
 
-export namespace JSONAPIAdapter {
 
   export interface AdapterOptions {
     type: string;
     idPath?: string;
-    relationships?: Relationship[]
+    relationships?: JSONAPIAdapterRelationship[]
     namespace?: string
     omit?: string[]
   }
@@ -188,17 +187,9 @@ export namespace JSONAPIAdapter {
     [attr: string]: string|number|string[]|number[]|boolean|boolean[]
   }
 
-  export enum RelationshipType {
-    BELONGS_TO,
-    TO_MANY
-  }
-
-  export interface Relationship {
+  export interface JSONAPIAdapterRelationship {
     path: string  
     type: string
     relationshipType: RelationshipType
   }
 
-}
-
-export default JSONAPIAdapter

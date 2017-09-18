@@ -12,7 +12,7 @@ export class Model extends MongoritoModel {
   static RequiredError = RequiredError;
   static ObjectID = ObjectID;
   static appliedIndex: boolean;
-  static versionKey: string = "_v"
+  static versionKey: string = "version"
   collectionName: string;
 
   get changedKeys() {

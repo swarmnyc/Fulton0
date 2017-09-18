@@ -1,4 +1,3 @@
-export namespace OAuthGrants {
     export interface IOAuthAccessTokenObject {
         accessToken: string
         refreshToken?: string
@@ -66,6 +65,3 @@ export namespace OAuthGrants {
         getRefreshToken: (refreshToken: string) => Promise<IOAuthAccessTokenObject>
         revokeToken: (token: IOAuthAccessTokenObject) => Promise<IOAuthAccessTokenObject>
     }
-}
-
-export default OAuthGrants
