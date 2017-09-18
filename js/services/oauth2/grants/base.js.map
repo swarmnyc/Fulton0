@@ -1,1 +1,0 @@
-{"version":3,"file":"base.js","sourceRoot":"","sources":["../../../../src/services/oauth2/grants/base.ts"],"names":[],"mappings":";;;;;;;;;;AAEA;IACY,SAAS,CAAC,GAAY;QAC9B,MAAM,CAAC,GAAG,CAAC,OAAO,CAAC,MAAM,CAAC,CAAC,OAAO,CAAC,CAAC;IACtC,CAAC;IAEK,MAAM,CAAC,GAAY;8DAAkB,CAAC;KAAA;CAC7C;AAND,4CAMC"}

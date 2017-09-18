@@ -4,6 +4,8 @@ import { OAuth2BaseModel } from './models';
 export * from './models'
 export * from './lib'
 export * from './grants'
+import { JoiRouterDefinition } from '../../router'
+import { OAuth2Server } from './lib/server'
 
 export class BaseOAuth2Service extends Service {
     as() {
@@ -20,10 +22,15 @@ export class BaseOAuth2Service extends Service {
     grants(): string[] {
       return ['password'];
     }
+    getRouteDefinition(endpointName: string, tokenHandler: (model: OAuth2BaseModel, grants?: string[]) => void): JoiRouterDefinition {
+      return undefined;
+    }
 
-    async init() {
+    async init(): Promise<any> {
         const Model = this.model();
         let o = Object.assign({}, { grants: this.grants(), tokenEndpoint: this.tokenEndpoint(), model: Model });
-        return new oauth2lib.OAuth2Server(o);
+        return new oauth2lib.OAuth2Server(o, (server) => {
+          return this.getRouteDefinition(server.tokenEndpoint(), server.token())
+        });
     }
 }

@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
-    "test": "rm -r build || true && npm run build && alsatian \"./build/app/**/*.spec.js\"",
+    "test": "rm -r js || true && npm run build && cd example_project && npm install && cd .. && alsatian \"./js/**/*.spec.js\"",
     "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report --reporter=text-lcov | coveralls",
     "build": "tsc -p ./src || true",

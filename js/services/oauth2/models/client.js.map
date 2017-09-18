@@ -1,1 +1,0 @@
-{"version":3,"file":"client.js","sourceRoot":"","sources":["../../../../src/services/oauth2/models/client.ts"],"names":[],"mappings":";;;;;;;;;;AAAA,wBAAoC;AAGpC,uBAA+B,SAAQ,kBAAe;IAC9C,iBAAiB,CAAC,EAAU,EAAE,MAAc;;YAChD,MAAM,CAAC,SAAS,CAAC;QACnB,CAAC;KAAA;CACF;AAJD,8CAIC"}

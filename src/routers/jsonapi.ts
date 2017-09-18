@@ -1,4 +1,5 @@
 import * as KoaRouter from 'koa-joi-router';
+import { Context } from 'Koa'
 import { Router, JoiRouterDefinition } from '../router';
 import { Model } from '../model';
 import { JSONAPIAdapter } from '../adapters/jsonapi';
@@ -507,7 +508,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     };
   }
   
- deserializerMiddleware() {
+ deserializerMiddleware(): Function {
   const deserialize = this.adapter().deserialize;
   const writablePaths: string[] = this.writablePaths();
   return async function(ctx: Router.Context, next: Function) {
@@ -528,7 +529,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
   }
 
 
-  _responder() {
+  _responder(): Function {
     const self = this;
     const generatePaginationLinks = this._generatePaginationLinks;    
     const getIncludes = this._getIncludes;
@@ -596,7 +597,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     return `${moment().year()} SWARMNYC`;
   }
 
-  static forbidden() {
+  static forbidden(): any {
     return {
       handler: async function (ctx: JSONAPIRouter.Context) {
         ctx.throw(403);

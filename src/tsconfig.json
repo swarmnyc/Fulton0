@@ -9,5 +9,11 @@
         "removeComments": false,
         "allowJs": true,
         "experimentalDecorators": true
-    }
+    },
+    "include": [
+        "./**/*"
+    ],
+    "exclude": [
+        "example_project"
+    ]
 }
