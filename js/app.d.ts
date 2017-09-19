@@ -115,6 +115,7 @@ export declare class App extends EventEmitter {
     get(key: string): {};
     register(router: Router): void;
     apiGroups(): APIRouter[];
+    customSetUp(app: Koa): Promise<void>;
     /**
      * Returns a new Koa app instance with routes and services loaded into the app
      *

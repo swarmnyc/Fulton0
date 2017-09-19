@@ -154,6 +154,10 @@ class App extends events_1.EventEmitter {
     apiGroups() {
         return this._groups;
     }
+    customSetUp(app) {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    }
     /**
      * Returns a new Koa app instance with routes and services loaded into the app
      *
@@ -193,6 +197,7 @@ class App extends events_1.EventEmitter {
             if (opts.loadRoutes === true) {
                 routeLoader.load(this);
             }
+            yield this.customSetUp(app);
             app.use(docs.get('/api/docs', {
                 title: `${this.constructor.name} API`,
                 version: `1.0.0`,
