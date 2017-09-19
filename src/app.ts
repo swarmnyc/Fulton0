@@ -181,6 +181,10 @@ export class App extends EventEmitter {
   apiGroups() {
     return this._groups;
   }
+
+  customSetUp(app: Koa) {
+
+  }
   /**
    * Returns a new Koa app instance with routes and services loaded into the app 
    * 
@@ -227,6 +231,7 @@ export class App extends EventEmitter {
     if (opts.loadRoutes === true) {
       routeLoader.load(this);
     }
+    this.customSetUp(app)
 
     app.use(docs.get('/api/docs', {
       title: `${this.constructor.name} API`,
