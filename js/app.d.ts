@@ -23,12 +23,13 @@ export interface ServiceHash {
  */
 export declare class App extends EventEmitter {
     protected app: Koa;
-    protected _groups: APIRouter[];
+    _groups: APIRouter[];
     log: BaseLoggerService;
     _services: ServiceHash;
     appRoot: string;
     routers(): typeof Router[];
     services(): typeof Service[];
+    oauthModels(): typeof Service[];
     /**
      * Returns an array of request handler middlewares to apply to each incoming request before passing the request off to the router.
      *

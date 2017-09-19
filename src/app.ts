@@ -40,7 +40,7 @@ export interface ServiceHash {
  */
 export class App extends EventEmitter {
   protected app: Koa;
-  protected _groups: APIRouter[];
+  _groups: APIRouter[];
   log: BaseLoggerService;
   _services: ServiceHash;
 
@@ -53,6 +53,10 @@ export class App extends EventEmitter {
   services(): typeof Service[] { 
     return [] 
   } 
+
+  oauthModels(): typeof Service[] {
+    return []
+  }
 
   /**
    * Returns an array of request handler middlewares to apply to each incoming request before passing the request off to the router.
@@ -198,24 +202,17 @@ export class App extends EventEmitter {
     let oauth: any;
 
     app.on('error', this.didError.bind(this));
-        
-    if (opts.loadServices === true) {
-      await serviceLoader.load(this);
-    }
-
+     
     if (this.bodyParser() === true) {
       app.use(bodyParser());
     }
 
-    if (this._services['log']) {
-      this.log = this._services['log'];
+    if (opts.loadServices === true) {
+      await serviceLoader.load(this);
     }
 
-    if (opts.loadServices === true && this._services['oauth']) {
-      oauth = new KoaRouter();
-      oauth.route(this._services['oauth'].getRoute());
-      this._groups.push({ groupName: "Token", description: "OAuth Authentication", prefix: "", routes: oauth.routes });
-      app.use(oauth.middleware());
+    if (this._services['log']) {
+      this.log = this._services['log'];
     }
 
     if (this.etag() === true) {

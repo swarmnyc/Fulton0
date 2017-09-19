@@ -39,6 +39,9 @@ class App extends events_1.EventEmitter {
     services() {
         return [];
     }
+    oauthModels() {
+        return [];
+    }
     /**
      * Returns an array of request handler middlewares to apply to each incoming request before passing the request off to the router.
      *
@@ -172,20 +175,14 @@ class App extends events_1.EventEmitter {
             const routeLoader = new route_loader_1.default();
             let oauth;
             app.on('error', this.didError.bind(this));
-            if (opts.loadServices === true) {
-                yield serviceLoader.load(this);
-            }
             if (this.bodyParser() === true) {
                 app.use(bodyParser());
             }
+            if (opts.loadServices === true) {
+                yield serviceLoader.load(this);
+            }
             if (this._services['log']) {
                 this.log = this._services['log'];
-            }
-            if (opts.loadServices === true && this._services['oauth']) {
-                oauth = new KoaRouter();
-                oauth.route(this._services['oauth'].getRoute());
-                this._groups.push({ groupName: "Token", description: "OAuth Authentication", prefix: "", routes: oauth.routes });
-                app.use(oauth.middleware());
             }
             if (this.etag() === true) {
                 app.use(conditional());
