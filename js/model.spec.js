@@ -8,14 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 const alsatian_1 = require("alsatian");
-const model_1 = require("./model");
+const model_1 = require('./model');
 var addTimestamps = true;
 class TestModel extends model_1.Model {
     timestamps() {
@@ -63,17 +62,17 @@ let ModelTests = class ModelTests {
                 });
             };
             let model = new TestModel();
-            model = (yield model.validate()); //will add the default version value
+            model = yield model.validate(); //will add the default version value
             console.log(model.schema());
             alsatian_1.Expect(model.get("version")).toEqual(0);
-            model = (yield model.setAndValidate({ "version": 0 })); //should update version to 1
+            model = yield model.setAndValidate({ "version": 0 }); //should update version to 1
             alsatian_1.Expect(model.get("version")).toEqual(1);
         });
     }
     testInitialSetAndValidate() {
         return __awaiter(this, void 0, void 0, function* () {
             let model = new TestModel();
-            model = (yield model.setAndValidate({ "what": "what" }));
+            model = yield model.setAndValidate({ "what": "what" });
             alsatian_1.Expect(model.get("version")).toEqual(0);
         });
     }
@@ -86,13 +85,13 @@ let ModelTests = class ModelTests {
                 });
             };
             let model = new TestModel();
-            model = (yield model.validate()); //will add the default version value
+            model = yield model.validate(); //will add the default version value
             console.log(model.schema());
             alsatian_1.Expect(model.get("version")).toEqual(0);
             model.set({ "version": 1 }); //fake an update
             let e;
             try {
-                model = (yield model.setAndValidate({ "version": 0 })); //should update version to 1
+                model = yield model.setAndValidate({ "version": 0 }); //should update version to 1
             }
             catch (error) {
                 e = error;

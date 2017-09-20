@@ -1,6 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const KoaRouter = require("koa-joi-router");
+const KoaRouter = require('koa-joi-router');
 class RouteLoader {
     constructor() {
         this.path = 'routes';
@@ -15,5 +14,6 @@ class RouteLoader {
     }
 }
 exports.RouteLoader = RouteLoader;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = RouteLoader;
 //# sourceMappingURL=route-loader.js.map

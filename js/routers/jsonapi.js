@@ -2,23 +2,22 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const KoaRouter = require("koa-joi-router");
-const router_1 = require("../router");
-const jsonapi_1 = require("../adapters/jsonapi");
-const jsonapi_request_validator_1 = require("./jsonapi-route-components/jsonapi-request-validator");
-const query_1 = require("../helpers/query");
-const qs_1 = require("../middlewares/qs");
-const _ = require("lodash");
-const moment = require("moment");
-const pluralize = require("pluralize");
-const jsonapi_query_reader_1 = require("./jsonapi-route-components/jsonapi-query-reader");
-const jsonapi_errors_1 = require("./jsonapi-route-components/jsonapi-errors");
+const KoaRouter = require('koa-joi-router');
+const router_1 = require('../router');
+const jsonapi_1 = require('../adapters/jsonapi');
+const jsonapi_request_validator_1 = require('./jsonapi-route-components/jsonapi-request-validator');
+const query_1 = require('../helpers/query');
+const qs_1 = require('../middlewares/qs');
+const _ = require('lodash');
+const moment = require('moment');
+const pluralize = require('pluralize');
+const jsonapi_query_reader_1 = require('./jsonapi-route-components/jsonapi-query-reader');
+const jsonapi_errors_1 = require('./jsonapi-route-components/jsonapi-errors');
 const { Joi } = KoaRouter;
 class JSONAPIRouter extends router_1.Router {
     name() {
@@ -641,16 +640,16 @@ exports.JSONAPIRouter = JSONAPIRouter;
 /**
  * @typedef RelationshipType
  */
-var RelationshipType;
 (function (RelationshipType) {
     RelationshipType[RelationshipType["BELONGS_TO"] = 0] = "BELONGS_TO";
     RelationshipType[RelationshipType["TO_MANY"] = 1] = "TO_MANY";
-})(RelationshipType = exports.RelationshipType || (exports.RelationshipType = {}));
-var OPERATION;
+})(exports.RelationshipType || (exports.RelationshipType = {}));
+var RelationshipType = exports.RelationshipType;
 (function (OPERATION) {
     OPERATION[OPERATION["GET"] = 0] = "GET";
     OPERATION[OPERATION["CREATE"] = 1] = "CREATE";
     OPERATION[OPERATION["UPDATE"] = 2] = "UPDATE";
     OPERATION[OPERATION["REMOVE"] = 3] = "REMOVE";
-})(OPERATION = exports.OPERATION || (exports.OPERATION = {}));
+})(exports.OPERATION || (exports.OPERATION = {}));
+var OPERATION = exports.OPERATION;
 //# sourceMappingURL=jsonapi.js.map

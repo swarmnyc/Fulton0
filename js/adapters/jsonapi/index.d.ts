@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { IAdapter } from '../..';
 import { RelationshipType } from '../../routers/jsonapi';
 export declare class AdapterError extends Error {

@@ -1,6 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const _ = require("lodash");
+const _ = require('lodash');
 class SchemaValidator {
     static runTypecastingValidator(value, schemaPath) {
         let isArray = _.endsWith(schemaPath.type, '[]');

@@ -1,7 +1,6 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const __1 = require("../..");
-const mongodb_1 = require("mongodb");
+const __1 = require('../..');
+const mongodb_1 = require('mongodb');
 class MongoritoQueryCreator {
     constructor(query, model) {
         this.query = query;
@@ -131,5 +130,6 @@ MongoritoQueryCreator.ObjectIDCreator = function (value) {
 MongoritoQueryCreator.booleanCheck = function (value) {
     return (value === 'true');
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = MongoritoQueryCreator;
 //# sourceMappingURL=mongorito-query-creator.js.map

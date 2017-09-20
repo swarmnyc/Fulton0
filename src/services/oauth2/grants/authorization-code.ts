@@ -11,39 +11,34 @@ export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
     this.model = model;
   }
 
-  protected _validateRequestUri(ctx: Context, code: OAuth2AuthorizationCode): boolean {
-    if (!code.redirectUri) {
-      return true;
-    }
-
-    const redirectUri: string = ctx.request['body']['redirect_uri'] || ctx.request.query['redirect_uri'];
-    return (redirectUri === code.redirectUri);
-  }
-
   async handle(ctx: Context) {
     const code: string = ctx.request['body']['code'];
-    let auth: OAuth2AuthorizationCode;
-    let isValidRequestUri: boolean;
-    let token: OAuth2AccessToken;
-
+    
     if (!code) {
       return errorHandler.call(ctx, 'bad request');
     }
-
-    auth = await this.model.getAuthorizationCode(code);
-    isValidRequestUri = this._validateRequestUri(ctx, auth);
-
-    if (isValidRequestUri === false) {
-      return errorHandler.call(ctx, 'bad request');
+    let user;
+    try {
+        user = await this.model.getUserFromCode(code)
+    } catch(error) {
+        return errorHandler.call(ctx, 'bad request')
     }
 
-    await this.model.revokeAuthorizationCode(auth);
-    token = await this.model.saveToken(auth.user, ctx.state.oauth.client, auth.scope, auth.authorizationCode);
-    ctx.state.oauth.user = auth.user;
-    ctx.state.oauth.scope = auth.scope;
-    ctx.state.oauth.auth = auth;
-    ctx.state.oauth.token = token;
+    let token: OAuth2AccessToken;
+    try {
+        token = await this.model.getTokenForUser(user, ctx.state.oauth.client);
+    } catch(error) {
+        return errorHandler.call(ctx, 'bad request')
+    }
 
+    ctx.state.oauth.user = user;
+    ctx.state.oauth.token = token;
+    ctx.state.oauth.accessToken = {
+        accessToken: token.access_token.toString(),
+        accessTokenExpiresOn: token.accessTokenExpiresOn,
+        clientId: token.client_id.toString(),
+        userId: token.user_id.toString()
+    }
     return true;
   }
 }

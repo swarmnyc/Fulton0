@@ -1,4 +1,5 @@
 /// <reference types="node" />
+/// <reference types="koa-bodyparser" />
 import * as Koa from 'koa';
 import * as KoaRouter from 'koa-joi-router';
 import { Router } from './router';

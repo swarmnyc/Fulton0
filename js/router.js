@@ -2,13 +2,12 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const KoaRouter = require("koa-joi-router");
+const KoaRouter = require('koa-joi-router');
 /**
  * The generic Router class. Wraps around koa-router to provide some convenience function
  *
@@ -16,6 +15,14 @@ const KoaRouter = require("koa-joi-router");
  * @class Router
  */
 class Router {
+    constructor(router = KoaRouter()) {
+        this.router = router;
+        this.router.prefix(this.prefix());
+        if (this.auth()) {
+            this.router.use(this.auth());
+        }
+        this.configure(this.router);
+    }
     prefix() {
         const namespace = this.namespace();
         return (!!namespace) ? `/${namespace}` : '';
@@ -91,15 +98,8 @@ class Router {
      */
     configure(router) {
     }
-    constructor(router = KoaRouter()) {
-        this.router = router;
-        this.router.prefix(this.prefix());
-        if (this.auth()) {
-            this.router.use(this.auth());
-        }
-        this.configure(this.router);
-    }
 }
 exports.Router = Router;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Router;
 //# sourceMappingURL=router.js.map

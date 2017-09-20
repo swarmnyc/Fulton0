@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Service } from '../../service';
 import { RedisClient } from 'redis';
 export declare class BaseRedisService extends Service {

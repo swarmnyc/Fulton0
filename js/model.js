@@ -2,17 +2,16 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const mongorito_1 = require("mongorito");
-const _ = require("lodash");
-const schema_1 = require("./schema");
-const schema_error_1 = require("./schema-error");
-const mongodb_1 = require("mongodb");
+const mongorito_1 = require('mongorito');
+const _ = require('lodash');
+const schema_1 = require('./schema');
+const schema_error_1 = require('./schema-error');
+const mongodb_1 = require('mongodb');
 class Model extends mongorito_1.Model {
     constructor(attr, opts) {
         super(attr, opts);
@@ -249,5 +248,6 @@ Model.RequiredError = schema_error_1.RequiredError;
 Model.ObjectID = mongodb_1.ObjectID;
 Model.versionKey = "version";
 exports.Model = Model;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Model;
 //# sourceMappingURL=model.js.map

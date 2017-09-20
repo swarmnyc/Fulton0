@@ -1,3 +1,4 @@
+/// <reference types="node" />
 export * from './router';
 export * from './request-handler';
 export * from './app';
