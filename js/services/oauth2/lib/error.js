@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function errorHandler(ctx, mesg) {
     const code = _getCode(mesg);
     ctx.response.set('content-type', 'text/plain');

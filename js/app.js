@@ -2,25 +2,26 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments)).next());
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as Application from 'koa/lib/application';
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
-const Koa = require('koa');
-const KoaRouter = require('koa-joi-router');
-const service_loader_1 = require('./service-loader');
-const path_1 = require('path');
-const route_loader_1 = require('./route-loader');
-const events_1 = require('events');
-const _ = require('lodash');
-const bodyParser = require('koa-bodyparser');
-const conditional = require('koa-conditional-get');
-const etag = require('koa-etag');
-const docs = require('koa-docs');
+const Koa = require("koa");
+const KoaRouter = require("koa-joi-router");
+const service_loader_1 = require("./service-loader");
+const path_1 = require("path");
+const route_loader_1 = require("./route-loader");
+const events_1 = require("events");
+const _ = require("lodash");
+const bodyParser = require("koa-bodyparser");
+const conditional = require("koa-conditional-get");
+const etag = require("koa-etag");
+const docs = require("koa-docs");
 const _set = _.set;
 const _get = _.get;
 const { Joi } = KoaRouter;
@@ -32,21 +33,6 @@ const { Joi } = KoaRouter;
  * @extends {EventEmitter}
  */
 class App extends events_1.EventEmitter {
-    /**
-     * Creates an instance of App.
-     *
-     * @param {AppConfig} [config] - Optional configuration settings for your app
-     *
-     * @memberOf App
-     */
-    constructor() {
-        super();
-        this.appRoot = path_1.resolve(`${__dirname}/..`);
-        this.app = new Koa();
-        this._services = {};
-        this._groups = [];
-        this.on('didInit', this.didInit.bind(this));
-    }
     routers() {
         return [];
     }
@@ -86,6 +72,21 @@ class App extends events_1.EventEmitter {
      */
     etag() {
         return true;
+    }
+    /**
+     * Creates an instance of App.
+     *
+     * @param {AppConfig} [config] - Optional configuration settings for your app
+     *
+     * @memberOf App
+     */
+    constructor() {
+        super();
+        this.appRoot = path_1.resolve(`${__dirname}/..`);
+        this.app = new Koa();
+        this._services = {};
+        this._groups = [];
+        this.on('didInit', this.didInit.bind(this));
     }
     /**
      * Returns event listener of underlying koa app
@@ -207,6 +208,5 @@ class App extends events_1.EventEmitter {
     }
 }
 exports.App = App;
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = App;
 //# sourceMappingURL=app.js.map

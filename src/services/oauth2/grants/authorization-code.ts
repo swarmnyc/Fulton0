@@ -19,7 +19,7 @@ export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
     }
     let user;
     try {
-        user = await this.model.getUserFromCode(code)
+        user = await this.model.getUserFromCode(code, ctx)
     } catch(error) {
         return errorHandler.call(ctx, 'bad request')
     }

@@ -1,8 +1,9 @@
 import { OAuth2BaseModel } from '.';
 import { OAuth2AuthorizationCode, OAuth2User, OAuth2Client, OAuth2Scope, OAuth2AccessToken } from '../lib';
+import { Context } from 'koa';
 
 export class OAuth2CodeModel extends OAuth2BaseModel {
-  async getUserFromCode(code: string): Promise<OAuth2User> {
+  async getUserFromCode(code: string, ctx: Context): Promise<OAuth2User> {
         return undefined
     }
 

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class OAuth2RequestHandler {
     constructor(ctx, request, response) {
         this.ctx = ctx;

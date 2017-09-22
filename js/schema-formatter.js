@@ -1,6 +1,7 @@
 "use strict";
-const mongodb_1 = require('mongodb');
-const _ = require('lodash');
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongodb_1 = require("mongodb");
+const _ = require("lodash");
 class SchemaFormatter {
     static runFormatter(value, schemaPath) {
         let isArray = _.endsWith(schemaPath.type, '[]');

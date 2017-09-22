@@ -1,7 +1,8 @@
 "use strict";
-const KoaRouter = require('koa-joi-router');
-const schema_1 = require('../../schema');
-const _ = require('lodash');
+Object.defineProperty(exports, "__esModule", { value: true });
+const KoaRouter = require("koa-joi-router");
+const schema_1 = require("../../schema");
+const _ = require("lodash");
 class RequestValidator {
     constructor(router) {
         this.router = router;
@@ -67,7 +68,7 @@ class RequestValidator {
                         id: joi.string()
                     })
                 });
-            default:
+            default://arrays!
                 let typeOfArray = schema_1.SchemaTypes.getTypeOfArray(type);
                 if (typeof typeOfArray === "undefined") {
                     return joi.any();

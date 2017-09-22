@@ -1,6 +1,7 @@
 "use strict";
-const lodash_1 = require('lodash');
-const _ = require('lodash');
+Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_1 = require("lodash");
+const _ = require("lodash");
 class APIQueryConverter {
     constructor(startingQuery) {
         this.startingQuery = startingQuery;
@@ -121,6 +122,5 @@ APIQueryConverter.sizeKey = 'size';
 APIQueryConverter.skipKey = "skip";
 APIQueryConverter.offsetKey = "offset";
 APIQueryConverter.pageKey = "page";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = APIQueryConverter;
 //# sourceMappingURL=api-query-converter.js.map

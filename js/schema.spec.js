@@ -8,15 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments)).next());
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 const alsatian_1 = require("alsatian");
-const schema_1 = require('./schema');
-const mongodb_1 = require('mongodb');
-const model_1 = require('./model');
+const schema_1 = require("./schema");
+const mongodb_1 = require("mongodb");
+const model_1 = require("./model");
 let primitiveOnlyFindReturn;
 class PrimitiveOnlyModel extends model_1.Model {
     static find(query, options) {
@@ -88,7 +89,7 @@ let SchemaTest = class SchemaTest {
                     let schema = new schema_1.Schema(model.schema(), PrimitiveOnlyModel);
                     let validatedModel;
                     try {
-                        validatedModel = yield schema["_removeExtraneousPaths"](model);
+                        validatedModel = (yield schema["_removeExtraneousPaths"](model));
                     }
                     catch (error) {
                         alsatian_1.Expect.fail("validation should not have failed");
@@ -115,11 +116,11 @@ let SchemaTest = class SchemaTest {
                     let attributesBeforeReadOnly;
                     let validatedModel;
                     try {
-                        validatedModel = yield schema.validate(model);
+                        validatedModel = (yield schema.validate(model));
                         validatedModel.setIsNewToFalse();
                         attributesBeforeReadOnly = validatedModel.attributes;
                         validatedModel.set("readOnly", "should not change to this!");
-                        validatedModel = yield schema["_enforceReadOnlyPaths"](model);
+                        validatedModel = (yield schema["_enforceReadOnlyPaths"](model));
                     }
                     catch (error) {
                         alsatian_1.Expect.fail("validation should not have failed");
@@ -148,7 +149,7 @@ let SchemaTest = class SchemaTest {
                     let schema = new schema_1.Schema(model.schema(), PrimitiveOnlyModel);
                     let validatedModel;
                     try {
-                        validatedModel = yield schema["_validateUniquePaths"](model);
+                        validatedModel = (yield schema["_validateUniquePaths"](model));
                     }
                     catch (error) {
                         alsatian_1.Expect(true).toBe(true);
@@ -177,7 +178,7 @@ let SchemaTest = class SchemaTest {
             });
             let schema = new schema_1.Schema(model.schema(), PrimitiveOnlyModel);
             model.attributes.readOnly = undefined;
-            model = yield schema["_assignDefaultValues"](model);
+            model = (yield schema["_assignDefaultValues"](model));
             alsatian_1.Expect(model.attributes.readOnly).toBe("testing");
             alsatian_1.Expect(model.attributes.defaultValueFromFunction).toBe("Testing value 123");
         });

@@ -1,5 +1,6 @@
 "use strict";
-const _ = require('lodash');
+Object.defineProperty(exports, "__esModule", { value: true });
+const _ = require("lodash");
 class QueryReader {
     static getQueryParams(settings, queryObj) {
         const maxLimit = settings.maxLimit();

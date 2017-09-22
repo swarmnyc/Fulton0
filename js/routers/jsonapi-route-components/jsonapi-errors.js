@@ -1,5 +1,6 @@
 "use strict";
-const model_1 = require('../../model');
+Object.defineProperty(exports, "__esModule", { value: true });
+const model_1 = require("../../model");
 function onRequestError(err) {
     let code;
     let mesg;

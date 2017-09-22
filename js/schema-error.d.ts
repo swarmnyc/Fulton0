@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export declare class ValidationError extends Error {
     path: string;
     value: any;
