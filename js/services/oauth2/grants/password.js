@@ -28,7 +28,7 @@ class PasswordGrantHandler extends base_1.BaseGrantHandler {
                 lib_1.errorHandler(ctx, 'bad request');
                 return;
             }
-            user = yield this.model.getUser(username, password);
+            user = yield this.model.getUser(username, password, ctx);
             if (!user) {
                 lib_1.errorHandler(ctx, 'unauthorized');
                 return;

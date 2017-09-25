@@ -13,7 +13,7 @@ class OAuth2PasswordModel extends base_1.OAuth2BaseModel {
     usernameField() {
         return 'username';
     }
-    getUser(username, password) {
+    getUser(username, password, ctx) {
         return __awaiter(this, void 0, void 0, function* () {
             return undefined;
         });

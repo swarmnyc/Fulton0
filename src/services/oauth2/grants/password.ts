@@ -27,7 +27,7 @@ export class PasswordGrantHandler extends BaseGrantHandler {
       return;
     }
 
-    user = await this.model.getUser(username, password);
+    user = await this.model.getUser(username, password, ctx);
     
     if (!user) {
       errorHandler(ctx, 'unauthorized');
