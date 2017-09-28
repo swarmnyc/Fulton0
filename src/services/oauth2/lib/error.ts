@@ -1,10 +1,12 @@
 import { Context } from 'koa';
 
 export function errorHandler(ctx: Context, mesg: string) {
-  const code = _getCode(mesg);
-  ctx.response.set('content-type', 'text/plain');
-  // TODO: Review this for later
-  return ctx.throw(code, JSON.stringify({ error: mesg }));
+    const code = _getCode(mesg);
+    // TODO: Review this for later
+    // CORS option should get from app, set to * for now.
+    const properties = {headers:{'access-control-allow-origin': '*'}};
+    const body = {errors: [{status: code, title: mesg}]};
+    return ctx.throw(code, JSON.stringify(body), properties);
 }
 
 function _getCode(mesg: string) {
