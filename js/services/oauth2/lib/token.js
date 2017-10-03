@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const _1 = require(".");
 const grants = require("../grants");
 function token(model, grants) {
     return function (ctx, next) {
@@ -17,7 +16,7 @@ function token(model, grants) {
             const grantType = _getGrantType(ctx);
             const client = yield _getClient(ctx, model);
             if (grants.indexOf(grantType) === -1) {
-                return _1.errorHandler(ctx, 'bad request');
+                return model.errorHandler(ctx, 'bad request');
             }
             ctx.state.oauth.client = client;
             switch (grantType) {

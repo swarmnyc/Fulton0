@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const lib_1 = require("../lib");
 const base_1 = require("./base");
 class PasswordGrantHandler extends base_1.BaseGrantHandler {
     constructor(model) {
@@ -25,12 +24,12 @@ class PasswordGrantHandler extends base_1.BaseGrantHandler {
             let token;
             ctx.state.oauth.scope = scope;
             if (!username || !password) {
-                lib_1.errorHandler(ctx, 'bad request');
+                this.model.errorHandler(ctx, 'bad request');
                 return;
             }
             user = yield this.model.getUser(username, password, ctx);
             if (!user) {
-                lib_1.errorHandler(ctx, 'unauthorized');
+                this.model.errorHandler(ctx, 'unauthorized');
                 return;
             }
             token = yield this.model.saveToken(user, ctx.state.oauth.client, scope);

@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require(".");
-const lib_1 = require("../lib");
 class AuthorizationCodeGrantHandler extends _1.BaseGrantHandler {
     constructor(model) {
         super();
@@ -19,21 +18,21 @@ class AuthorizationCodeGrantHandler extends _1.BaseGrantHandler {
         return __awaiter(this, void 0, void 0, function* () {
             const code = ctx.request['body']['code'];
             if (!code) {
-                return lib_1.errorHandler.call(ctx, 'bad request');
+                return this.model.errorHandler(ctx, 'bad request');
             }
             let user;
             try {
                 user = yield this.model.getUserFromCode(code, ctx);
             }
             catch (error) {
-                return lib_1.errorHandler.call(ctx, 'bad request');
+                return this.model.errorHandler(ctx, 'bad request', error);
             }
             let token;
             try {
                 token = yield this.model.getTokenForUser(user, ctx.state.oauth.client);
             }
             catch (error) {
-                return lib_1.errorHandler.call(ctx, 'bad request');
+                return this.model.errorHandler(ctx, 'bad request', error);
             }
             ctx.state.oauth.user = user;
             ctx.state.oauth.token = token;
@@ -43,7 +42,7 @@ class AuthorizationCodeGrantHandler extends _1.BaseGrantHandler {
                 clientId: token.client_id.toString(),
                 userId: token.user_id.toString()
             };
-            return true;
+            return;
         });
     }
 }
