@@ -1,7 +1,7 @@
 import { BaseGrantHandler } from '.';
 import { Context } from 'koa';
 import { OAuth2CodeModel } from '../models';
-import { OAuth2AuthorizationCode, OAuth2AccessToken, errorHandler } from '../lib';
+import { OAuth2AuthorizationCode, OAuth2AccessToken } from '../lib';
 
 export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
   model: OAuth2CodeModel
@@ -15,20 +15,20 @@ export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
     const code: string = ctx.request['body']['code'];
     
     if (!code) {
-      return errorHandler.call(ctx, 'bad request');
+      return this.model.errorHandler(ctx, 'bad request');
     }
     let user;
     try {
         user = await this.model.getUserFromCode(code, ctx)
     } catch(error) {
-        return errorHandler.call(ctx, 'bad request')
+        return this.model.errorHandler(ctx, 'bad request', error)
     }
 
     let token: OAuth2AccessToken;
     try {
         token = await this.model.getTokenForUser(user, ctx.state.oauth.client);
     } catch(error) {
-        return errorHandler.call(ctx, 'bad request')
+        return this.model.errorHandler(ctx, 'bad request', error)
     }
 
     ctx.state.oauth.user = user;
@@ -39,6 +39,6 @@ export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
         clientId: token.client_id.toString(),
         userId: token.user_id.toString()
     }
-    return true;
+    return;
   }
 }

@@ -1,5 +1,4 @@
 import { Request, Response, Context } from 'koa';
-import { errorHandler } from '.';
 import { OAuth2User, OAuth2Client, OAuth2AccessToken, OAuth2Scope, OAuth2AuthorizationCode } from '.';
 import * as models from '../models';
 import * as grants from '../grants';
@@ -11,7 +10,7 @@ export function token(model: models.OAuth2BaseModel, grants?: string[]): Functio
     const client = await _getClient(ctx, model);
 
     if (grants.indexOf(grantType) === -1) {
-      return errorHandler(ctx, 'bad request');
+      return model.errorHandler(ctx, 'bad request');
     }
 
     ctx.state.oauth.client = client;

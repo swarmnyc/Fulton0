@@ -12,24 +12,24 @@ export function authenticate(model: models.OAuth2BaseModel, scope?: string[]) {
     let isValidScope: boolean;
 
     if (!bearerToken) {
-      return oauth2lib.errorHandler(ctx, 'unauthorized');
+      return this.model.errorHandler(ctx, 'unauthorized');
     }
 
     token = await model.getAccessToken(bearerToken);
 
     if (!token) {
-      return oauth2lib.errorHandler(ctx, 'unauthorized');
+      return this.model.errorHandler(ctx, 'unauthorized');
     }
 
     isValidToken = _validateAccessToken(token);
     if (isValidToken === false) {
-      return oauth2lib.errorHandler(ctx, 'unauthorized');
+      return this.model.errorHandler(ctx, 'unauthorized');
     }
 
     if (scope) {
       isValidScope = await model.validateScope(token, scope);
       if (isValidScope === false) {
-        return oauth2lib.errorHandler(ctx, 'unauthorized');
+        return this.model.errorHandler(ctx, 'unauthorized');
       }
       ctx.set('X-Accepted-OAuth-Scopes', scope);
       ctx.set('X-OAuth-Scopes', token.scope);

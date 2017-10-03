@@ -1,5 +1,4 @@
 import { Request, Response, Context } from 'koa';
-import { errorHandler } from '../lib';
 import { OAuth2User, OAuth2Client, OAuth2AccessToken, OAuth2Scope, OAuth2AuthorizationCode } from '../lib';
 import * as models from '../models';
 import { BaseGrantHandler } from './base';
@@ -23,14 +22,14 @@ export class PasswordGrantHandler extends BaseGrantHandler {
     ctx.state.oauth.scope = scope;
 
     if (!username || !password) {
-      errorHandler(ctx, 'bad request');
+      this.model.errorHandler(ctx, 'bad request');
       return;
     }
 
     user = await this.model.getUser(username, password, ctx);
     
     if (!user) {
-      errorHandler(ctx, 'unauthorized');
+      this.model.errorHandler(ctx, 'unauthorized');
       return;
     }
 
