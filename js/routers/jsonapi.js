@@ -177,11 +177,11 @@ class JSONAPIRouter extends router_1.Router {
                         ids = [doc['relationships'][relPath].data.id];
                     }
                 }
-                if (ids.length) {
+                if (ids.length > 0) {
                     let relatedDocs = yield rel.Model.find({ _id: { $in: ids } });
                     if (relatedDocs.length) {
                         let jsondocs = _.map(relatedDocs, (doc) => {
-                            let newdoc = doc.toJSON;
+                            let newdoc = doc.toJSON();
                             newdoc = rel.Model.applyClientTransforms(ctx, newdoc);
                             return newdoc;
                         });
