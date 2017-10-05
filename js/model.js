@@ -60,6 +60,25 @@ class Model extends mongorito_1.Model {
     schema() {
         return undefined;
     }
+    static hideKeysFromClient(ctx) {
+        return [];
+    }
+    /*
+        For transforming the value of a key
+    */
+    static transformKeysForClient(ctx) {
+        return {};
+    }
+    static applyClientTransforms(ctx, doc) {
+        let newdoc = _.omit(doc, this.hideKeysFromClient(ctx));
+        let transforms = this.transformKeysForClient(ctx);
+        for (let key in transforms) {
+            if (typeof newdoc[key] !== "undefined") {
+                newdoc[key] = transforms[key](newdoc[key]);
+            }
+        }
+        return newdoc;
+    }
     static schema() {
         return new this().schema();
     }

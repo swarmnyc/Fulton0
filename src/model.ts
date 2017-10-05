@@ -4,7 +4,10 @@ import * as _ from 'lodash';
 import { ISchemaDefinition, Schema } from './schema';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
 import { ObjectID } from 'mongodb';
-
+import { Context } from 'koa'
+export interface KeyTransformDictionary {
+    [path: string]: (any) => any
+  }
 
 export class Model extends MongoritoModel {
   static ValidationError = ValidationError;
@@ -30,6 +33,28 @@ export class Model extends MongoritoModel {
    */
   schema(): ISchemaDefinition {
     return undefined;
+  }
+
+  static hideKeysFromClient(ctx: Context): string[] {
+	  return []
+  }
+  
+  /*
+	  For transforming the value of a key
+  */
+  static transformKeysForClient(ctx: Context): KeyTransformDictionary {
+	return {}
+  }
+
+  static applyClientTransforms(ctx: Context, doc: any): any {
+	let newdoc = _.omit(doc, this.hideKeysFromClient(ctx))
+	let transforms = this.transformKeysForClient(ctx)
+	for (let key in transforms) {
+		if (typeof newdoc[key] !== "undefined") {
+			newdoc[key] = transforms[key](newdoc[key])
+		}
+	}
+	return newdoc
   }
 
   static schema(): ISchemaDefinition {

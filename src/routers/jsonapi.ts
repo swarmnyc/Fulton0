@@ -166,7 +166,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     return pluralize(this.type(), 1);
   }
 
-  protected async _getIncludes(include: string, doc: JSONModel) {
+  protected async _getIncludes(include: string, doc: JSONModel, ctx: Context) {
     const relationships: RouterRelationship[] = this.relationships();
     let output: JSONModel[] = [];
     let matchedRelationships: RouterRelationship[];
@@ -177,6 +177,7 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
       return includes.indexOf(item.path) >= 0;
     });
     for (let rel of matchedRelationships) {
+	  let modelType = rel.Model
       let ids: string[] = [];
       let link: string = rel.link ? rel.link : `${this.namespace()}/${rel.type}`;
       let adapter = new JSONAPIAdapter({ type: rel.type, namespace: link, idPath: this.idPath() });
@@ -193,7 +194,11 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
       if (ids.length) {
         let relatedDocs = await rel.Model.find({ _id: { $in: ids }});
         if (relatedDocs.length) {
-          let jsondocs = _.invokeMap(relatedDocs, 'toJSON');
+          let jsondocs = _.map(relatedDocs, (doc) => {
+			  let newdoc = doc.toJSON
+			  newdoc = rel.Model.applyClientTransforms(ctx, newdoc)
+			  return newdoc
+		  });
           output.push(adapter.serialize(jsondocs).data);
         }
       }
@@ -547,9 +552,16 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
         Object.assign(output, { errors: ctx.state.errors });
       } else if (ctx.state.model) {
         if (Array.isArray(ctx.state.model)) {
-          Object.assign(output, serialize(_.invokeMap(ctx.state.model, 'toJSON')));
+			let models = _.map(ctx.state.model, (model) => {
+				let newmodel = (model as Model).toJSON()
+				newmodel = self.Model().applyClientTransforms(ctx, newmodel)
+				return newmodel
+			})
+          Object.assign(output, serialize(models));
         } else {
-          Object.assign(output, serialize(ctx.state.model.toJSON()));
+		  let model = ctx.state.model.toJSON()
+		  model = self.Model().applyClientTransforms(ctx, model)	
+          Object.assign(output, serialize(model));
         }
 
         if (ctx.state.query && ctx.state.query.page && ctx.state.query.page.offset && ctx.state.query.page.size && ctx.state.count) {
@@ -571,10 +583,10 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
           let p: Promise<JSONModel>[];
           if (Array.isArray(output.data)) {
             p = output.data.map((item) => {
-              return getIncludes.call(self, ctx.state.query.include, item);
+              return getIncludes.call(self, ctx.state.query.include, item, ctx);
             });
           } else {
-            p = [getIncludes.call(self, ctx.state.query.include, output.data)];
+            p = [getIncludes.call(self, ctx.state.query.include, output.data, ctx)];
           }
 
           await Promise.all(p).then((results) => {

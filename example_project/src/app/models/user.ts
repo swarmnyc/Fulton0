@@ -18,6 +18,18 @@ export class User extends Model implements OAuth2User {
     this.before('save', 'saltPasswordOnSave');
   }
 
+  static hideKeysFromClient(): string[] {
+	return ["secret"]
+  }
+
+  static transformKeysForClient() {
+	return {
+		"password": (password) => {
+			return true
+		}
+	}
+  }
+
   async saltPasswordOnSave(next: any) {
     if (this.isNew() || this.changed['password']) {
       const passwordHash = await hashPassword(this.get('password'));
@@ -26,6 +38,7 @@ export class User extends Model implements OAuth2User {
 
     await next;
   }
+  
 
   schema() {
     return {
