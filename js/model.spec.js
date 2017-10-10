@@ -16,16 +16,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const alsatian_1 = require("alsatian");
 const model_1 = require("./model");
+const schema_1 = require("./schema");
+const jsonapi_1 = require("./routers/jsonapi");
 var addTimestamps = true;
 class TestModel extends model_1.Model {
     timestamps() {
         return addTimestamps;
     }
     schema() {
-        return {};
+        return {
+            "testToOne": { type: schema_1.SchemaTypes.ToOne, ref: TestModel },
+            "testToTwo": { type: schema_1.SchemaTypes.ToMany, ref: TestModel }
+        };
     }
     concurrencyControl() {
         return true;
+    }
+    collection() {
+        return "test-model";
     }
     getHiddenSchema() {
         return this._schema;
@@ -100,6 +108,16 @@ let ModelTests = class ModelTests {
             alsatian_1.Expect(e).toBeDefined();
         });
     }
+    testRouterRelationship() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let routerRelationship = TestModel.routerRelationships();
+            alsatian_1.Expect(routerRelationship.length).toBe(2);
+            alsatian_1.Expect(routerRelationship[0].Model).toBe(TestModel);
+            alsatian_1.Expect(routerRelationship[0].path).toBe("testToOne");
+            alsatian_1.Expect(routerRelationship[0].relationshipType).toBe(jsonapi_1.RelationshipType.BELONGS_TO);
+            alsatian_1.Expect(routerRelationship[0].type).toBe((new TestModel()).collection());
+        });
+    }
 };
 __decorate([
     alsatian_1.TestCase(new TestModel({}))
@@ -122,6 +140,9 @@ __decorate([
 __decorate([
     alsatian_1.AsyncTest("Savimg Concurrency Controlled Model That Has Been Updated")
 ], ModelTests.prototype, "testSavingModelFail", null);
+__decorate([
+    alsatian_1.AsyncTest("Router relationship get sets up properly")
+], ModelTests.prototype, "testRouterRelationship", null);
 ModelTests = __decorate([
     alsatian_1.TestFixture("Test Models")
 ], ModelTests);

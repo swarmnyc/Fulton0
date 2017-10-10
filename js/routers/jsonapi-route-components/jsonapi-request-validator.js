@@ -37,7 +37,7 @@ class RequestValidator {
         attributes = _.mapValues(attributes, function (schemaKey) {
             return this.generateJoiValidationObjForSchemaType(schemaKey.type);
         }.bind(this));
-        let relationshipKeys = _.map(this.router.relationships(), function (relationship) {
+        let relationshipKeys = _.map(this.router.Model().routerRelationships(), function (relationship) {
             return relationship.path;
         });
         let relationships = _.pick(attributes, relationshipKeys);

@@ -96,15 +96,6 @@ class JSONAPIRouter extends router_1.Router {
         return '_id';
     }
     /**
-     * Define relationships belonging to the model in the form of an
-     * array of relationship definitions.
-     * @see {JSONAPIRouter#RouterRelationship}
-     * @returns {JSONAPIRouter#RouterRelationship[]}
-     */
-    relationships() {
-        return [];
-    }
-    /**
      * Array of path names to not be returned by the route
      *
      * @returns {string[]}
@@ -115,7 +106,8 @@ class JSONAPIRouter extends router_1.Router {
         return [];
     }
     adapterOptions() {
-        let relationships = this.relationships().map((relationship) => {
+        let routerRelationships = this.Model().routerRelationships();
+        let relationships = routerRelationships.map((relationship) => {
             return _.omit(relationship, 'Model');
         });
         return {
@@ -152,7 +144,8 @@ class JSONAPIRouter extends router_1.Router {
     }
     _getIncludes(include, doc, ctx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const relationships = this.relationships();
+            let routerRelationships = this.Model().routerRelationships();
+            const relationships = routerRelationships;
             let output = [];
             let matchedRelationships;
             let includes = include.split(',').map((pathName) => {
@@ -165,7 +158,8 @@ class JSONAPIRouter extends router_1.Router {
                 let modelType = rel.Model;
                 let ids = [];
                 let link = rel.link ? rel.link : `${this.namespace()}/${rel.type}`;
-                let adapter = new jsonapi_1.JSONAPIAdapter({ type: rel.type, namespace: link, idPath: this.idPath() });
+                let linkRelationships = rel.Model.routerRelationships();
+                let adapter = new jsonapi_1.JSONAPIAdapter({ relationships: linkRelationships, type: rel.type, namespace: link, idPath: this.idPath() });
                 let relPath = _.kebabCase(rel.path);
                 if (doc['relationships'] && doc['relationships'][relPath]) {
                     if (Array.isArray(doc['relationships'][relPath]['data'])) {

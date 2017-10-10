@@ -1,10 +1,12 @@
 import { Model as MongoritoModel } from 'mongorito';
 import { IAttributesHash } from 'mongorito';
 import * as _ from 'lodash';
-import { ISchemaDefinition, Schema } from './schema';
+import { ISchemaDefinition, Schema, SchemaTypes } from './schema';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
 import { ObjectID } from 'mongodb';
 import { Context } from 'koa'
+import { RouterRelationship, RelationshipType } from './routers/jsonapi';
+
 export interface KeyTransformDictionary {
     [path: string]: (any) => any
   }
@@ -33,6 +35,23 @@ export class Model extends MongoritoModel {
    */
   schema(): ISchemaDefinition {
     return undefined;
+  }
+
+  static routerRelationships(): RouterRelationship[] {
+	  let relationships: RouterRelationship[] = []
+	  let schema = this.schema()
+	  for (let key in schema) {
+		  let schemaObj = schema[key]
+		  if (SchemaTypes.isRef(schemaObj.type)) {
+			  relationships.push({
+				  type: (new schemaObj.ref()).collectionName,
+				  relationshipType: (schemaObj.type === SchemaTypes.ToMany) ? RelationshipType.TO_MANY : RelationshipType.BELONGS_TO,
+				  Model: schemaObj.ref,
+				  path: key
+			  })
+		  }
+	  }
+	  return relationships
   }
 
   static hideKeysFromClient(ctx: Context): string[] {

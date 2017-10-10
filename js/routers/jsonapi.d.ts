@@ -58,13 +58,6 @@ export declare class JSONAPIRouter extends Router implements ValidationPropertie
      */
     idPath(): string;
     /**
-     * Define relationships belonging to the model in the form of an
-     * array of relationship definitions.
-     * @see {JSONAPIRouter#RouterRelationship}
-     * @returns {JSONAPIRouter#RouterRelationship[]}
-     */
-    relationships(): RouterRelationship[];
-    /**
      * Array of path names to not be returned by the route
      *
      * @returns {string[]}

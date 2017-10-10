@@ -7,18 +7,8 @@ export class ArticleRouter extends JSONAPIRouter {
     return Article;
   }
 
-  type() {
-    return 'articles';
-  }
-
   auth() {
     return false
-  }
-
-  relationships(): RouterRelationship[] {
-    return [
-      { type: "users", path: "user", relationshipType: RelationshipType.BELONGS_TO , Model: User }
-    ]
   }
   
 }

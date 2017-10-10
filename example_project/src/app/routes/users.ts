@@ -9,10 +9,6 @@ export class UserRouter extends JSONAPIRouter {
     return User;
   }
 
-  type() {
-    return 'users';
-  }
-
   auth() {
     return authTokenMiddleware(['GET'])
   }

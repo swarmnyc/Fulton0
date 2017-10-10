@@ -1,5 +1,7 @@
 import { AsyncTest, Expect, Test, TestCase, TestFixture } from "alsatian";
 import { Model } from './model';
+import { SchemaTypes } from './schema';
+import { RouterRelationship, RelationshipType } from './routers/jsonapi';
 
 var addTimestamps = true
 
@@ -10,11 +12,16 @@ export class TestModel extends Model {
 
     schema() {
         return {
+			"testToOne":  { type: SchemaTypes.ToOne, ref: TestModel },
+			"testToTwo":  { type: SchemaTypes.ToMany, ref: TestModel }
         }
     }
     concurrencyControl() {
         return true
-    }
+	}
+	collection() {
+		return "test-model"
+	}
 
     getHiddenSchema() {
         return this._schema;
@@ -95,6 +102,16 @@ export class ModelTests {
             e = error
         }
         Expect(e).toBeDefined()
+	}
+	
+	@AsyncTest("Router relationship get sets up properly")
+    async testRouterRelationship() {
+		let routerRelationship = TestModel.routerRelationships()
+		Expect(routerRelationship.length).toBe(2)
+		Expect(routerRelationship[0].Model).toBe(TestModel)
+		Expect(routerRelationship[0].path).toBe("testToOne")
+		Expect(routerRelationship[0].relationshipType).toBe(RelationshipType.BELONGS_TO)
+		Expect(routerRelationship[0].type).toBe((new TestModel()).collection())
     }
 
    

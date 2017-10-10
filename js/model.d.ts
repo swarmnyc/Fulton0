@@ -4,6 +4,7 @@ import { ISchemaDefinition, Schema } from './schema';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
 import { ObjectID } from 'mongodb';
 import { Context } from 'koa';
+import { RouterRelationship } from './routers/jsonapi';
 export interface KeyTransformDictionary {
     [path: string]: (any) => any;
 }
@@ -24,6 +25,7 @@ export declare class Model extends MongoritoModel {
      * @memberOf Model
      */
     schema(): ISchemaDefinition;
+    static routerRelationships(): RouterRelationship[];
     static hideKeysFromClient(ctx: Context): string[];
     static transformKeysForClient(ctx: Context): KeyTransformDictionary;
     static applyClientTransforms(ctx: Context, doc: any): any;

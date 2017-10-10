@@ -106,16 +106,6 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
   }
 
   /**
-   * Define relationships belonging to the model in the form of an
-   * array of relationship definitions.
-   * @see {JSONAPIRouter#RouterRelationship}
-   * @returns {JSONAPIRouter#RouterRelationship[]}
-   */
-  relationships(): RouterRelationship[] {
-    return [];
-  }
-
-  /**
    * Array of path names to not be returned by the route
    * 
    * @returns {string[]}
@@ -127,7 +117,8 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
   }
 
   adapterOptions(): AdapterOptions {
-    let relationships: JSONAPIAdapterRelationship[] = this.relationships().map((relationship) => {
+	  let routerRelationships = this.Model().routerRelationships()
+    let relationships: JSONAPIAdapterRelationship[] = routerRelationships.map((relationship) => {
       return _.omit(relationship, 'Model');
     }) as RouterRelationship[];
     return {
@@ -167,7 +158,8 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
   }
 
   protected async _getIncludes(include: string, doc: JSONModel, ctx: Context) {
-    const relationships: RouterRelationship[] = this.relationships();
+	let routerRelationships = this.Model().routerRelationships()
+    const relationships: RouterRelationship[] = routerRelationships;
     let output: JSONModel[] = [];
     let matchedRelationships: RouterRelationship[];
     let includes: string[] = include.split(',').map((pathName: string) => {
@@ -179,8 +171,9 @@ export class JSONAPIRouter extends Router implements ValidationProperties, Query
     for (let rel of matchedRelationships) {
 	  let modelType = rel.Model
       let ids: string[] = [];
-      let link: string = rel.link ? rel.link : `${this.namespace()}/${rel.type}`;
-      let adapter = new JSONAPIAdapter({ type: rel.type, namespace: link, idPath: this.idPath() });
+	  let link: string = rel.link ? rel.link : `${this.namespace()}/${rel.type}`;
+	  let linkRelationships = rel.Model.routerRelationships();
+      let adapter = new JSONAPIAdapter({ relationships: linkRelationships, type: rel.type, namespace: link, idPath: this.idPath() });
       let relPath = _.kebabCase(rel.path);
       if (doc['relationships'] && doc['relationships'][relPath]) {
         if (Array.isArray(doc['relationships'][relPath]['data'])) {

@@ -13,6 +13,7 @@ const _ = require("lodash");
 const schema_1 = require("./schema");
 const schema_error_1 = require("./schema-error");
 const mongodb_1 = require("mongodb");
+const jsonapi_1 = require("./routers/jsonapi");
 class Model extends mongorito_1.Model {
     constructor(attr, opts) {
         super(attr, opts);
@@ -59,6 +60,22 @@ class Model extends mongorito_1.Model {
      */
     schema() {
         return undefined;
+    }
+    static routerRelationships() {
+        let relationships = [];
+        let schema = this.schema();
+        for (let key in schema) {
+            let schemaObj = schema[key];
+            if (schema_1.SchemaTypes.isRef(schemaObj.type)) {
+                relationships.push({
+                    type: (new schemaObj.ref()).collectionName,
+                    relationshipType: (schemaObj.type === schema_1.SchemaTypes.ToMany) ? jsonapi_1.RelationshipType.TO_MANY : jsonapi_1.RelationshipType.BELONGS_TO,
+                    Model: schemaObj.ref,
+                    path: key
+                });
+            }
+        }
+        return relationships;
     }
     static hideKeysFromClient(ctx) {
         return [];
