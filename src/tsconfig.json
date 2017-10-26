@@ -16,9 +16,6 @@
             "custom-types"
         ]
     },
-    "": [
-        ""
-    ],
     "exclude": [
         "example_project/**/*",
         "example_project",

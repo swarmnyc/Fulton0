@@ -20,6 +20,13 @@
   "author": "SWARM <hello@swarmnyc.com>",
   "license": "UNLICENSED",
   "dependencies": {
+    "@types/csv-parse": "^1.1.9",
+    "@types/dotenv": "2.0.20",
+    "@types/koa": "2.0.38",
+    "@types/koa-bodyparser": "3.0.23",
+    "@types/koa-router": "7.0.21",
+    "@types/mongodb": "^2.2.15",
+    "@types/node": "^8.0.47",
     "aws-sdk": "^2.95.0",
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "3.4.6",
@@ -57,13 +64,6 @@
     "winston": "2.3.0"
   },
   "devDependencies": {
-    "@types/csv-parse": "^1.1.9",
-    "@types/dotenv": "2.0.20",
-    "@types/koa": "2.0.38",
-    "@types/koa-bodyparser": "3.0.23",
-    "@types/koa-router": "7.0.21",
-    "@types/mongodb": "^2.2.15",
-    "@types/node": "^8.0.47",
     "alsatian": "^2.0.0",
     "copyfiles": "^1.2.0",
     "coveralls": "^2.13.1",
