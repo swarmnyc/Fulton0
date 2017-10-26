@@ -7,11 +7,10 @@
   "private": true,
   "scripts": {
     "prebuild": "rimraf build",
-    "test": "rm -r js || true && npm run build && alsatian \"./js/**/*.spec.js\"",
+    "test": "rm -rf js && npm run build && alsatian \"./js/**/*.spec.js\"",
     "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report --reporter=text-lcov | coveralls",
     "build": "tsc -p ./src",
-    "package": "rm -f docker/worker/app.package.tar.gz && rm -f docker/worker/package.json && rimraf build && tsc -p && cp package.json docker/worker/package.json && tar czf app.package.tar.gz build && mv app.package.tar.gz docker/worker/app.package.tar.gz && rimraf build",
     "clean": "rimraf build"
   },
   "repository": {
@@ -21,7 +20,6 @@
   "author": "SWARM <hello@swarmnyc.com>",
   "license": "UNLICENSED",
   "dependencies": {
-    "alsatian": "^2.0.0",
     "aws-sdk": "^2.95.0",
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "3.4.6",
@@ -49,7 +47,6 @@
     "mongodb": "2.2.11",
     "mongorito": "2.2.0",
     "nodemailer": "^4.0.1",
-    "nyc": "^11.2.1",
     "oauth2-server": "2.4.1",
     "qs": "6.4.0",
     "redis": "2.6.5",
@@ -67,13 +64,14 @@
     "@types/koa-router": "7.0.21",
     "@types/mongodb": "^2.2.15",
     "@types/node": "^8.0.47",
+    "alsatian": "^2.0.0",
     "copyfiles": "^1.2.0",
     "coveralls": "^2.13.1",
     "dotenv": "4.0.0",
+    "nyc": "^11.2.1",
     "faker": "3.1.0",
     "rimraf": "2.5.4",
     "sinon": "1.17.6",
-    "typescript": "2.5.2",
-    "typings": "2.0.0"
+    "typescript": "2.5.2"
   }
 }
