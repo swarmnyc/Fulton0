@@ -1,3 +1,4 @@
+import * as mongorito from 'mongorito';
 import { Service } from '../../service';
 export declare class BaseMongoDBService extends Service {
     uri: string;
@@ -26,6 +27,6 @@ export declare class BaseMongoDBService extends Service {
      * @memberOf BaseMongoDBService
      */
     as(): string;
-    init(): Promise<any>;
+    init(): Promise<typeof mongorito>;
     deinit(): Promise<void>;
 }

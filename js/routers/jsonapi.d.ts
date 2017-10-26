@@ -8,7 +8,8 @@ import { ValidationProperties } from './jsonapi-route-components/jsonapi-request
 import { QueryParams } from '../helpers/query/types';
 import { QueryParamSettings } from './jsonapi-route-components/jsonapi-query-reader';
 import { JSONModel } from './jsonapi-route-components/jsonapi-types';
-export declare class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
+export declare abstract class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
+    abstract relationships(): RouterRelationship[];
     name(): string;
     description(): string;
     isAPI(): boolean;
@@ -80,8 +81,8 @@ export declare class JSONAPIRouter extends Router implements ValidationPropertie
     count(query: QueryParams, ctx: Router.Context): Promise<any>;
     find(query: QueryParams, ctx: Router.Context): Promise<JSONModel[]>;
     findById(id: string, ctx: Router.Context): Promise<mongorito.Model>;
-    create(data: JSONModel, ctx: Router.Context): Promise<any>;
-    update(model: Model, payload: JSONModel, ctx: Router.Context): Promise<any>;
+    create(data: JSONModel, ctx: Router.Context): Promise<Model>;
+    update(model: Model, payload: JSONModel, ctx: Router.Context): Promise<Model>;
     remove(model: Model, ctx: Router.Context): Promise<boolean>;
     setHeaders(): Function;
     setupQuery(ctx: Router.Context): QueryParams;

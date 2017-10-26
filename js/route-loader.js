@@ -8,7 +8,7 @@ class RouteLoader {
     load(app) {
         const Routes = app.routers();
         Routes.forEach((Route) => {
-            const router = new Route(KoaRouter(), app);
+            const router = new Route(KoaRouter());
             app.register(router);
         });
         return;

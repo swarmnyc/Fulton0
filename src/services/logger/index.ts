@@ -2,18 +2,18 @@ import { Service } from '../../service';
 import * as winston from 'winston';
 import * as _ from 'lodash';
 
-interface TransportConfig {
+export interface TransportConfig {
     [TransportName: string]: TransportConfigOptions
 }
 
 // See https://github.com/winstonjs/winston/blob/master/docs/transports.md for options
-interface TransportConfigOptions {
+export interface TransportConfigOptions {
     enabled?: boolean
     level?: string
     [OptionName: string]: any
 }
 
-interface LoggerConfig {
+export interface LoggerConfig {
     handleExceptions?: boolean
     transports?: TransportConfig
 }

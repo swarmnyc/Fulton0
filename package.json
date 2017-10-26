@@ -10,7 +10,7 @@
     "test": "rm -r js || true && npm run build && alsatian \"./js/**/*.spec.js\"",
     "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report --reporter=text-lcov | coveralls",
-    "build": "tsc -p ./src || true",
+    "build": "tsc -p ./src",
     "package": "rm -f docker/worker/app.package.tar.gz && rm -f docker/worker/package.json && rimraf build && tsc -p && cp package.json docker/worker/package.json && tar czf app.package.tar.gz build && mv app.package.tar.gz docker/worker/app.package.tar.gz && rimraf build",
     "clean": "rimraf build"
   },
@@ -65,7 +65,8 @@
     "@types/koa": "2.0.38",
     "@types/koa-bodyparser": "3.0.23",
     "@types/koa-router": "7.0.21",
-    "@types/node": "^8.0.17",
+    "@types/mongodb": "^2.2.15",
+    "@types/node": "^8.0.47",
     "copyfiles": "^1.2.0",
     "coveralls": "^2.13.1",
     "dotenv": "4.0.0",
