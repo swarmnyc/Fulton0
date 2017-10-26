@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "A web app framework for koa written in typescript",
   "main": "js/index.js",
-  "typings": "js/index.d.ts",
+  "types": "js/index.d.ts",
   "private": true,
   "scripts": {
     "prebuild": "rimraf build",
