@@ -1,5 +1,5 @@
 import * as KoaRouter from 'koa-joi-router';
-import { Context } from 'Koa'
+import { Context } from 'koa'
 import * as mongorito from 'mongorito'
 import { Router, JoiRouterDefinition } from '../router';
 import { Model } from '../model';
