@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/// <reference path="./custom-types/mongorito.d.ts" />
 const mongorito_1 = require("mongorito");
 const _ = require("lodash");
 const schema_1 = require("./schema");

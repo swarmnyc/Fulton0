@@ -10,11 +10,7 @@
         "rootDir": "./",
         "removeComments": false,
         "experimentalDecorators": true,
-        "allowJs": false,
-        "typeRoots": [
-            "../node_modules/@types",
-            "custom-types"
-        ]
+        "allowJs": false
     },
     "exclude": [
         "example_project/**/*",

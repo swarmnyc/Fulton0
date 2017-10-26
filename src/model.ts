@@ -1,3 +1,4 @@
+/// <reference path="./custom-types/mongorito.d.ts" />
 import { Model as MongoritoModel } from 'mongorito';
 import { IAttributesHash } from 'mongorito';
 import * as _ from 'lodash';
