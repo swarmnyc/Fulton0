@@ -6,7 +6,6 @@
   "typings": "js/index.d.ts",
   "private": true,
   "scripts": {
-    "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
     "test": "rm -r js || true && npm run build && alsatian \"./js/**/*.spec.js\"",
     "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
@@ -58,7 +57,6 @@
     "request-promise": "^4.1.1",
     "request-promise-native": "1.0.3",
     "source-map-support": "0.4.6",
-    "typescript": "^2.5.2",
     "winston": "2.3.0"
   },
   "devDependencies": {

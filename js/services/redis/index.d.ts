@@ -6,6 +6,6 @@ export declare class BaseRedisService extends Service {
     instance: RedisClient;
     as(): string;
     onError(e: Error): void;
-    init(): Promise<RedisClient>;
+    init(): Promise<any>;
     deinit(): Promise<void>;
 }

@@ -1,3 +1,4 @@
+/// <reference types="koa" />
 import { OAuth2BaseModel } from './base';
 import { OAuth2User } from '../lib';
 import { Context } from 'koa';

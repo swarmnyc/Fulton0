@@ -1,3 +1,4 @@
+/// <reference types="koa" />
 import { BaseGrantHandler } from '.';
 import { Context } from 'koa';
 import { OAuth2ClientModel } from '../models';

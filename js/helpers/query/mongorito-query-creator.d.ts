@@ -2,10 +2,9 @@ import { IQueryObject } from './types';
 import { Model as MongoritoModel } from 'mongorito';
 import { Model } from '../..';
 import { ISchemaDefinition } from '../..';
-import { ObjectID } from 'mongodb';
 export default class MongoritoQueryCreator {
     static straightReturn: (value: any) => any;
-    static ObjectIDCreator: (value: any) => ObjectID;
+    static ObjectIDCreator: (value: any) => any;
     static booleanCheck: (value: any) => boolean;
     static createModelQuery(query: IQueryObject, model: typeof Model): typeof MongoritoModel;
     query: IQueryObject;

@@ -7,7 +7,6 @@
   "private": true,
   "scripts": {
     "start": "node --inspect=0.0.0.0:5858 build/main.js",
-    "postinstall": "cd src && typings install",
     "prebuild": "rimraf build",
     "test": "rm -r build || true && npm run build && alsatian \"./build/**/*.spec.js\"",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report",

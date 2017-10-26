@@ -1,8 +1,8 @@
+/// <reference types="koa" />
 import { Model as MongoritoModel } from 'mongorito';
 import { IAttributesHash } from 'mongorito';
 import { ISchemaDefinition, Schema } from './schema';
 import { ValidationError, UniqueError, RequiredError } from './schema-error';
-import { ObjectID } from 'mongodb';
 import { Context } from 'koa';
 import { RouterRelationship } from './routers/jsonapi';
 export interface KeyTransformDictionary {
@@ -12,11 +12,11 @@ export declare class Model extends MongoritoModel {
     static ValidationError: typeof ValidationError;
     static UniqueError: typeof UniqueError;
     static RequiredError: typeof RequiredError;
-    static ObjectID: typeof ObjectID;
+    static ObjectID: any;
     static appliedIndex: boolean;
     static versionKey: string;
     collectionName: string;
-    readonly changedKeys: {};
+    readonly changedKeys: any;
     /**
      * Define a schema for your model here.
      *

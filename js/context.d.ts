@@ -1,3 +1,4 @@
+/// <reference types="koa" />
 import { BaseContext as KoaBaseContext, Context as KoaContext } from 'koa';
 export interface Context extends KoaContext {
     params?: any;
