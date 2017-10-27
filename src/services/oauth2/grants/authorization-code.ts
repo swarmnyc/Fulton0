@@ -35,7 +35,7 @@ export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
     ctx.state.oauth.token = token;
     ctx.state.oauth.accessToken = {
         accessToken: token.access_token.toString(),
-        accessTokenExpiresOn: token.accessTokenExpiresOn,
+        accessTokenExpiresOn: token.access_token_expires_on,
         clientId: token.client_id.toString(),
         userId: token.user_id.toString()
     }

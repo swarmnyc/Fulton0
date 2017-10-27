@@ -116,7 +116,7 @@ export class App extends EventEmitter {
    * 
    * @memberOf App
    */
-  listener(): Function {
+  listener(): (...args: any[]) => void {
     return this.app.callback();
   }
 

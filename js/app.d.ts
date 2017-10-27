@@ -71,7 +71,7 @@ export declare class App extends EventEmitter {
      *
      * @memberOf App
      */
-    listener(): Function;
+    listener(): (...args: any[]) => void;
     /**
      * Event fired after init() is called. Replace with your own function
      * to fire an event after the app is ready

@@ -64,6 +64,6 @@ function _getTokenFromRequest(ctx) {
     return token;
 }
 function _validateAccessToken(token) {
-    return (moment(token.accessTokenExpiresOn).isAfter(moment()));
+    return (moment(token.access_token_expires_on).isAfter(moment()));
 }
 //# sourceMappingURL=authenticate.js.map

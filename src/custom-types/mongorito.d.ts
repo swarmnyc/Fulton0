@@ -114,6 +114,7 @@ declare module "mongorito" {
             static findById<T extends Model>(id: string): Promise<T>
             static update(query: IQuery, update: IUpdateObject, options?: IUpdateOptions): Promise<IResultsObject>
             static remove(query?: IQuery): Promise<IResultsObject>
+            static aggregate(pipeline?: any[]): Promise<any>
           }
     
           
