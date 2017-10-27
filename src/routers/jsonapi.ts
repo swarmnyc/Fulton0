@@ -18,7 +18,9 @@ import { JSONAPIRelationshipData, JSONAPIRelationship, JSONAPIRelationships, JSO
 const { Joi } = KoaRouter;
 
 export abstract class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
-  abstract relationships(): RouterRelationship[];
+  relationships(): RouterRelationship[]{
+    return [];
+  }
 
   name(): string {
     return _.startCase(this.type());
