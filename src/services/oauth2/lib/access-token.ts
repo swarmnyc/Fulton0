@@ -1,7 +1,7 @@
 export interface OAuth2AccessToken {
   access_token: string
   refresh_token?: string
-  accessTokenExpiresOn: Date
+  access_token_expires_on: Date
   refresh_token_expires_on?: Date
   client_id: string
   scope?: string[]  

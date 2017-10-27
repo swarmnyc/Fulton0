@@ -1,5 +1,5 @@
 import * as KoaRouter from 'koa-joi-router';
-import { Context } from 'Koa'
+import { Context } from 'koa'
 import * as mongorito from 'mongorito'
 import { Router, JoiRouterDefinition } from '../router';
 import { Model } from '../model';
@@ -17,7 +17,10 @@ import { onRequestError } from './jsonapi-route-components/jsonapi-errors';
 import { JSONAPIRelationshipData, JSONAPIRelationship, JSONAPIRelationships, JSONModel, JSONAPILinksObject, JSONAPIErrorSource, JSONAPIError, JSONAPIVersion, JSONAPIResponse} from './jsonapi-route-components/jsonapi-types';
 const { Joi } = KoaRouter;
 
-export class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
+export abstract class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
+  relationships(): RouterRelationship[]{
+    return [];
+  }
 
   name(): string {
     return _.startCase(this.type());

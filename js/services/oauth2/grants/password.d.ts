@@ -1,3 +1,4 @@
+/// <reference types="koa" />
 import { Context } from 'koa';
 import * as models from '../models';
 import { BaseGrantHandler } from './base';

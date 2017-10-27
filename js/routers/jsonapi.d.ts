@@ -1,5 +1,5 @@
 /// <reference types="koa" />
-import { Context } from 'Koa';
+import { Context } from 'koa';
 import * as mongorito from 'mongorito';
 import { Router, JoiRouterDefinition } from '../router';
 import { Model } from '../model';
@@ -8,7 +8,8 @@ import { ValidationProperties } from './jsonapi-route-components/jsonapi-request
 import { QueryParams } from '../helpers/query/types';
 import { QueryParamSettings } from './jsonapi-route-components/jsonapi-query-reader';
 import { JSONModel } from './jsonapi-route-components/jsonapi-types';
-export declare class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
+export declare abstract class JSONAPIRouter extends Router implements ValidationProperties, QueryParamSettings {
+    relationships(): RouterRelationship[];
     name(): string;
     description(): string;
     isAPI(): boolean;
@@ -76,7 +77,7 @@ export declare class JSONAPIRouter extends Router implements ValidationPropertie
     adapter(): JSONAPIAdapter;
     private _generatePaginationLinks(offset, count, limit);
     protected singularType(): any;
-    protected _getIncludes(include: string, doc: JSONModel, ctx: Context): Promise<any[]>;
+    protected _getIncludes(include: string, doc: JSONModel, ctx: Context): Promise<any>;
     count(query: QueryParams, ctx: Router.Context): Promise<any>;
     find(query: QueryParams, ctx: Router.Context): Promise<JSONModel[]>;
     findById(id: string, ctx: Router.Context): Promise<mongorito.Model>;

@@ -1,3 +1,5 @@
+/// <reference path="../src/custom-types/mongorito.d.ts" />
+/// <reference types="koa" />
 import { Model as MongoritoModel } from 'mongorito';
 import { IAttributesHash } from 'mongorito';
 import { ISchemaDefinition, Schema } from './schema';
@@ -16,7 +18,7 @@ export declare class Model extends MongoritoModel {
     static appliedIndex: boolean;
     static versionKey: string;
     collectionName: string;
-    readonly changedKeys: {};
+    readonly changedKeys: any;
     /**
      * Define a schema for your model here.
      *

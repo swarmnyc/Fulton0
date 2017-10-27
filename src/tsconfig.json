@@ -10,7 +10,7 @@
         "rootDir": "./",
         "removeComments": false,
         "experimentalDecorators": true,
-        "allowJs": true
+        "allowJs": false
     },
     "exclude": [
         "example_project/**/*",

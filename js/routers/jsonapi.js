@@ -21,6 +21,9 @@ const jsonapi_query_reader_1 = require("./jsonapi-route-components/jsonapi-query
 const jsonapi_errors_1 = require("./jsonapi-route-components/jsonapi-errors");
 const { Joi } = KoaRouter;
 class JSONAPIRouter extends router_1.Router {
+    relationships() {
+        return [];
+    }
     name() {
         return _.startCase(this.type());
     }

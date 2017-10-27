@@ -1,7 +1,8 @@
+/// <reference types="koa" />
 import { OAuth2AccessToken, OAuth2Client, OAuth2User, OAuth2Scope } from '../lib';
 import { Context } from 'koa';
 export declare class OAuth2BaseModel {
-    errorHandler(ctx: Context, mesg: string, err?: Error): void;
+    errorHandler(ctx: Context, mesg: string, err?: Error): never;
     _getCode(mesg: string): number;
     getAccessToken(token: string): Promise<OAuth2AccessToken>;
     getClient(id: string, secret: string): Promise<OAuth2Client>;

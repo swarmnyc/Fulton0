@@ -31,7 +31,7 @@ export class OAuth2Server {
       return token(model, this.grants);
     }
 
-    authenticate(scope?: string[]) {
+    authenticate(scope?: string[]) : Function {
       const model = new this.model();
       return authenticate(model, scope);
     }

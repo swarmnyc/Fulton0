@@ -1,3 +1,5 @@
+/// <reference types="koa" />
+/// <reference types="koa-bodyparser" />
 import { Request, Response, Context } from 'koa';
 export declare class OAuth2RequestHandler {
     request: Request;

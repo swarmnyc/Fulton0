@@ -1,4 +1,6 @@
 /// <reference types="node" />
+/// <reference types="koa" />
+/// <reference types="koa-bodyparser" />
 import * as Koa from 'koa';
 import * as KoaRouter from 'koa-joi-router';
 import { Router } from './router';
@@ -69,7 +71,7 @@ export declare class App extends EventEmitter {
      *
      * @memberOf App
      */
-    listener(): Function;
+    listener(): (...args: any[]) => void;
     /**
      * Event fired after init() is called. Replace with your own function
      * to fire an event after the app is ready
@@ -113,7 +115,7 @@ export declare class App extends EventEmitter {
      *
      * @memberOf App
      */
-    get(key: string): {};
+    get(key: string): any;
     register(router: Router): void;
     apiGroups(): APIRouter[];
     customSetUp(app: Koa): Promise<void>;

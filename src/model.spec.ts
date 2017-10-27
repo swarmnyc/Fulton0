@@ -1,6 +1,6 @@
 import { AsyncTest, Expect, Test, TestCase, TestFixture } from "alsatian";
 import { Model } from './model';
-import { SchemaTypes } from './schema';
+import { SchemaTypes, Schema } from './schema';
 import { RouterRelationship, RelationshipType } from './routers/jsonapi';
 
 var addTimestamps = true
@@ -23,7 +23,7 @@ export class TestModel extends Model {
 		return "test-model"
 	}
 
-    getHiddenSchema() {
+    getHiddenSchema() : Schema {
         return this._schema;
     }
     callUpdateHook() {
