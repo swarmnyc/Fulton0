@@ -63,5 +63,5 @@ function _getTokenFromRequest(ctx: Context): string {
 }
 
 function _validateAccessToken(token: oauth2lib.OAuth2AccessToken) {
-  return (moment(token.access_token_expires_on).isAfter(moment()));
+  return (moment(token.accessTokenExpiresOn).isAfter(moment()));
 }

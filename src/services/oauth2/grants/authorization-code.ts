@@ -34,10 +34,10 @@ export class AuthorizationCodeGrantHandler extends BaseGrantHandler {
     ctx.state.oauth.user = user;
     ctx.state.oauth.token = token;
     ctx.state.oauth.accessToken = {
-        accessToken: token.access_token.toString(),
-        accessTokenExpiresOn: token.access_token_expires_on,
-        clientId: token.client_id.toString(),
-        userId: token.user_id.toString()
+        accessToken: token.accessToken.toString(),
+        accessTokenExpiresOn: token.accessTokenExpiresOn,
+        clientId: token.clientId.toString(),
+        userId: token.userId.toString()
     }
     return;
   }
