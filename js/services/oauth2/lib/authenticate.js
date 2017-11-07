@@ -18,20 +18,20 @@ function authenticate(model, scope) {
             let isValidToken;
             let isValidScope;
             if (!bearerToken) {
-                return this.model.errorHandler(ctx, 'unauthorized');
+                return model.errorHandler(ctx, 'unauthorized');
             }
             token = yield model.getAccessToken(bearerToken);
             if (!token) {
-                return this.model.errorHandler(ctx, 'unauthorized');
+                return model.errorHandler(ctx, 'unauthorized');
             }
             isValidToken = _validateAccessToken(token);
             if (isValidToken === false) {
-                return this.model.errorHandler(ctx, 'unauthorized');
+                return model.errorHandler(ctx, 'unauthorized');
             }
             if (scope) {
                 isValidScope = yield model.validateScope(token, scope);
                 if (isValidScope === false) {
-                    return this.model.errorHandler(ctx, 'unauthorized');
+                    return model.errorHandler(ctx, 'unauthorized');
                 }
                 ctx.set('X-Accepted-OAuth-Scopes', scope);
                 ctx.set('X-OAuth-Scopes', token.scope);
