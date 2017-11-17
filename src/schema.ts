@@ -36,6 +36,12 @@ export class SchemaTypes {
   static isBoolean(type: String) {
     return type == SchemaTypes.Boolean || type == SchemaTypes.BooleanArray
   }
+
+  static Object = "object"
+  static ObjectArray = "object[]"
+  static isObject(type: String) {
+    return type == SchemaTypes.Object || type == SchemaTypes.ObjectArray
+  }
 }
 
 export interface ISchemaPathDefinition {
@@ -249,7 +255,7 @@ export class Schema {
       let value = obj[schemaPath.pathName];
 
       if (schemaPathType === 'any' || schemaPathType === 'object') { 
-        return;
+        newObj[schemaPath.pathName] = value;
       }
 
       if (_.isNil(value)) {

@@ -32,6 +32,9 @@ class SchemaTypes {
     static isBoolean(type) {
         return type == SchemaTypes.Boolean || type == SchemaTypes.BooleanArray;
     }
+    static isObject(type) {
+        return type == SchemaTypes.Object || type == SchemaTypes.ObjectArray;
+    }
 }
 SchemaTypes.ToOne = "ObjectId";
 SchemaTypes.ToMany = "ObjectId[]";
@@ -43,6 +46,8 @@ SchemaTypes.Date = "date";
 SchemaTypes.DateArray = "date[]";
 SchemaTypes.Boolean = "boolean";
 SchemaTypes.BooleanArray = "boolean[]";
+SchemaTypes.Object = "object";
+SchemaTypes.ObjectArray = "object[]";
 exports.SchemaTypes = SchemaTypes;
 class Schema {
     constructor(def, Model) {
@@ -211,7 +216,7 @@ class Schema {
             let schemaPathType = isArray ? schemaPath.type.slice(0, -2) : schemaPath.type;
             let value = obj[schemaPath.pathName];
             if (schemaPathType === 'any' || schemaPathType === 'object') {
-                return;
+                newObj[schemaPath.pathName] = value;
             }
             if (_.isNil(value)) {
                 newObj[schemaPath.pathName] = null;

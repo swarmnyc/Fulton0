@@ -109,4 +109,8 @@ export class SchemaFormatter {
         }
         return makeBoolean(value);
       }
+
+      static object(value, schemaPath) {
+        return value;
+      }
 }

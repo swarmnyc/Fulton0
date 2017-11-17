@@ -1,6 +1,6 @@
 {
   "name": "fulton",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "description": "A web app framework for koa written in typescript",
   "main": "js/index.js",
   "types": "js/index.d.ts",
@@ -25,6 +25,7 @@
     "@types/koa": "2.0.38",
     "@types/koa-bodyparser": "3.0.23",
     "@types/koa-router": "7.0.21",
+    "@types/lodash": "^4.14.85",
     "@types/moment": "^2.13.0",
     "@types/mongodb": "^2.2.15",
     "@types/node": "^8.0.47",

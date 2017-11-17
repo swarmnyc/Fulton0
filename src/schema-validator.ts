@@ -31,6 +31,10 @@ export class SchemaValidator {
         return validateObjectId(value);
       }
 
+      static object(value, schemaPath) {
+        return;
+      }
+
       static string(value, schemaPath) {
         var validateString = function(value) {
           if (typeof value !== "string") {

@@ -105,6 +105,9 @@ class SchemaFormatter {
         }
         return makeBoolean(value);
     }
+    static object(value, schemaPath) {
+        return value;
+    }
 }
 exports.SchemaFormatter = SchemaFormatter;
 //# sourceMappingURL=schema-formatter.js.map

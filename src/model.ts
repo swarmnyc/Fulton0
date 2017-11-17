@@ -21,7 +21,7 @@ export class Model extends MongoritoModel {
   static versionKey: string = "version"
   collectionName: string;
 
-  get changedKeys() {
+  get changedKeys() : any {
     let changedKeys = this.changed;
     return _.omitBy(changedKeys, function(value) {
       return value === false;

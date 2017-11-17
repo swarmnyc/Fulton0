@@ -61,6 +61,8 @@ class RequestValidator {
                 return joi.number();
             case schema_1.SchemaTypes.String:
                 return joi.string();
+            case schema_1.SchemaTypes.Object:
+                return joi.object();
             case schema_1.SchemaTypes.ToOne:
                 return joi.object().keys({
                     data: joi.object().keys({

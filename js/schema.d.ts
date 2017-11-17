@@ -17,6 +17,9 @@ export declare class SchemaTypes {
     static Boolean: string;
     static BooleanArray: string;
     static isBoolean(type: String): boolean;
+    static Object: string;
+    static ObjectArray: string;
+    static isObject(type: String): boolean;
 }
 export interface ISchemaPathDefinition {
     type: string;
