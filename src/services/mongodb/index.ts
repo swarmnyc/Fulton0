@@ -46,8 +46,7 @@ export class BaseMongoDBService extends Service {
 
   async init() {
     const instance = mongorito;
-    var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } }, 
-                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };
+    var options = { keepAlive: 300000, connectTimeoutMS: 30000, reconnectTries: Number.MAX_SAFE_INTEGER };
     await instance.connect(this.mongoUri(), options);
     mongorito.db.on('error', console.error.bind(console, 'connection error:'));
     return mongorito;
