@@ -61,8 +61,7 @@ class BaseMongoDBService extends service_1.Service {
     init() {
         return __awaiter(this, void 0, void 0, function* () {
             const instance = mongorito;
-            var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
-                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } } };
+            var options = { keepAlive: 300000, connectTimeoutMS: 30000, reconnectTries: Number.MAX_SAFE_INTEGER };
             yield instance.connect(this.mongoUri(), options);
             mongorito.db.on('error', console.error.bind(console, 'connection error:'));
             return mongorito;
