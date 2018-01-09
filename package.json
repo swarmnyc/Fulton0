@@ -8,6 +8,7 @@
   "scripts": {
     "prebuild": "rimraf build",
     "test": "rm -rf js && npm run build && alsatian \"./js/**/*.spec.js\"",
+    "coverage": "nyc --reporter=lcov --reporter=teamcity npm run test",
     "check-coverage-local": "nyc --reporter=lcov --reporter=html npm run test && nyc report",
     "check-coverage": "nyc --reporter=lcov --reporter=html npm run test && nyc report --reporter=text-lcov | coveralls",
     "build": "tsc -p ./src",
